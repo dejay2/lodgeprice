@@ -9,6 +9,7 @@ import Settings from '@/pages/Settings'
 import NotFound from '@/pages/NotFound'
 import { TestPricing } from '@/pages/TestPricing'
 import PropertySelectionDemo from '@/pages/PropertySelectionDemo'
+import PricingCalendarDemo from '@/pages/PricingCalendarDemo'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                 <Route path="settings" element={<Settings />} />
                 <Route path="test" element={<TestPricing />} />
                 <Route path="property-selection-demo" element={<PropertySelectionDemo />} />
+                <Route path="pricing-calendar-demo" element={<PricingCalendarDemo />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

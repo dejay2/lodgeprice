@@ -1,392 +1,348 @@
 /**
- * PricingCalendarGrid - Calendar display with pricing data
- * Renders a month view with navigation and interactive cells
+ * PricingCalendarGrid - React Calendar with Pricing Display
+ * Implements react-calendar with custom tileContent for pricing as per PRP-10
+ * Integrates with calculate_final_price and preview_pricing_calendar database functions
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { usePricingContext } from '@/context/PricingContext'
-import { usePricingCalculation } from '@/hooks/usePricingCalculation'
-import CalendarCell from './CalendarCell'
-import type { CalculateFinalPriceReturn } from '@/types/helpers'
-import type { PricingCalendarGridProps } from '@/types/pricing'
+import React, { useState, useEffect, useCallback } from 'react'
+import Calendar from 'react-calendar'
+import { supabase, withRetry, handleSupabaseError } from '@/lib/supabase'
+import PricingTile from './PricingTile'
+import StayLengthSelector from './StayLengthSelector'
+import PricingLegend from './PricingLegend'
+import { PropertySelection } from './PropertySelection'
+import type {
+  PricingCalendarGridProps,
+  CalculateFinalPriceResult,
+  PreviewPricingCalendarResult,
+  CalendarLoadingState,
+  CalendarValue
+} from '@/types/pricing-calendar.types'
+import './PricingCalendarGrid.css'
 
 /**
- * Calendar header with month/year navigation
+ * Calendar Controls Component
+ * Property selection and stay length controls as per PRP-10 architecture
  */
-interface CalendarHeaderProps {
-  currentMonth: Date
-  onMonthChange: (month: Date) => void
-  onTodayClick: () => void
+interface CalendarControlsComponentProps {
+  propertyId: string
+  selectedStayLength: number
+  onPropertyChange: (propertyId: string) => void
+  onStayLengthChange: (nights: number) => void
 }
 
-const CalendarHeader: React.FC<CalendarHeaderProps> = ({ 
-  currentMonth, 
-  onMonthChange, 
-  onTodayClick 
+const CalendarControlsComponent: React.FC<CalendarControlsComponentProps> = ({
+  propertyId,
+  selectedStayLength,
+  onPropertyChange,
+  onStayLengthChange
 }) => {
-  const monthYear = currentMonth.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric' 
-  })
-  
-  const handlePrevMonth = () => {
-    const newMonth = new Date(currentMonth)
-    newMonth.setMonth(newMonth.getMonth() - 1)
-    onMonthChange(newMonth)
-  }
-  
-  const handleNextMonth = () => {
-    const newMonth = new Date(currentMonth)
-    newMonth.setMonth(newMonth.getMonth() + 1)
-    onMonthChange(newMonth)
-  }
-  
-  const handlePrevYear = () => {
-    const newMonth = new Date(currentMonth)
-    newMonth.setFullYear(newMonth.getFullYear() - 1)
-    onMonthChange(newMonth)
-  }
-  
-  const handleNextYear = () => {
-    const newMonth = new Date(currentMonth)
-    newMonth.setFullYear(newMonth.getFullYear() + 1)
-    onMonthChange(newMonth)
-  }
-  
   return (
-    <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
-      <div className="btn-group" role="group">
-        <button 
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handlePrevYear}
-          title="Previous year"
-        >
-          &lt;&lt;
-        </button>
-        <button 
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handlePrevMonth}
-          title="Previous month"
-        >
-          &lt;
-        </button>
-      </div>
-      
-      <div className="d-flex align-items-center gap-3">
-        <h3 className="h5 mb-0">{monthYear}</h3>
-        <button 
-          className="btn btn-outline-primary btn-sm"
-          onClick={onTodayClick}
-        >
-          Today
-        </button>
-      </div>
-      
-      <div className="btn-group" role="group">
-        <button 
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handleNextMonth}
-          title="Next month"
-        >
-          &gt;
-        </button>
-        <button 
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handleNextYear}
-          title="Next year"
-        >
-          &gt;&gt;
-        </button>
+    <div className="calendar-controls">
+      <div className="row g-3">
+        <div className="col-md-6">
+          <PropertySelection
+            value={propertyId}
+            onChange={(newPropertyId, _property) => onPropertyChange(newPropertyId)}
+          />
+        </div>
+        <div className="col-md-6">
+          <StayLengthSelector
+            selectedLength={selectedStayLength}
+            onLengthChange={onStayLengthChange}
+            availableLengths={[1, 2, 3, 4, 5, 6, 7, 14, 21, 30]}
+          />
+        </div>
       </div>
     </div>
   )
 }
 
-/**
- * Calendar controls for view options
- */
-interface CalendarControlsProps {
-  highlightDiscounts: boolean
-  showSeasonalAdjustments: boolean
-  onHighlightChange: (value: boolean) => void
-  onSeasonalChange: (value: boolean) => void
-}
-
-const CalendarControls: React.FC<CalendarControlsProps> = ({
-  highlightDiscounts,
-  showSeasonalAdjustments,
-  onHighlightChange,
-  onSeasonalChange
-}) => {
-  return (
-    <div className="calendar-controls d-flex gap-3 mb-3">
-      <div className="form-check">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="highlight-discounts"
-          checked={highlightDiscounts}
-          onChange={(e) => onHighlightChange(e.target.checked)}
-        />
-        <label className="form-check-label" htmlFor="highlight-discounts">
-          Highlight discounts
-        </label>
-      </div>
-      <div className="form-check">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="show-seasonal"
-          checked={showSeasonalAdjustments}
-          onChange={(e) => onSeasonalChange(e.target.checked)}
-        />
-        <label className="form-check-label" htmlFor="show-seasonal">
-          Show seasonal adjustments
-        </label>
-      </div>
-    </div>
-  )
-}
 
 /**
- * Main PricingCalendarGrid component
+ * Main PricingCalendarGrid component using react-calendar
+ * Implements all PRP-10 requirements with database integration
  */
 const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
-  propertyId,
-  dateRange,
-  nights,
-  onPriceClick,
-  onPriceEdit,
-  editable = false,
-  highlightDiscounts: initialHighlight = true,
-  showSeasonalAdjustments: initialSeasonal = true
+  propertyId: initialPropertyId,
+  selectedStayLength: initialStayLength = 3,
+  onPropertyChange,
+  onStayLengthChange,
+  onDateClick,
+  className = ''
 }) => {
-  const { calendarData, loading: contextLoading } = usePricingContext()
-  const { calculateBulk, loading: calcLoading, error } = usePricingCalculation()
-  
-  // Set initial month based on date range or default to current month
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    if (dateRange?.start) {
-      return new Date(dateRange.start.getFullYear(), dateRange.start.getMonth(), 1)
-    }
-    const today = new Date()
-    return new Date(today.getFullYear(), today.getMonth(), 1)
+  // Component state
+  const [propertyId, setPropertyId] = useState(initialPropertyId)
+  const [selectedStayLength, setSelectedStayLength] = useState(initialStayLength)
+  const [calendarValue, setCalendarValue] = useState<CalendarValue>(new Date())
+  const [pricingData, setPricingData] = useState<Map<string, CalculateFinalPriceResult>>(new Map())
+  const [loadingState, setLoadingState] = useState<CalendarLoadingState>({
+    isLoadingPrices: false,
+    isLoadingProperty: false,
+    isChangingStayLength: false,
+    error: null
   })
   
-  const [highlightDiscounts, setHighlightDiscounts] = useState(initialHighlight)
-  const [showSeasonalAdjustments, setShowSeasonalAdjustments] = useState(initialSeasonal)
-  const [monthData, setMonthData] = useState<Map<string, CalculateFinalPriceReturn>>(new Map())
+  /**
+   * Load pricing data using preview_pricing_calendar for performance
+   * Implements bulk loading as specified in PRP-10
+   */
+  const loadCalendarPricing = useCallback(async (
+    propId: string,
+    startDate: Date,
+    endDate: Date,
+    stayLength: number
+  ) => {
+    if (!propId) return
+    
+    setLoadingState(prev => ({ ...prev, isLoadingPrices: true, error: null }))
+    
+    try {
+      const result = await withRetry(async () => {
+        const { data, error } = await supabase.rpc('preview_pricing_calendar', {
+          p_property_id: propId,
+          p_start_date: startDate.toISOString().split('T')[0],
+          p_end_date: endDate.toISOString().split('T')[0],
+          p_nights: stayLength
+        })
+        
+        if (error) throw error
+        return data as PreviewPricingCalendarResult[]
+      })
+      
+      // Convert to pricing data map
+      const newPricingData = new Map<string, CalculateFinalPriceResult>()
+      
+      result.forEach(dayData => {
+        newPricingData.set(dayData.check_date, {
+          base_price: dayData.base_price,
+          seasonal_adjustment: dayData.seasonal_adjustment_percent * dayData.base_price / 100,
+          last_minute_discount: dayData.last_minute_discount_percent * dayData.base_price / 100,
+          final_price_per_night: dayData.final_price_per_night,
+          total_price: dayData.total_price,
+          min_price_enforced: dayData.min_price_enforced
+        })
+      })
+      
+      setPricingData(newPricingData)
+      setLoadingState(prev => ({ ...prev, isLoadingPrices: false }))
+      
+    } catch (error) {
+      console.error('Failed to load calendar pricing:', error)
+      setLoadingState(prev => ({
+        ...prev,
+        isLoadingPrices: false,
+        error: handleSupabaseError(error)
+      }))
+    }
+  }, [])
   
   /**
-   * Calculate the days to display in the calendar grid
+   * Load pricing data when property, stay length, or visible month changes
    */
-  const calendarDays = useMemo(() => {
-    const year = currentMonth.getFullYear()
-    const month = currentMonth.getMonth()
+  useEffect(() => {
+    if (!propertyId) return
     
-    // First day of the month
+    // Calculate date range for current view (current month + neighboring days)
+    const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
+    
+    // Get first and last day of calendar view (including neighboring month days)
     const firstDay = new Date(year, month, 1)
-    // Last day of the month
     const lastDay = new Date(year, month + 1, 0)
     
-    // Start of the calendar (previous month's days)
+    // Extend to include neighboring days shown in calendar
     const startDate = new Date(firstDay)
     startDate.setDate(startDate.getDate() - firstDay.getDay())
     
-    // End of the calendar (next month's days to complete the grid)
     const endDate = new Date(lastDay)
     const daysToAdd = (6 - lastDay.getDay())
     if (daysToAdd > 0) {
       endDate.setDate(endDate.getDate() + daysToAdd)
     }
     
-    // Generate all days
-    const days: Date[] = []
-    const current = new Date(startDate)
-    
-    while (current <= endDate) {
-      days.push(new Date(current))
-      current.setDate(current.getDate() + 1)
+    loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength)
+  }, [propertyId, selectedStayLength, calendarValue, loadCalendarPricing])
+  
+  /**
+   * Handle property selection change
+   */
+  const handlePropertyChange = useCallback((newPropertyId: string) => {
+    setPropertyId(newPropertyId)
+    if (onPropertyChange) {
+      onPropertyChange(newPropertyId)
     }
-    
-    return days
-  }, [currentMonth])
+  }, [onPropertyChange])
   
   /**
-   * Load pricing data for the current month, respecting dateRange filter
+   * Handle stay length change with loading state
    */
-  useEffect(() => {
-    const loadMonthData = async () => {
-      if (!propertyId) return
-      
-      const year = currentMonth.getFullYear()
-      const month = currentMonth.getMonth()
-      
-      // Get first and last day of the month
-      let firstDay = new Date(year, month, 1)
-      let lastDay = new Date(year, month + 1, 0)
-      
-      // If dateRange is specified, use it to constrain the data loading
-      if (dateRange?.start && dateRange?.end) {
-        // Only load data for the intersection of current month and date range
-        firstDay = new Date(Math.max(firstDay.getTime(), dateRange.start.getTime()))
-        lastDay = new Date(Math.min(lastDay.getTime(), dateRange.end.getTime()))
-        
-        // If no intersection, skip loading
-        if (firstDay > lastDay) {
-          setMonthData(new Map())
-          return
-        }
-      }
-      
-      try {
-        const data = await calculateBulk({
-          propertyId,
-          dateRange: { start: firstDay, end: lastDay },
-          nights
-        })
-        
-        setMonthData(data)
-      } catch (err) {
-        console.error('Failed to load calendar data:', err)
-      }
+  const handleStayLengthChange = useCallback((newLength: number) => {
+    setLoadingState(prev => ({ ...prev, isChangingStayLength: true }))
+    setSelectedStayLength(newLength)
+    if (onStayLengthChange) {
+      onStayLengthChange(newLength)
     }
-    
-    loadMonthData()
-  }, [propertyId, currentMonth, nights, dateRange, calculateBulk])
+    // Loading will be cleared by useEffect when pricing data reloads
+    setTimeout(() => {
+      setLoadingState(prev => ({ ...prev, isChangingStayLength: false }))
+    }, 100)
+  }, [onStayLengthChange])
   
   /**
-   * Navigate to today
+   * Handle calendar date selection/click
    */
-  const handleTodayClick = useCallback(() => {
-    const today = new Date()
-    setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1))
-  }, [])
-  
-  /**
-   * Handle date click
-   */
-  const handleCellClick = useCallback((date: Date) => {
+  const handleDateClick = useCallback((date: Date) => {
     const dateKey = date.toISOString().split('T')[0]
-    const priceData = monthData.get(dateKey) || calendarData.get(dateKey)
+    const priceData = pricingData.get(dateKey)
     
-    if (priceData && onPriceClick) {
-      onPriceClick(date, priceData)
+    if (onDateClick) {
+      onDateClick(date, priceData || null)
     }
-  }, [monthData, calendarData, onPriceClick])
+  }, [pricingData, onDateClick])
   
   /**
-   * Handle price edit
+   * Custom tileContent function for react-calendar
+   * Renders PricingTile component for each date
    */
-  const handleCellEdit = useCallback(async (date: Date, newPrice: number) => {
-    if (onPriceEdit) {
-      await onPriceEdit(date, newPrice)
+  const tileContent = useCallback(({ date, view }: { date: Date; view: string }) => {
+    if (view !== 'month') return null
+    
+    const dateKey = date.toISOString().split('T')[0]
+    const priceData = pricingData.get(dateKey)
+    
+    return (
+      <PricingTile
+        date={date}
+        view={view}
+        priceData={priceData}
+        stayLength={selectedStayLength}
+        hasSeasonalAdjustment={priceData ? Math.abs(priceData.seasonal_adjustment) > 0.01 : false}
+        hasDiscount={priceData ? priceData.last_minute_discount > 0.01 : false}
+        isMinPriceEnforced={priceData ? priceData.min_price_enforced : false}
+      />
+    )
+  }, [pricingData, selectedStayLength])
+  
+  /**
+   * Custom tileClassName function for conditional styling
+   */
+  const tileClassName = useCallback(({ date, view }: { date: Date; view: string }) => {
+    if (view !== 'month') return null
+    
+    const dateKey = date.toISOString().split('T')[0]
+    const priceData = pricingData.get(dateKey)
+    
+    const classes = []
+    
+    if (priceData?.seasonal_adjustment && Math.abs(priceData.seasonal_adjustment) > 0.01) {
+      classes.push('has-seasonal')
     }
-  }, [onPriceEdit])
+    
+    if (priceData?.last_minute_discount && priceData.last_minute_discount > 0.01) {
+      classes.push('has-discount')
+    }
+    
+    if (priceData?.min_price_enforced) {
+      classes.push('min-price-enforced')
+    }
+    
+    return classes.length > 0 ? classes.join(' ') : null
+  }, [pricingData])
   
-  /**
-   * Check if a date is in the current month
-   */
-  const isCurrentMonth = (date: Date) => {
-    return date.getMonth() === currentMonth.getMonth() && 
-           date.getFullYear() === currentMonth.getFullYear()
-  }
-  
-  /**
-   * Check if a date is today
-   */
-  const isToday = (date: Date) => {
-    const today = new Date()
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear()
-  }
-  
-  const loading = contextLoading || calcLoading
+  const isLoading = loadingState.isLoadingPrices || loadingState.isChangingStayLength
   
   return (
-    <div className="pricing-calendar-grid">
-      <CalendarHeader
-        currentMonth={currentMonth}
-        onMonthChange={setCurrentMonth}
-        onTodayClick={handleTodayClick}
+    <div className={`pricing-calendar-grid ${className}`} data-testid="pricing-calendar">
+      {/* Calendar Controls */}
+      <CalendarControlsComponent
+        propertyId={propertyId}
+        selectedStayLength={selectedStayLength}
+        onPropertyChange={handlePropertyChange}
+        onStayLengthChange={handleStayLengthChange}
       />
       
-      <CalendarControls
-        highlightDiscounts={highlightDiscounts}
-        showSeasonalAdjustments={showSeasonalAdjustments}
-        onHighlightChange={setHighlightDiscounts}
-        onSeasonalChange={setShowSeasonalAdjustments}
-      />
-      
-      {error && (
+      {/* Error Display */}
+      {loadingState.error && (
         <div className="alert alert-danger mb-3">
-          Error loading calendar data: {error}
+          <strong>Error loading calendar data:</strong> {loadingState.error}
+          <button 
+            className="btn btn-link btn-sm ms-2"
+            onClick={() => {
+              setLoadingState(prev => ({ ...prev, error: null }))
+              // Retry loading
+              if (propertyId) {
+                const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
+                const year = currentDate.getFullYear()
+                const month = currentDate.getMonth()
+                
+                const firstDay = new Date(year, month, 1)
+                const lastDay = new Date(year, month + 1, 0)
+                
+                const startDate = new Date(firstDay)
+                startDate.setDate(startDate.getDate() - firstDay.getDay())
+                
+                const endDate = new Date(lastDay)
+                const daysToAdd = (6 - lastDay.getDay())
+                if (daysToAdd > 0) {
+                  endDate.setDate(endDate.getDate() + daysToAdd)
+                }
+                
+                loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength)
+              }
+            }}
+          >
+            Retry
+          </button>
         </div>
       )}
       
-      {loading ? (
-        <div className="text-center p-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading calendar...</span>
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="calendar-loading">
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">
+                {loadingState.isChangingStayLength ? 'Updating prices...' : 'Loading calendar...'}
+              </span>
+            </div>
+            <div className="mt-2 text-muted">
+              {loadingState.isChangingStayLength ? 
+                `Calculating prices for ${selectedStayLength} night${selectedStayLength !== 1 ? 's' : ''}...` :
+                'Loading pricing data...'
+              }
+            </div>
           </div>
         </div>
       ) : (
-        <div className="calendar-grid">
-          {/* Weekday headers */}
-          <div className="row g-0 border-bottom mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="col text-center fw-bold py-2">
-                {day}
-              </div>
-            ))}
-          </div>
+        <>
+          {/* React Calendar with Custom Pricing Display */}
+          <Calendar
+            value={calendarValue}
+            onChange={(value) => {
+              if (value instanceof Date) {
+                setCalendarValue(value)
+              }
+            }}
+            view="month"
+            showFixedNumberOfWeeks={false}
+            showNeighboringMonth={true}
+            tileContent={tileContent}
+            tileClassName={tileClassName}
+            onClickDay={handleDateClick}
+            className="pricing-calendar"
+          />
           
-          {/* Calendar days */}
-          <div className="calendar-days">
-            {Array.from({ length: Math.ceil(calendarDays.length / 7) }, (_, weekIndex) => (
-              <div key={weekIndex} className="row g-0">
-                {calendarDays.slice(weekIndex * 7, (weekIndex + 1) * 7).map(date => {
-                  const dateKey = date.toISOString().split('T')[0]
-                  const priceData = monthData.get(dateKey) || calendarData.get(dateKey)
-                  
-                  return (
-                    <div key={dateKey} className="col p-1">
-                      <CalendarCell
-                        date={date}
-                        priceData={priceData || null}
-                        isCurrentMonth={isCurrentMonth(date)}
-                        isToday={isToday(date)}
-                        isEditable={editable && isCurrentMonth(date)}
-                        highlightDiscount={highlightDiscounts && (priceData?.last_minute_discount ?? 0) > 0}
-                        showSeasonalAdjustment={showSeasonalAdjustments && (priceData?.seasonal_adjustment ?? 0) !== 0}
-                        onClick={() => handleCellClick(date)}
-                        onEdit={editable ? (newPrice) => handleCellEdit(date, newPrice) : undefined}
-                      />
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* Pricing Legend */}
+          <PricingLegend
+            showSeasonalIndicator={true}
+            showDiscountIndicator={true}
+            showMinPriceIndicator={true}
+            className="mt-3"
+          />
+        </>
       )}
-      
-      {/* Legend */}
-      <div className="calendar-legend mt-3 d-flex gap-3 text-muted small">
-        <div>
-          <span className="badge bg-success me-1">&nbsp;</span>
-          Discount applied
-        </div>
-        <div>
-          <span className="badge bg-info me-1">&nbsp;</span>
-          Seasonal adjustment
-        </div>
-        <div>
-          <span className="badge bg-warning me-1">&nbsp;</span>
-          Minimum price enforced
-        </div>
-      </div>
     </div>
   )
 }
