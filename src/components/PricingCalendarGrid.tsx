@@ -153,7 +153,7 @@ const CalendarControls: React.FC<CalendarControlsProps> = ({
  */
 const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   propertyId,
-  dateRange: _dateRange,
+  dateRange,
   nights,
   onPriceClick,
   onPriceEdit,
@@ -164,7 +164,11 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   const { calendarData, loading: contextLoading } = usePricingContext()
   const { calculateBulk, loading: calcLoading, error } = usePricingCalculation()
   
+  // Set initial month based on date range or default to current month
   const [currentMonth, setCurrentMonth] = useState(() => {
+    if (dateRange?.start) {
+      return new Date(dateRange.start.getFullYear(), dateRange.start.getMonth(), 1)
+    }
     const today = new Date()
     return new Date(today.getFullYear(), today.getMonth(), 1)
   })
@@ -209,7 +213,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   }, [currentMonth])
   
   /**
-   * Load pricing data for the current month
+   * Load pricing data for the current month, respecting dateRange filter
    */
   useEffect(() => {
     const loadMonthData = async () => {
@@ -219,8 +223,21 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
       const month = currentMonth.getMonth()
       
       // Get first and last day of the month
-      const firstDay = new Date(year, month, 1)
-      const lastDay = new Date(year, month + 1, 0)
+      let firstDay = new Date(year, month, 1)
+      let lastDay = new Date(year, month + 1, 0)
+      
+      // If dateRange is specified, use it to constrain the data loading
+      if (dateRange?.start && dateRange?.end) {
+        // Only load data for the intersection of current month and date range
+        firstDay = new Date(Math.max(firstDay.getTime(), dateRange.start.getTime()))
+        lastDay = new Date(Math.min(lastDay.getTime(), dateRange.end.getTime()))
+        
+        // If no intersection, skip loading
+        if (firstDay > lastDay) {
+          setMonthData(new Map())
+          return
+        }
+      }
       
       try {
         const data = await calculateBulk({
@@ -236,7 +253,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     }
     
     loadMonthData()
-  }, [propertyId, currentMonth, nights, calculateBulk])
+  }, [propertyId, currentMonth, nights, dateRange, calculateBulk])
   
   /**
    * Navigate to today
