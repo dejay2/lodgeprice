@@ -3,9 +3,11 @@
  * 
  * Provides inline editing capability for base prices with validation and keyboard support
  * Implements optimistic UI updates as specified in PRP-11
+ * Enhanced for preview mode functionality (PRP-14)
  */
 
-import React, { useState, useRef, useEffect, KeyboardEvent } from 'react'
+import React, { useState, useRef, useEffect, KeyboardEvent, useContext } from 'react'
+import { PricingPreviewContext } from '@/context/PricingPreviewContext'
 
 // Types for the inline price editor
 export interface InlinePriceEditorProps {
@@ -16,6 +18,8 @@ export interface InlinePriceEditorProps {
   onValidationError?: (error: string) => void
   className?: string
   autoFocus?: boolean
+  date?: Date  // Added for preview mode tracking
+  propertyId?: string  // Added for preview mode tracking
 }
 
 interface ValidationState {
@@ -39,7 +43,9 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
   onCancel,
   onValidationError,
   className = '',
-  autoFocus = true
+  autoFocus = true,
+  date,
+  propertyId
 }) => {
   const [inputValue, setInputValue] = useState(value.toString())
   const [validation, setValidation] = useState<ValidationState>({
@@ -49,6 +55,9 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
   const [isSaving, setIsSaving] = useState(false)
   
   const inputRef = useRef<HTMLInputElement>(null)
+  
+  // Access preview context if available
+  const previewContext = useContext(PricingPreviewContext)
 
   // Auto-focus and select the input value on mount
   useEffect(() => {
@@ -134,6 +143,7 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
 
   /**
    * Handle save operation with validation check
+   * Enhanced for preview mode (PRP-14)
    */
   const handleSave = async () => {
     const validationResult = validatePrice(inputValue)
@@ -154,6 +164,23 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
       return
     }
 
+    // Check if we're in preview mode
+    if (previewContext?.isPreviewMode && date && propertyId) {
+      // In preview mode, add change to preview context instead of saving to database
+      previewContext.addPricingChange({
+        type: 'basePrice',
+        propertyId,
+        date,
+        oldValue: value,
+        newValue: numericPrice,
+        description: `Base price change for ${date.toLocaleDateString()}`
+      })
+      // Call onSave without actually saving to database
+      onCancel() // Close the editor
+      return
+    }
+
+    // Normal save operation (not in preview mode)
     try {
       setIsSaving(true)
       await onSave(numericPrice)

@@ -1,23 +1,32 @@
 /**
  * PricingDashboard - Main container for pricing management interface
  * Coordinates all pricing components and manages layout
+ * Enhanced with preview mode functionality (PRP-14)
  */
 
 import React, { useState, useEffect } from 'react'
 import { usePricingContext } from '@/context/PricingContext'
 import { useAppContext } from '@/context/AppContext'
+import { PricingPreviewProvider, usePricingPreview } from '@/context/PricingPreviewContext'
+import { useProperties } from '@/hooks/useProperties'
 import PricingCalendarGrid from './PricingCalendarGrid'
 import SeasonalRatePanel from './SeasonalRatePanel'
 import DiscountStrategyPanel from './DiscountStrategyPanel'
 import PriceDetailModal from './PriceDetailModal'
+import PreviewControls from './PreviewControls'
+import PreviewSummary from './PreviewSummary'
+import PricingConfirmationModal from './PricingConfirmationModal'
 import type { CalculateFinalPriceReturn } from '@/types/helpers'
+import type { CalculateFinalPriceResult } from '@/types/pricing-calendar.types'
+import './PricingPreview.css'
 
 /**
  * Dashboard header component for controls and summary
  */
 const DashboardHeader: React.FC = () => {
-  const { selectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
+  const { selectedProperty, setSelectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
   const { stayLength, setStayLength } = useAppContext()
+  const { properties } = useProperties()
   
   useEffect(() => {
     // Sync with app context
@@ -29,21 +38,46 @@ const DashboardHeader: React.FC = () => {
     setDefaultNights(nights)
   }
   
+  const handlePropertyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const propertyId = e.target.value
+    const property = properties.find(p => p.lodgify_property_id === propertyId)
+    if (property) {
+      setSelectedProperty(property)
+    }
+  }
+  
   return (
     <div className="dashboard-header bg-white shadow-sm border-bottom p-3 mb-4">
       <div className="container-fluid">
         <div className="row align-items-center">
-          <div className="col-md-6">
+          <div className="col-md-4">
             <h2 className="h4 mb-0">
               {selectedProperty ? (
-                <>Pricing for {selectedProperty.property_name}</>
+                <>Pricing Dashboard</>
               ) : (
                 <>Select a property to manage pricing</>
               )}
             </h2>
           </div>
-          <div className="col-md-6">
+          <div className="col-md-8">
             <div className="d-flex justify-content-end align-items-center gap-3">
+              <div className="d-flex align-items-center gap-2">
+                <label htmlFor="property-select" className="mb-0">Property:</label>
+                <select
+                  id="property-select"
+                  className="form-select form-select-sm"
+                  value={selectedProperty?.lodgify_property_id || ''}
+                  onChange={handlePropertyChange}
+                  style={{ width: 'auto' }}
+                >
+                  <option value="">Choose a property...</option>
+                  {properties.map((property) => (
+                    <option key={property.lodgify_property_id} value={property.lodgify_property_id}>
+                      {property.property_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="d-flex align-items-center gap-2">
                 <label htmlFor="nights-select" className="mb-0">Default nights:</label>
                 <select
@@ -119,9 +153,9 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
 }
 
 /**
- * Main PricingDashboard component
+ * Inner dashboard component that uses preview context
  */
-const PricingDashboard: React.FC = () => {
+const PricingDashboardInner: React.FC = () => {
   const { 
     selectedProperty, 
     selectedDateRange, 
@@ -131,6 +165,9 @@ const PricingDashboard: React.FC = () => {
     refreshSeasonalRates,
     refreshDiscountStrategies
   } = usePricingContext()
+  
+  // Preview context must be called at the top level to comply with Rules of Hooks
+  const { isPreviewMode, pendingChanges } = usePricingPreview()
   
   const [activeTab, setActiveTab] = useState<TabView>('calendar')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -156,10 +193,21 @@ const PricingDashboard: React.FC = () => {
   /**
    * Handle date click from calendar
    */
-  const handleDateClick = (date: Date, priceData: CalculateFinalPriceReturn) => {
-    setSelectedDate(date)
-    setPriceDetailData(priceData)
-    setShowPriceDetail(true)
+  const handleDateClick = (date: Date, priceData: CalculateFinalPriceResult | null) => {
+    if (priceData) {
+      setSelectedDate(date)
+      // Convert to the expected format for PriceDetailModal
+      const convertedData: CalculateFinalPriceReturn = {
+        base_price: priceData.base_price,
+        seasonal_adjustment: priceData.seasonal_adjustment,
+        last_minute_discount: priceData.last_minute_discount,
+        final_price_per_night: priceData.final_price_per_night,
+        total_price: priceData.total_price,
+        min_price_enforced: priceData.min_price_enforced
+      }
+      setPriceDetailData(convertedData)
+      setShowPriceDetail(true)
+    }
   }
   
   /**
@@ -196,37 +244,47 @@ const PricingDashboard: React.FC = () => {
   }
   
   return (
-    <div className="pricing-dashboard">
+    <div className={`pricing-dashboard ${isPreviewMode ? 'pricing-dashboard--preview-mode' : ''}`}>
       <DashboardHeader />
       
+      {/* Preview Controls Bar - Always show, but style differently based on mode */}
+      <div className={`preview-controls-bar ${isPreviewMode ? 'bg-warning bg-opacity-10 border-bottom border-warning' : 'bg-light border-bottom'} p-3`}>
+        <div className="container-fluid">
+          <PreviewControls className="mb-0" />
+        </div>
+      </div>
+      
       <div className="container-fluid">
-        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-        
-        {loading && (
-          <div className="text-center p-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-            <p className="mt-3">Loading pricing data...</p>
-          </div>
-        )}
-        
-        {!loading && (
-          <div className="tab-content">
-            {activeTab === 'calendar' && (
-              <div className="tab-pane active">
-                <PricingCalendarGrid
-                  propertyId={selectedProperty.lodgify_property_id}
-                  dateRange={selectedDateRange}
-                  nights={defaultNights}
-                  onPriceClick={handleDateClick}
-                  onPriceEdit={handlePriceEdit}
-                  editable={true}
-                  highlightDiscounts={true}
-                  showSeasonalAdjustments={true}
-                />
+        <div className="row">
+          <div className={isPreviewMode && pendingChanges.length > 0 ? 'col-lg-9' : 'col-12'}>
+            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            
+            {loading && (
+              <div className="text-center p-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3">Loading pricing data...</p>
               </div>
             )}
+            
+            {!loading && (
+              <div className="tab-content">
+                {activeTab === 'calendar' && (
+                  <div className="tab-pane active">
+                    <PricingCalendarGrid
+                      propertyId={selectedProperty.lodgify_property_id}
+                      selectedStayLength={defaultNights}
+                      onDateClick={handleDateClick}
+                      enableInlineEditing={true}
+                      onBasePriceChanged={(propertyId, newPrice) => {
+                        console.log('Base price changed:', propertyId, newPrice)
+                        // Refresh calendar data after base price change
+                        refreshCalendarData()
+                      }}
+                    />
+                  </div>
+                )}
             
             {activeTab === 'seasonal' && (
               <div className="tab-pane active">
@@ -244,8 +302,19 @@ const PricingDashboard: React.FC = () => {
                 />
               </div>
             )}
+              </div>
+            )}
           </div>
-        )}
+          
+          {/* Preview Summary Sidebar */}
+          {isPreviewMode && pendingChanges.length > 0 && (
+            <div className="col-lg-3">
+              <div className="sticky-top" style={{ top: '1rem' }}>
+                <PreviewSummary className="mt-4" />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Price Detail Modal */}
@@ -259,7 +328,23 @@ const PricingDashboard: React.FC = () => {
           priceData={priceDetailData}
         />
       )}
+      
+      {/* Pricing Confirmation Modal */}
+      <PricingConfirmationModal 
+        propertyName={selectedProperty.property_name}
+      />
     </div>
+  )
+}
+
+/**
+ * Main PricingDashboard component with preview provider
+ */
+const PricingDashboard: React.FC = () => {
+  return (
+    <PricingPreviewProvider>
+      <PricingDashboardInner />
+    </PricingPreviewProvider>
   )
 }
 

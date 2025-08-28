@@ -1,0 +1,240 @@
+/**
+ * PricingPreview.css - Styles for preview mode functionality
+ * Implements visual indicators for FR-3 and FR-5
+ */
+
+/* Preview Mode Container */
+.pricing-dashboard--preview-mode {
+  position: relative;
+}
+
+.pricing-dashboard--preview-mode::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ffc107, #fd7e14);
+  z-index: 1000;
+}
+
+/* Preview Controls Bar */
+.preview-controls-bar {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Preview Controls */
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.preview-controls--active {
+  padding: 0.5rem 0;
+}
+
+.preview-mode-badge {
+  display: flex;
+  align-items: center;
+}
+
+.preview-mode-badge .badge {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Preview Summary */
+.preview-summary .card {
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.preview-summary .card-header {
+  border-bottom: 2px solid rgba(255, 193, 7, 0.5);
+}
+
+.preview-summary--compact {
+  margin-bottom: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Calendar Tile Preview States */
+.pricing-calendar--preview .pricing-tile--changed {
+  position: relative;
+  background-color: rgba(255, 193, 7, 0.1) !important;
+  border: 2px solid #ffc107 !important;
+}
+
+.pricing-tile--changed::after {
+  content: 'PREVIEW';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.625rem;
+  font-weight: bold;
+  color: #856404;
+  background-color: #fff3cd;
+  padding: 1px 4px;
+  border-radius: 2px;
+  line-height: 1;
+}
+
+.pricing-tile--optimistic {
+  animation: optimisticUpdate 0.3s ease-out;
+}
+
+@keyframes optimisticUpdate {
+  0% {
+    transform: scale(1);
+    background-color: rgba(255, 193, 7, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+}
+
+/* Price Change Indicators */
+.price-change-indicator {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.price-change-indicator .original-price {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+.price-change-indicator .arrow {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.price-change-indicator .preview-price {
+  color: #0d6efd;
+  font-weight: bold;
+}
+
+/* Confirmation Modal Enhancements */
+.modal-content .pricing-comparison {
+  padding: 0;
+}
+
+.pricing-comparison table {
+  margin-bottom: 0;
+}
+
+.pricing-comparison thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.75rem;
+}
+
+.pricing-comparison tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.pricing-comparison tbody td {
+  padding: 0.625rem 0.75rem;
+}
+
+/* Loading States for Preview */
+.preview-calculating {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.preview-calculating::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffc107;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Error States for Preview */
+.preview-error {
+  background-color: #f8d7da !important;
+  border-color: #f5c6cb !important;
+}
+
+.preview-error-message {
+  color: #721c24;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .preview-summary {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  .preview-summary .card {
+    border-radius: 1rem 1rem 0 0;
+    margin: 0;
+  }
+}
