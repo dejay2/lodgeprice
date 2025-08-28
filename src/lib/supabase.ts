@@ -1,19 +1,77 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database.types'
 
-// Environment variable validation
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseServiceRoleKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_SERVICE_ROLE_KEY are set.'
-  )
+// Enhanced environment variable validation interface
+interface ValidationResult {
+  success: boolean
+  error?: string
+  missing?: string[]
 }
 
-// Create Supabase client with service role key for full access
-// This bypasses RLS which is necessary for this personal tool application
-export const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+// Validate Supabase URL format
+const isValidSupabaseUrl = (url: string): boolean => {
+  return /^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(url)
+}
+
+// Enhanced environment variable validation function
+function validateSupabaseEnvironment(): ValidationResult {
+  const url = import.meta.env.VITE_SUPABASE_URL
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY
+  
+  // Check for missing variables
+  const missing: string[] = []
+  if (!url || url.trim() === '') missing.push('VITE_SUPABASE_URL')
+  if (!key || key.trim() === '') missing.push('VITE_SUPABASE_ANON_KEY')
+  
+  if (missing.length > 0) {
+    return {
+      success: false,
+      missing,
+      error: `Missing required environment variables: ${missing.join(', ')}\n\n` +
+             'Please copy .env.example to .env and add your Supabase credentials:\n' +
+             '1. Go to https://supabase.com/dashboard\n' +
+             '2. Select your project (vehonbnvzcgcticpfsox)\n' +
+             '3. Go to Settings > API\n' +
+             '4. Copy URL and anon key to your .env file\n\n' +
+             'For more help, see .env.example'
+    }
+  }
+  
+  // Validate URL format
+  if (!isValidSupabaseUrl(url)) {
+    return {
+      success: false, 
+      error: `VITE_SUPABASE_URL must be a valid Supabase URL\n` +
+             `Expected format: https://your-project-id.supabase.co\n` +
+             `Received: ${url}\n\n` +
+             `For the Lodgeprice project, it should be:\n` +
+             `https://vehonbnvzcgcticpfsox.supabase.co`
+    }
+  }
+  
+  return { success: true }
+}
+
+// Validate environment variables on module load
+const validation = validateSupabaseEnvironment()
+if (!validation.success) {
+  console.error('Environment variable validation failed:', validation.error)
+  throw new Error(validation.error)
+}
+
+// Development-only logging for diagnostics
+if (import.meta.env.DEV) {
+  console.log('[Environment] Supabase environment variables validated successfully')
+  console.log('[Environment] Project:', import.meta.env.VITE_SUPABASE_URL?.split('.')[0]?.replace('https://', ''))
+}
+
+// Environment variable access
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+// Create Supabase client with anonymous key and RLS enabled
+// This is secure for client-side usage when RLS policies are properly configured
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
@@ -21,27 +79,47 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleK
   },
   global: {
     headers: {
-      'x-client-info': 'lodgeprice-admin'
+      'x-client-info': 'lodgeprice-frontend'
     }
   }
 })
 
-// Export supabaseAdmin as an alias for backward compatibility
-// Both point to the same service role client
-export const supabaseAdmin = supabase
+// For operations that require bypassing RLS (if needed), use service role key
+// This should only be used for specific admin operations
+const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+export const supabaseAdmin = supabaseServiceRoleKey ? createClient<Database>(
+  supabaseUrl, 
+  supabaseServiceRoleKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false
+    },
+    global: {
+      headers: {
+        'x-client-info': 'lodgeprice-admin'
+      }
+    }
+  }
+) : supabase // Fallback to anon client if service role key not provided
 
 // Enhanced error handling function
-export const handleSupabaseError = (error: any): string => {
-  if (error?.message?.includes('Invalid API key')) {
+export const handleSupabaseError = (error: unknown): string => {
+  const errorMessage = error && typeof error === 'object' && 'message' in error 
+    ? (error as { message: string }).message 
+    : String(error)
+
+  if (errorMessage?.includes('Invalid API key')) {
     return 'Database configuration error. Please check your connection settings.'
   }
-  if (error?.message?.includes('timeout')) {
+  if (errorMessage?.includes('timeout')) {
     return 'Database connection timed out. Please try again.'
   }
-  if (error?.message?.includes('Network Error')) {
+  if (errorMessage?.includes('Network Error')) {
     return 'Network connection unavailable. Please check your internet connection.'
   }
-  if (error?.message?.includes('new row violates row-level security policy')) {
+  if (errorMessage?.includes('new row violates row-level security policy')) {
     return 'Authorization error. Please ensure you have proper access permissions.'
   }
   return 'An unexpected database error occurred. Please try again or contact support.'
