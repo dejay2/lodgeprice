@@ -3,12 +3,15 @@
 
 export interface Property {
   id: string
-  property_id: string  // Note: This is the lodgify property ID (e.g. "327020")
+  lodgify_property_id: string  // The lodgify property ID (e.g. "327020") 
+  property_id: string  // Alias for lodgify_property_id for backward compatibility
+  lodgify_room_type_id: number | null
   property_name: string
   base_price_per_day: number
   min_price_per_day: number
-  created_at?: string
-  updated_at?: string
+  active_discount_strategy_id: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface DateRange {
@@ -17,8 +20,8 @@ export interface DateRange {
   start_date: string
   end_date: string
   discount_rate: number  // Adjustment rate (-1 to 10, negative = discount)
-  created_at?: string
-  updated_at?: string
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface Booking {

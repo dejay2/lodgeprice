@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
-import type { Property, DateRange, PricingCalculationResult } from '@/types/database'
+import type { Property, DateRange } from '@/types/database'
+import type { CalculateFinalPriceReturn } from '@/types/helpers'
 
 // Property API functions
 export const propertyApi = {
@@ -63,13 +64,13 @@ export const pricingApi = {
     propertyId: string,  // This is the TEXT property_id, e.g. "327020"
     checkDate: string, 
     nights: number
-  ): Promise<PricingCalculationResult> {
+  ): Promise<CalculateFinalPriceReturn> {
     const result = await supabase
       .rpc('calculate_final_price', {
-        property_id: propertyId,
-        check_in_date: checkDate,
-        stay_length: nights
-      } as any)
+        p_property_id: propertyId,
+        p_check_date: checkDate,
+        p_nights: nights
+      })
 
     if (result.error) throw new Error(`Failed to calculate price: ${result.error.message}`)
     return result.data
@@ -84,11 +85,11 @@ export const pricingApi = {
   ) {
     const result = await supabase
       .rpc('preview_pricing_calendar', {
-        property_id: propertyId,
-        start_date: startDate,
-        end_date: endDate,
-        stay_length: nights
-      } as any)
+        p_property_id: propertyId,
+        p_start_date: startDate,
+        p_end_date: endDate,
+        p_nights: nights
+      })
 
     if (result.error) throw new Error(`Failed to get pricing preview: ${result.error.message}`)
     return result.data
@@ -152,11 +153,11 @@ export const bookingApi = {
   ): Promise<boolean> {
     const result = await supabase
       .rpc('check_booking_conflict', {
-        property_id: propertyId,
-        start_date: arrivalDate,
-        end_date: departureDate,
-        booking_id: bookingId || null
-      } as any)
+        p_property_id: propertyId,
+        p_arrival_date: arrivalDate,
+        p_departure_date: departureDate,
+        p_exclude_booking_id: bookingId || null
+      })
 
     if (result.error) throw new Error(`Failed to check booking conflict: ${result.error.message}`)
     return result.data

@@ -9,6 +9,109 @@ import type {
 } from './helpers'
 
 /**
+ * Database function parameter and return types
+ * These interfaces provide type-safe access to database pricing functions
+ */
+
+/**
+ * Parameters for calculate_final_price database function
+ */
+export interface PricingCalculationParams {
+  propertyId: string  // lodgify_property_id as TEXT
+  checkDate: string   // ISO date string
+  nights: number      // integer stay length
+}
+
+/**
+ * Return type for calculate_final_price function
+ */
+export interface PricingCalculationResult {
+  base_price: number
+  seasonal_adjustment: number
+  last_minute_discount: number
+  final_price_per_night: number
+  total_price: number
+  min_price_enforced: boolean
+}
+
+/**
+ * Parameters for get_last_minute_discount function
+ */
+export interface LastMinuteDiscountParams {
+  propertyId: string        // lodgify_property_id
+  daysBeforeCheckin: number // days until check-in
+  nights?: number          // optional, defaults to 1
+  checkDate?: string       // optional, defaults to CURRENT_DATE
+}
+
+/**
+ * Parameters for check_booking_conflict function
+ */
+export interface BookingConflictParams {
+  propertyId: string     // lodgify_property_id
+  arrivalDate: string    // ISO date string
+  departureDate: string  // ISO date string
+  bookingId?: string | null  // optional booking ID to exclude
+}
+
+/**
+ * Parameters for preview_pricing_calendar function
+ */
+export interface PricingCalendarParams {
+  propertyId: string  // lodgify_property_id
+  startDate: string   // ISO date string
+  endDate: string     // ISO date string
+  nights: number      // stay length for pricing calculation
+}
+
+/**
+ * Return type for preview_pricing_calendar function
+ */
+export interface PricingCalendarResult {
+  date: string
+  base_price: number
+  seasonal_rate: number | null
+  final_price: number
+  discount_applied: number | null
+  is_available: boolean
+}
+
+/**
+ * Type-safe RPC function wrappers
+ */
+export type CalculatePriceFunction = (
+  params: PricingCalculationParams
+) => Promise<PricingCalculationResult>
+
+export type GetDiscountFunction = (
+  params: LastMinuteDiscountParams
+) => Promise<number>
+
+export type CheckConflictFunction = (
+  params: BookingConflictParams
+) => Promise<boolean>
+
+export type PreviewCalendarFunction = (
+  params: PricingCalendarParams
+) => Promise<PricingCalendarResult[]>
+
+/**
+ * Database function call helpers with proper typing
+ */
+export const dbFunctions = {
+  calculateFinalPrice: 'calculate_final_price' as const,
+  getLastMinuteDiscount: 'get_last_minute_discount' as const,
+  checkBookingConflict: 'check_booking_conflict' as const,
+  previewPricingCalendar: 'preview_pricing_calendar' as const,
+  applyDiscountToAll: 'apply_discount_to_all_properties' as const,
+  removeAllDiscounts: 'remove_all_discounts' as const,
+  copyDiscountStrategy: 'copy_discount_strategy' as const,
+  getGlobalStrategies: 'get_global_strategies' as const,
+  storeApiKey: 'store_api_key' as const,
+  getApiKey: 'get_api_key' as const,
+} as const
+
+/**
  * Component prop types for pricing UI integration
  */
 

@@ -16,31 +16,41 @@ export interface Database {
       properties: {
         Row: {
           id: string
-          property_id: string
+          lodgify_property_id: string  // This is the TEXT field for Lodgify property ID
+          property_id: string           // Alias for lodgify_property_id for backward compatibility
+          lodgify_room_type_id: number | null
           property_name: string
           base_price_per_day: number
           min_price_per_day: number
+          active_discount_strategy_id: string | null  // Reference to active discount strategy
           created_at: string | null
           updated_at: string | null
         }
         Insert: {
           id?: string
-          property_id: string
+          lodgify_property_id: string
+          property_id?: string
+          lodgify_room_type_id?: number | null
           property_name: string
           base_price_per_day: number
           min_price_per_day: number
+          active_discount_strategy_id?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
         Update: {
           id?: string
+          lodgify_property_id?: string
           property_id?: string
+          lodgify_room_type_id?: number | null
           property_name?: string
           base_price_per_day?: number
           min_price_per_day?: number
+          active_discount_strategy_id?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       date_ranges: {
         Row: {
@@ -70,6 +80,7 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       bookings: {
         Row: {
@@ -111,6 +122,7 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       discount_strategies: {
         Row: {
@@ -155,6 +167,7 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       discount_rules: {
         Row: {
@@ -187,6 +200,7 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       lodgify_integrations: {
         Row: {
@@ -225,6 +239,151 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
+      }
+      sync_operations: {
+        Row: {
+          id: string
+          property_id: string
+          operation_type: string
+          status: string
+          trigger_source: string | null
+          trigger_details: Json | null
+          date_range_start: string | null
+          date_range_end: string | null
+          total_records: number | null
+          processed_records: number
+          payload_size_kb: number | null
+          api_endpoint: string | null
+          api_method: string | null
+          api_status_code: number | null
+          api_response: Json | null
+          error_message: string | null
+          error_details: Json | null
+          retry_count: number
+          max_retries: number
+          next_retry_at: string | null
+          duration_ms: number | null
+          started_at: string | null
+          completed_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          operation_type: string
+          status?: string
+          trigger_source?: string | null
+          trigger_details?: Json | null
+          date_range_start?: string | null
+          date_range_end?: string | null
+          total_records?: number | null
+          processed_records?: number
+          payload_size_kb?: number | null
+          api_endpoint?: string | null
+          api_method?: string | null
+          api_status_code?: number | null
+          api_response?: Json | null
+          error_message?: string | null
+          error_details?: Json | null
+          retry_count?: number
+          max_retries?: number
+          next_retry_at?: string | null
+          duration_ms?: number | null
+          started_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          operation_type?: string
+          status?: string
+          trigger_source?: string | null
+          trigger_details?: Json | null
+          date_range_start?: string | null
+          date_range_end?: string | null
+          total_records?: number | null
+          processed_records?: number
+          payload_size_kb?: number | null
+          api_endpoint?: string | null
+          api_method?: string | null
+          api_status_code?: number | null
+          api_response?: Json | null
+          error_message?: string | null
+          error_details?: Json | null
+          retry_count?: number
+          max_retries?: number
+          next_retry_at?: string | null
+          duration_ms?: number | null
+          started_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      price_cache: {
+        Row: {
+          id: string
+          property_id: string
+          cache_date: string
+          base_price: number | null
+          seasonal_adjustment: number | null
+          seasonal_rate: number | null
+          discount_percentage: number | null
+          discount_amount: number | null
+          final_price: number
+          min_price: number | null
+          has_seasonal_rate: boolean
+          has_last_minute_discount: boolean
+          at_minimum_price: boolean
+          input_hash: string | null
+          cache_created_at: string | null
+          cache_expires_at: string | null
+          last_accessed_at: string | null
+          access_count: number
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          cache_date: string
+          base_price?: number | null
+          seasonal_adjustment?: number | null
+          seasonal_rate?: number | null
+          discount_percentage?: number | null
+          discount_amount?: number | null
+          final_price: number
+          min_price?: number | null
+          has_seasonal_rate?: boolean
+          has_last_minute_discount?: boolean
+          at_minimum_price?: boolean
+          input_hash?: string | null
+          cache_created_at?: string | null
+          cache_expires_at?: string | null
+          last_accessed_at?: string | null
+          access_count?: number
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          cache_date?: string
+          base_price?: number | null
+          seasonal_adjustment?: number | null
+          seasonal_rate?: number | null
+          discount_percentage?: number | null
+          discount_amount?: number | null
+          final_price?: number
+          min_price?: number | null
+          has_seasonal_rate?: boolean
+          has_last_minute_discount?: boolean
+          at_minimum_price?: boolean
+          input_hash?: string | null
+          cache_created_at?: string | null
+          cache_expires_at?: string | null
+          last_accessed_at?: string | null
+          access_count?: number
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -240,6 +399,7 @@ export interface Database {
           booking_status: string
           nights: number
         }
+        Relationships: []
       }
       property_pricing: {
         Row: {
@@ -250,6 +410,7 @@ export interface Database {
           rate_name: string | null
           seasonal_adjustment: number | null
         }
+        Relationships: []
       }
       active_discount_strategies: {
         Row: {
@@ -261,6 +422,7 @@ export interface Database {
           max_discount: number
           is_active: boolean
         }
+        Relationships: []
       }
       discount_rule_details: {
         Row: {
@@ -270,75 +432,118 @@ export interface Database {
           min_nights: number | null
           applicable_days: Json | null
         }
+        Relationships: []
       }
     }
     Functions: {
       calculate_final_price: {
         Args: {
-          property_id: string
-          check_in_date: string
-          stay_length: number
+          p_property_id: string  // lodgify_property_id TEXT
+          p_check_date: string   // DATE in ISO format
+          p_nights: number       // INTEGER (no default value)
         }
         Returns: {
-          property_id: string
-          property_name: string
-          check_date: string
-          nights: number
-          base_price_per_night: number
+          base_price: number
           seasonal_adjustment: number
-          seasonal_rate: number
-          adjusted_price_per_night: number
           last_minute_discount: number
-          discounted_price_per_night: number
           final_price_per_night: number
           total_price: number
-          min_price_per_night: number
-          savings_amount: number
-          savings_percentage: number
-          has_seasonal_rate: boolean
-          has_last_minute_discount: boolean
-          at_minimum_price: boolean
-        }[]
+          min_price_enforced: boolean
+        }
+
       }
       get_last_minute_discount: {
         Args: {
-          property_id: string
-          check_in_date: string
+          p_property_id: string          // TEXT property ID (lodgify_property_id)
+          p_days_before_checkin: number   // INTEGER
+          p_nights: number               // INTEGER, defaults to 1
+          p_check_date: string           // DATE, defaults to CURRENT_DATE
         }
-        Returns: {
-          discount_percentage: number
-          strategy_name: string | null
-          days_until_checkin: number
-        }[]
+        Returns: number  // Returns NUMERIC discount value
+
       }
       check_booking_conflict: {
         Args: {
-          property_id: string
-          start_date: string
-          end_date: string
-          booking_id: string | null
+          p_property_id: string           // TEXT property ID (lodgify_property_id)
+          p_arrival_date: string          // DATE in ISO format
+          p_departure_date: string        // DATE in ISO format
+          p_exclude_booking_id: string | null    // TEXT booking ID, optional
         }
-        Returns: {
-          has_conflict: boolean
-          conflicting_booking_id: string | null
-          conflicting_dates: string | null
-        }[]
+        Returns: boolean  // Returns BOOLEAN indicating conflict
+
       }
       preview_pricing_calendar: {
         Args: {
-          property_id: string
-          start_date: string
-          end_date: string
-          stay_length: number
+          p_property_id: string   // lodgify_property_id TEXT
+          p_start_date: string    // DATE in ISO format
+          p_end_date: string      // DATE in ISO format
+          p_nights: number        // INTEGER stay length
         }
-        Returns: {
-          date: string
+        Returns: Array<{
+          check_date: string
+          days_from_today: number
           base_price: number
-          seasonal_rate: number | null
-          final_price: number
-          discount_applied: number | null
-          is_available: boolean
-        }[]
+          seasonal_adjustment_percent: number
+          last_minute_discount_percent: number
+          final_price_per_night: number
+          total_price: number
+          savings_amount: number
+          savings_percent: number
+          min_price_enforced: boolean
+        }>
+
+      }
+      apply_discount_to_all_properties: {
+        Args: {
+          p_strategy_id: string  // UUID of global strategy
+        }
+        Returns: number  // Number of strategies created
+
+      }
+      remove_all_discounts: {
+        Args: {}
+        Returns: number  // Number of strategies deactivated
+
+      }
+      copy_discount_strategy: {
+        Args: {
+          p_strategy_id: string  // UUID of strategy to copy
+          p_new_name: string     // Name for new strategy
+        }
+        Returns: string  // UUID of new strategy
+
+      }
+      get_global_strategies: {
+        Args: {}
+        Returns: Array<{
+          strategy_id: string
+          strategy_name: string
+          activation_window: number
+          min_discount: number
+          max_discount: number
+          curve_type: string
+          is_active: boolean
+          valid_from: string | null
+          valid_until: string | null
+          rule_count: number
+        }>
+
+      }
+      store_api_key: {
+        Args: {
+          p_property_id: string           // UUID of property
+          p_api_key: string               // Plain text API key
+          p_expires_at?: string | null    // Optional expiration timestamp
+        }
+        Returns: string  // UUID of integration record
+
+      }
+      get_api_key: {
+        Args: {
+          p_property_id: string  // UUID of property
+        }
+        Returns: string  // Decrypted API key
+
       }
     }
     Enums: {

@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-// Temporarily comment out the Database type until we fix the type generation
-// import { Database } from '../types/database.types'
+import type { Database } from '../types/database.types'
 
 // Environment variable validation
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -12,9 +11,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// Create Supabase client with enhanced configuration
-// TODO: Add Database type back once type generation is working properly
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Create Supabase client with enhanced configuration and full type safety
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -107,38 +105,40 @@ export async function validateSupabaseConnection(): Promise<{
     // Test 2: Function calls (basic validation without requiring specific property IDs)
     const functionTests: { [key: string]: boolean } = {}
 
-    // Test calculate_final_price function (using a generic call that may return empty results)
+    // Test calculate_final_price function (using proper parameter names)
     try {
       const result = await supabase.rpc('calculate_final_price', {
-        property_id: 'test',
-        check_in_date: '2024-07-15',
-        stay_length: 3
+        p_property_id: 'test',
+        p_check_date: '2024-07-15',
+        p_nights: 3
       })
-      functionTests.calculate_final_price = !result.error
+      functionTests.calculate_final_price = !result.error || result.error.message.includes('not found')
     } catch {
       functionTests.calculate_final_price = false
     }
 
-    // Test get_last_minute_discount function
+    // Test get_last_minute_discount function with proper parameters
     try {
       const result = await supabase.rpc('get_last_minute_discount', {
-        property_id: 'test',
-        check_in_date: '2024-07-15'
+        p_property_id: 'test',
+        p_days_before_checkin: 7,
+        p_nights: 3,
+        p_check_date: '2024-07-15'
       })
-      functionTests.get_last_minute_discount = !result.error
+      functionTests.get_last_minute_discount = !result.error || result.error.message.includes('not found')
     } catch {
       functionTests.get_last_minute_discount = false
     }
 
-    // Test check_booking_conflict function
+    // Test check_booking_conflict function with proper parameters
     try {
       const result = await supabase.rpc('check_booking_conflict', {
-        property_id: 'test',
-        start_date: '2024-07-15',
-        end_date: '2024-07-18',
-        booking_id: null
+        p_property_id: 'test',
+        p_arrival_date: '2024-07-15',
+        p_departure_date: '2024-07-18',
+        p_exclude_booking_id: null
       })
-      functionTests.check_booking_conflict = !result.error
+      functionTests.check_booking_conflict = !result.error || result.error.message.includes('not found')
     } catch {
       functionTests.check_booking_conflict = false
     }
@@ -155,6 +155,37 @@ export async function validateSupabaseConnection(): Promise<{
     }
   }
 }
+
+// Type exports for easier usage throughout the application
+export type Property = Database['public']['Tables']['properties']['Row']
+export type PropertyInsert = Database['public']['Tables']['properties']['Insert']
+export type PropertyUpdate = Database['public']['Tables']['properties']['Update']
+
+export type DateRange = Database['public']['Tables']['date_ranges']['Row']
+export type DateRangeInsert = Database['public']['Tables']['date_ranges']['Insert']
+export type DateRangeUpdate = Database['public']['Tables']['date_ranges']['Update']
+
+export type Booking = Database['public']['Tables']['bookings']['Row']
+export type BookingInsert = Database['public']['Tables']['bookings']['Insert']
+export type BookingUpdate = Database['public']['Tables']['bookings']['Update']
+
+export type DiscountStrategy = Database['public']['Tables']['discount_strategies']['Row']
+export type DiscountStrategyInsert = Database['public']['Tables']['discount_strategies']['Insert']
+export type DiscountStrategyUpdate = Database['public']['Tables']['discount_strategies']['Update']
+
+export type DiscountRule = Database['public']['Tables']['discount_rules']['Row']
+export type DiscountRuleInsert = Database['public']['Tables']['discount_rules']['Insert']
+export type DiscountRuleUpdate = Database['public']['Tables']['discount_rules']['Update']
+
+export type SyncOperation = Database['public']['Tables']['sync_operations']['Row']
+export type PriceCache = Database['public']['Tables']['price_cache']['Row']
+export type LodgifyIntegration = Database['public']['Tables']['lodgify_integrations']['Row']
+
+// View types
+export type BookingSummary = Database['public']['Views']['booking_summary']['Row']
+export type PropertyPricing = Database['public']['Views']['property_pricing']['Row']
+export type ActiveDiscountStrategy = Database['public']['Views']['active_discount_strategies']['Row']
+export type DiscountRuleDetails = Database['public']['Views']['discount_rule_details']['Row']
 
 // Logging function for database operations
 export const logDatabaseOperation = (

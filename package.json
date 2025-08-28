@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "types:generate": "supabase gen types typescript --project-id vehonbnvzcgcticpfsox --schema public > src/types/database.generated.ts",
+    "types:check": "tsc --noEmit --strict",
+    "types:update": "npm run types:generate && npm run types:check"
   },
   "dependencies": {
     "react": "^18.2.0",

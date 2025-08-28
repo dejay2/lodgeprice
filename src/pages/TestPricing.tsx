@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { PricingService } from '@/services/pricing.service'
 import { BookingService } from '@/services/booking.service'
-import { DiscountService } from '@/services/discount.service'
 
 const pricingService = new PricingService()
 const bookingService = new BookingService()
-const discountService = new DiscountService()
 
 export function TestPricing() {
   const [testResults, setTestResults] = useState<any>({})

@@ -146,7 +146,7 @@ export class PricingService {
         throw new DatabaseError(`Failed to load calendar data: ${error.message}`, 'CALENDAR_LOAD', error)
       }
       
-      return (data as PreviewPricingCalendarReturn[]) || []
+      return data || []
     } catch (error) {
       return this.handlePricingError(error, 'calendar-load')
     }
