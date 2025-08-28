@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Production builds
+build/
+dist/
+out/
+
+# Debug logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+*.lcov
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Vite
+.vite/
+
+# Development/Planning files (not needed for functionality)
+PRPs/
+features/
+reports/
+examples/
+TASK.md
+project.md
+CLAUDE.md
+FRONTEND_SETUP.md
+database-schema.md
+
+# Test files
+test-*.js
+test-*.ts
+tests/
+*.test.*
+*.spec.*
+
+# MCP/Playwright artifacts
+.playwright-mcp/
+
+# Package manager locks (keep one based on your choice)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
