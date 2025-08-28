@@ -125,17 +125,11 @@ function Calendar() {
         <div className="bg-white shadow rounded-lg p-6">
           <PricingCalendarGrid
             propertyId={selectedPropertyId}
-            dateRange={calendarDateRange || { start: new Date(), end: addDays(new Date(), 30) }}
-            nights={3} // Default to 3 nights stay
-            editable={true}
-            highlightDiscounts={true}
-            showSeasonalAdjustments={true}
-            onPriceClick={(date, priceData) => {
-              console.log('Price clicked:', date, priceData)
-            }}
-            onPriceEdit={async (date, newPrice) => {
-              console.log('Price edit:', date, newPrice)
-              // TODO: Implement price editing functionality
+            selectedStayLength={3} // Default to 3 nights stay
+            enableInlineEditing={true}
+            onBasePriceChanged={(propertyId, newPrice) => {
+              console.log('Base price changed:', propertyId, newPrice)
+              // Price change is already handled by the PricingCalendarGrid component
             }}
           />
         </div>

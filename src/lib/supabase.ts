@@ -4,6 +4,7 @@ import type { Database } from '../types/database.types'
 // Environment variable validation
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -24,6 +25,23 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     }
   }
 })
+
+// Create admin client with service role key for operations that need to bypass RLS
+// This client should only be used for admin operations like updating base prices
+export const supabaseAdmin = supabaseServiceRoleKey 
+  ? createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      },
+      global: {
+        headers: {
+          'x-client-info': 'lodgeprice-admin'
+        }
+      }
+    })
+  : supabase // Fallback to regular client if service role key not available
 
 // Enhanced error handling function
 export const handleSupabaseError = (error: any): string => {

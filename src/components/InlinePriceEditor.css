@@ -1,0 +1,191 @@
+/**
+ * InlinePriceEditor CSS Styles
+ * 
+ * Styles for inline price editing component with visual states:
+ * - Normal input state
+ * - Error state for validation failures
+ * - Saving state with loading indication
+ * - Success state for completed saves
+ */
+
+.inline-price-editor {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.inline-price-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  background-color: #fff;
+  transition: all 0.15s ease-in-out;
+  
+  /* Remove default number input styling */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.inline-price-input::-webkit-outer-spin-button,
+.inline-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inline-price-input:focus {
+  border-color: #0d6efd;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Error state styling */
+.inline-price-input.error {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.inline-price-input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Saving state styling */
+.inline-price-input.saving {
+  border-color: #6c757d;
+  background-color: #f8f9fa;
+  cursor: wait;
+}
+
+.inline-price-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.price-error-message {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 2px;
+  padding: 4px 8px;
+  background-color: #dc3545;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.price-error-message::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #dc3545;
+}
+
+/* Saving indicator styling */
+.saving-indicator {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Animation for error messages */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success highlight animation for recently saved prices */
+.inline-price-editor.success-highlight .inline-price-input {
+  border-color: #198754;
+  background-color: #d1e7dd;
+  animation: successPulse 1.5s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% {
+    border-color: #198754;
+    background-color: #d1e7dd;
+  }
+  50% {
+    border-color: #20c997;
+    background-color: #d1e7dd;
+  }
+  100% {
+    border-color: #dee2e6;
+    background-color: #fff;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .inline-price-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 6px 8px;
+  }
+  
+  .price-error-message {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .inline-price-input {
+    border-width: 3px;
+  }
+  
+  .inline-price-input.error {
+    border-color: #b02a37;
+  }
+  
+  .price-error-message {
+    background-color: #b02a37;
+    font-weight: bold;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .inline-price-input {
+    background-color: #2b2b2b;
+    border-color: #495057;
+    color: #fff;
+  }
+  
+  .inline-price-input:focus {
+    border-color: #0d6efd;
+  }
+  
+  .inline-price-input.error {
+    background-color: #3d1a1a;
+  }
+  
+  .saving-indicator {
+    color: #adb5bd;
+  }
+}

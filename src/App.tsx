@@ -10,6 +10,7 @@ import NotFound from '@/pages/NotFound'
 import { TestPricing } from '@/pages/TestPricing'
 import PropertySelectionDemo from '@/pages/PropertySelectionDemo'
 import PricingCalendarDemo from '@/pages/PricingCalendarDemo'
+import InlineEditingDemo from '@/pages/InlineEditingDemo'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="test" element={<TestPricing />} />
                 <Route path="property-selection-demo" element={<PropertySelectionDemo />} />
                 <Route path="pricing-calendar-demo" element={<PricingCalendarDemo />} />
+                <Route path="inline-editing-demo" element={<InlineEditingDemo />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

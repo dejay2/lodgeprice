@@ -92,9 +92,12 @@ export class PricingService {
     }
     
     try {
+      // Convert UUID to lodgify_property_id for database function
+      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+      
       // Call database function
       const { data, error } = await supabase.rpc('calculate_final_price', {
-        p_property_id: propertyId,
+        p_property_id: lodgifyPropertyId,
         p_check_date: date.toISOString().split('T')[0],
         p_nights: nights,
       })
@@ -134,9 +137,12 @@ export class PricingService {
     this.validateDateRange(dateRange)
     
     try {
+      // Convert UUID to lodgify_property_id for database function
+      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+      
       // Use bulk function for efficiency
       const { data, error } = await supabase.rpc('preview_pricing_calendar', {
-        p_property_id: propertyId,
+        p_property_id: lodgifyPropertyId,
         p_start_date: dateRange.start.toISOString().split('T')[0],
         p_end_date: dateRange.end.toISOString().split('T')[0],
         p_nights: nights,
@@ -199,7 +205,7 @@ export class PricingService {
       const { error } = await supabase
         .from('properties')
         .update({ base_price_per_day: newPrice })
-        .eq('lodgify_property_id', propertyId)
+        .eq('id', propertyId)
       
       if (error) {
         throw new DatabaseError(`Failed to update base price: ${error.message}`, 'UPDATE_PRICE', error)
@@ -266,8 +272,11 @@ export class PricingService {
     if (cached !== null) return cached
     
     try {
+      // Convert UUID to lodgify_property_id for database function
+      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+      
       const { data, error } = await supabase.rpc('get_last_minute_discount', {
-        p_property_id: propertyId,
+        p_property_id: lodgifyPropertyId,
         p_days_before_checkin: daysBeforeCheckin,
         p_check_date: checkDate.toISOString().split('T')[0],
         p_nights: nights,
@@ -319,6 +328,40 @@ export class PricingService {
     if (date < today) {
       throw new ValidationError('Cannot calculate prices for past dates')
     }
+  }
+
+  /**
+   * Convert property identifier to lodgify_property_id for database function calls
+   * Handles both UUID (converts to lodgify_property_id) and lodgify_property_id (returns as-is)
+   * Database functions expect lodgify_property_id (e.g. "327020")
+   */
+  private async getLodgifyPropertyId(propertyId: string): Promise<string> {
+    // Check if it's already a lodgify_property_id (numeric string, no hyphens)
+    if (/^\d+$/.test(propertyId)) {
+      return propertyId
+    }
+
+    // Check if it's a UUID (contains hyphens and is 36 chars), convert to lodgify_property_id
+    if (propertyId.length === 36 && propertyId.includes('-')) {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('lodgify_property_id')
+        .eq('id', propertyId)
+        .single()
+
+      if (error) {
+        throw new DatabaseError(`Failed to get lodgify property ID: ${error.message}`, 'PROPERTY_LOOKUP', error)
+      }
+
+      if (!data?.lodgify_property_id) {
+        throw new ValidationError(`Property not found: ${propertyId}`)
+      }
+
+      return data.lodgify_property_id
+    }
+
+    // If it's neither a clear UUID nor numeric, treat it as lodgify_property_id
+    return propertyId
   }
   
   private validateDateRange(dateRange: DateRange): void {

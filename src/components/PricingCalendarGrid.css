@@ -348,3 +348,155 @@
     border-color: #000;
   }
 }
+
+/* Inline Editing Styles (PRP-11) */
+
+/* Editable pricing tiles */
+.pricing-tile.editable .price-amount {
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.pricing-tile.editable .price-amount:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.pricing-tile.editable .price-amount:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 1px;
+}
+
+/* Editing state */
+.pricing-tile.editing {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-color: #0d6efd !important;
+}
+
+.pricing-tile.editing .price-display {
+  position: relative;
+}
+
+/* Success highlight animation */
+.pricing-tile.success-highlight {
+  animation: successHighlight 2s ease-in-out;
+}
+
+@keyframes successHighlight {
+  0%, 100% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: rgba(25, 135, 84, 0.15);
+    border-color: #198754;
+  }
+}
+
+/* Error display in tiles */
+.pricing-tile .save-error {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #dc3545;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 1000;
+  max-width: 200px;
+  text-align: center;
+}
+
+.pricing-tile .save-error::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #dc3545;
+}
+
+.pricing-tile .retry-btn {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.pricing-tile .retry-btn:hover {
+  opacity: 0.8;
+}
+
+/* Loading indicator in tiles */
+.pricing-tile .save-loading {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+.pricing-tile .spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0d6efd;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Inline price editor in tiles */
+.pricing-tile .tile-price-editor {
+  width: 100%;
+}
+
+.pricing-tile .tile-price-editor .inline-price-input {
+  font-size: inherit;
+  font-weight: 600;
+  min-height: 24px;
+  border: 1px solid #0d6efd;
+}
+
+/* Responsive adjustments for inline editing */
+@media (max-width: 575.98px) {
+  .pricing-tile .save-error {
+    font-size: 10px;
+    padding: 2px 6px;
+    max-width: 150px;
+  }
+  
+  .pricing-tile .tile-price-editor .inline-price-input {
+    font-size: 12px;
+    padding: 2px 4px;
+  }
+}
+
+/* Focus management during editing */
+.pricing-tile.editing .price-indicators {
+  opacity: 0.5;
+}
+
+/* Prevent calendar navigation during editing */
+.react-calendar__tile.has-editing-tile {
+  pointer-events: none;
+}
+
+.react-calendar__tile.has-editing-tile .pricing-tile.editing {
+  pointer-events: all;
+}

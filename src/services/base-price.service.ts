@@ -1,0 +1,342 @@
+/**
+ * Base Price Service
+ * 
+ * Service layer for managing property base price updates with optimistic UI patterns
+ * Implements database integration as specified in PRP-11
+ */
+
+import { supabase, supabaseAdmin } from '@/lib/supabase'
+import type { Database } from '@/types/database.generated'
+
+type PropertiesRow = Database['public']['Tables']['properties']['Row']
+type PropertiesUpdate = Database['public']['Tables']['properties']['Update']
+
+/**
+ * Error types for base price operations
+ */
+export class BasePriceError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public propertyId?: string,
+    public constraint?: string
+  ) {
+    super(message)
+    this.name = 'BasePriceError'
+  }
+}
+
+/**
+ * Result type for base price updates
+ */
+export interface BasePriceUpdateResult {
+  success: boolean
+  property: PropertiesRow
+  previousPrice: number
+  newPrice: number
+  updatedAt: string
+}
+
+/**
+ * Retry configuration for database operations
+ */
+interface RetryConfig {
+  maxAttempts: number
+  baseDelay: number
+  maxDelay: number
+}
+
+const DEFAULT_RETRY_CONFIG: RetryConfig = {
+  maxAttempts: 3,
+  baseDelay: 1000, // 1 second
+  maxDelay: 8000   // 8 seconds
+}
+
+/**
+ * Base Price Service class
+ * 
+ * Provides methods for updating property base prices with proper error handling
+ * and retry logic as specified in PRP-11 requirements
+ */
+export class BasePriceService {
+  /**
+   * Update base price for a property with optimistic update support
+   * 
+   * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
+   * @param newBasePrice - New base price per day
+   * @param retryConfig - Optional retry configuration
+   * @returns Promise with update result
+   * @throws BasePriceError for various failure scenarios
+   */
+  static async updateBasePrice(
+    propertyId: string,
+    newBasePrice: number,
+    retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG
+  ): Promise<BasePriceUpdateResult> {
+    // Validate inputs
+    if (!propertyId || typeof propertyId !== 'string') {
+      throw new BasePriceError('Invalid property ID provided', 'INVALID_PROPERTY_ID')
+    }
+
+    if (typeof newBasePrice !== 'number' || newBasePrice <= 0) {
+      throw new BasePriceError('Base price must be a positive number', 'INVALID_PRICE', propertyId)
+    }
+
+    // Ensure precision (database stores 2 decimal places)
+    const roundedPrice = Math.round(newBasePrice * 100) / 100
+
+    return this.retryOperation(async () => {
+      // Convert propertyId to UUID if it's a lodgify_property_id
+      const propertyUuid = await this.getPropertyUuid(propertyId)
+      
+      // First, get current property data to validate constraints and track previous price
+      const { data: currentProperty, error: fetchError } = await supabase
+        .from('properties')
+        .select('id, lodgify_property_id, property_name, base_price_per_day, min_price_per_day, updated_at')
+        .eq('id', propertyUuid)
+        .single()
+
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
+          throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+        }
+        throw new BasePriceError(`Failed to fetch property: ${fetchError.message}`, 'FETCH_ERROR', propertyId)
+      }
+
+      if (!currentProperty) {
+        throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+      }
+
+      // Validate against minimum price constraint (client-side pre-validation)
+      if (roundedPrice < currentProperty.min_price_per_day) {
+        throw new BasePriceError(
+          `Price €${roundedPrice.toFixed(2)} is below minimum price €${currentProperty.min_price_per_day.toFixed(2)}`,
+          'PRICE_BELOW_MINIMUM',
+          propertyId,
+          'base_price_gte_min'
+        )
+      }
+
+      // Check if price actually changed
+      if (roundedPrice === currentProperty.base_price_per_day) {
+        // Return success without update if price hasn't changed
+        return {
+          success: true,
+          property: currentProperty as PropertiesRow,
+          previousPrice: currentProperty.base_price_per_day,
+          newPrice: roundedPrice,
+          updatedAt: currentProperty.updated_at || new Date().toISOString()
+        }
+      }
+
+      // Perform the update
+      const updateData: PropertiesUpdate = {
+        base_price_per_day: roundedPrice,
+        updated_at: new Date().toISOString()
+      }
+
+      const { data: updatedProperty, error: updateError } = await supabaseAdmin
+        .from('properties')
+        .update(updateData)
+        .eq('id', propertyUuid)
+        .select('*')
+        .single()
+
+      if (updateError) {
+        // Handle specific database constraint errors
+        if (updateError.code === '23514' && updateError.message.includes('base_price_gte_min')) {
+          throw new BasePriceError(
+            `Price €${roundedPrice.toFixed(2)} violates minimum price constraint`,
+            'CONSTRAINT_VIOLATION',
+            propertyId,
+            'base_price_gte_min'
+          )
+        }
+
+        if (updateError.code === '23502') {
+          throw new BasePriceError(
+            'Base price cannot be null',
+            'NULL_CONSTRAINT_VIOLATION',
+            propertyId
+          )
+        }
+
+        throw new BasePriceError(
+          `Database update failed: ${updateError.message}`,
+          'UPDATE_ERROR',
+          propertyId
+        )
+      }
+
+      if (!updatedProperty) {
+        throw new BasePriceError('Update succeeded but no property returned', 'UPDATE_NO_RESULT', propertyId)
+      }
+
+      return {
+        success: true,
+        property: updatedProperty,
+        previousPrice: currentProperty.base_price_per_day,
+        newPrice: updatedProperty.base_price_per_day,
+        updatedAt: updatedProperty.updated_at || new Date().toISOString()
+      }
+    }, retryConfig)
+  }
+
+  /**
+   * Get property information for validation
+   * 
+   * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
+   * @returns Property data including minimum price constraints
+   */
+  static async getPropertyInfo(propertyId: string): Promise<PropertiesRow> {
+    // Convert propertyId to UUID if it's a lodgify_property_id
+    const propertyUuid = await this.getPropertyUuid(propertyId)
+    
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', propertyUuid)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+      }
+      throw new BasePriceError(`Failed to fetch property info: ${error.message}`, 'FETCH_ERROR', propertyId)
+    }
+
+    return data
+  }
+
+  /**
+   * Retry operation with exponential backoff
+   * 
+   * @param operation - Async operation to retry
+   * @param config - Retry configuration
+   * @returns Promise with operation result
+   */
+  private static async retryOperation<T>(
+    operation: () => Promise<T>,
+    config: RetryConfig
+  ): Promise<T> {
+    let lastError: Error | null = null
+
+    for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+      try {
+        return await operation()
+      } catch (error) {
+        lastError = error as Error
+
+        // Don't retry certain types of errors
+        if (error instanceof BasePriceError) {
+          const nonRetryableCodes = [
+            'INVALID_PROPERTY_ID',
+            'INVALID_PRICE', 
+            'PROPERTY_NOT_FOUND',
+            'PRICE_BELOW_MINIMUM',
+            'CONSTRAINT_VIOLATION',
+            'NULL_CONSTRAINT_VIOLATION'
+          ]
+          
+          if (nonRetryableCodes.includes(error.code)) {
+            throw error
+          }
+        }
+
+        // Don't retry on last attempt
+        if (attempt === config.maxAttempts) {
+          break
+        }
+
+        // Calculate delay with exponential backoff and jitter
+        const delay = Math.min(
+          config.baseDelay * Math.pow(2, attempt - 1),
+          config.maxDelay
+        )
+        
+        // Add jitter (±25% of delay)
+        const jitter = delay * 0.25 * (Math.random() * 2 - 1)
+        const finalDelay = Math.max(0, delay + jitter)
+
+        console.warn(`Base price update attempt ${attempt} failed, retrying in ${Math.round(finalDelay)}ms:`, error)
+        
+        await new Promise(resolve => setTimeout(resolve, finalDelay))
+      }
+    }
+
+    // If we get here, all retries failed
+    throw lastError || new BasePriceError('Max retry attempts exceeded', 'MAX_RETRIES_EXCEEDED')
+  }
+
+  /**
+   * Validate price against property constraints without updating
+   * 
+   * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
+   * @param newPrice - Price to validate
+   * @returns Validation result with specific error messages
+   */
+  static async validatePrice(
+    propertyId: string,
+    newPrice: number
+  ): Promise<{ valid: boolean; error?: string }> {
+    try {
+      const property = await this.getPropertyInfo(propertyId)
+      
+      if (newPrice <= 0) {
+        return { valid: false, error: 'Price must be a positive number' }
+      }
+
+      if (newPrice < property.min_price_per_day) {
+        return { 
+          valid: false, 
+          error: `Price must be at least €${property.min_price_per_day.toFixed(2)}` 
+        }
+      }
+
+      return { valid: true }
+    } catch (error) {
+      return { 
+        valid: false, 
+        error: error instanceof BasePriceError ? error.message : 'Validation failed' 
+      }
+    }
+  }
+
+  /**
+   * Convert property ID to UUID for database operations
+   * Handles both UUID (returns as-is) and lodgify_property_id (converts to UUID)
+   * This mirrors how PricingService.getLodgifyPropertyId() works but in reverse
+   * 
+   * @param propertyId - Either UUID or lodgify_property_id string
+   * @returns Property UUID for database queries
+   */
+  private static async getPropertyUuid(propertyId: string): Promise<string> {
+    // Check if it's already a UUID (contains hyphens and is 36 chars)
+    if (propertyId.length === 36 && propertyId.includes('-')) {
+      return propertyId
+    }
+
+    // It's likely a lodgify_property_id, convert to UUID
+    const { data, error } = await supabase
+      .from('properties')
+      .select('id')
+      .eq('lodgify_property_id', propertyId)
+      .single()
+
+    if (error) {
+      throw new BasePriceError(
+        `Failed to find property with lodgify_property_id: ${propertyId}`,
+        'PROPERTY_LOOKUP_FAILED',
+        propertyId
+      )
+    }
+
+    if (!data?.id) {
+      throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+    }
+
+    return data.id
+  }
+}
+
+export default BasePriceService
