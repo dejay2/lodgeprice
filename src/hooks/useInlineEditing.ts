@@ -7,9 +7,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import BasePriceService, { BasePriceError } from '@/services/base-price.service'
-import type { Database } from '@/types/database.generated'
+// import type { Database } from '@/types/database.generated'
 
-type PropertiesRow = Database['public']['Tables']['properties']['Row']
+// type PropertiesRow = Database['public']['Tables']['properties']['Row']
 
 /**
  * State for individual editing operations

@@ -16,7 +16,6 @@ import { useInlineEditing } from '@/hooks/useInlineEditing'
 import type {
   PricingCalendarGridProps,
   CalculateFinalPriceResult,
-  PreviewPricingCalendarResult,
   CalendarLoadingState,
   CalendarValue
 } from '@/types/pricing-calendar.types'

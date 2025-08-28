@@ -91,7 +91,11 @@ export function useDiscountStrategies(): UseDiscountStrategies {
         throw new Error(strategiesError.message)
       }
       
-      setStrategies(strategiesData || [])
+      setStrategies((strategiesData || []).map(strategy => ({
+        ...strategy,
+        created_at: strategy.created_at || '',
+        updated_at: strategy.updated_at || ''
+      })))
       
       // Fetch rules for all strategies
       if (strategiesData && strategiesData.length > 0) {
@@ -112,7 +116,11 @@ export function useDiscountStrategies(): UseDiscountStrategies {
         if (rulesData) {
           for (const rule of rulesData) {
             const strategyRules = rulesMap.get(rule.strategy_id) || []
-            strategyRules.push(rule)
+            strategyRules.push({
+              ...rule,
+              created_at: rule.created_at || '',
+              updated_at: rule.updated_at || ''
+            })
             rulesMap.set(rule.strategy_id, strategyRules)
           }
         }
@@ -158,9 +166,17 @@ export function useDiscountStrategies(): UseDiscountStrategies {
       }
       
       // Update local state
-      setStrategies(prev => [data, ...prev])
+      setStrategies(prev => [{
+        ...data,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
+      }, ...prev])
       
-      return data
+      return {
+        ...data,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create discount strategy'
       setError(errorMessage)
@@ -203,7 +219,11 @@ export function useDiscountStrategies(): UseDiscountStrategies {
       }
       
       // Update local state
-      setStrategies(prev => prev.map(s => s.strategy_id === id ? data : s))
+      setStrategies(prev => prev.map(s => s.strategy_id === id ? {
+        ...data,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
+      } : s))
       
       // Refresh calendar if strategy is active
       if (data.is_active) {
@@ -369,7 +389,11 @@ export function useDiscountStrategies(): UseDiscountStrategies {
       setRules(prev => {
         const newRules = new Map(prev)
         const strategyRules = newRules.get(rule.strategy_id) || []
-        strategyRules.push(data)
+        strategyRules.push({
+          ...data,
+          created_at: data.created_at || '',
+          updated_at: data.updated_at || ''
+        })
         strategyRules.sort((a, b) => b.days_before_checkin - a.days_before_checkin)
         newRules.set(rule.strategy_id, strategyRules)
         return newRules

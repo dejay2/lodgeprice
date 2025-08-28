@@ -132,6 +132,11 @@ export class BookingService {
       throw new ValidationError(`Property not found: ${bookingData.propertyId}`)
     }
     
+    // Ensure property_id is valid
+    if (!bookingData.propertyId) {
+      throw new ValidationError('Property ID is required for booking creation')
+    }
+
     // Create booking record
     const bookingInsert: BookingInsert = {
       booking_id: this.generateBookingId(),
@@ -147,7 +152,7 @@ export class BookingService {
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .insert(bookingInsert)
+        .insert(bookingInsert as any)
         .select()
         .single()
       
@@ -226,11 +231,17 @@ export class BookingService {
     if (updates.totalPrice !== undefined) {
       bookingUpdate.total_price = updates.totalPrice
     }
+    if (updates.propertyId !== undefined) {
+      if (!updates.propertyId) {
+        throw new ValidationError('Property ID cannot be null or empty')
+      }
+      bookingUpdate.property_id = updates.propertyId
+    }
     
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .update(bookingUpdate)
+        .update(bookingUpdate as any)
         .eq('id', bookingId)
         .select()
         .single()

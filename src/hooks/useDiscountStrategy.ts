@@ -318,7 +318,12 @@ export const useFetchDiscountStrategies = () => {
         throw handleDatabaseError(fetchError, 'Fetching global strategies');
       }
       
-      setStrategies(data || []);
+      setStrategies((data || []).map(strategy => ({
+        ...strategy,
+        property_internal_id: null, // RPC doesn't return this field
+        created_at: '', // RPC doesn't return this field 
+        updated_at: '' // RPC doesn't return this field
+      })));
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';

@@ -13,6 +13,7 @@ import PricingCalendarDemo from '@/pages/PricingCalendarDemo'
 import InlineEditingDemo from '@/pages/InlineEditingDemo'
 import DiscountStrategyDemo from '@/pages/DiscountStrategyDemo'
 import SeasonalRateManagementPage from '@/components/seasonal-rate-management/SeasonalRateManagementPage'
+import LodgifyPayloadGeneratorPage from '@/pages/LodgifyPayloadGenerator'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="calendar/:propertyId" element={<Calendar />} />
                 <Route path="seasonal-rates" element={<SeasonalRateManagementPage />} />
+                <Route path="lodgify-payload-generator" element={<LodgifyPayloadGeneratorPage />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="test" element={<TestPricing />} />
                 <Route path="property-selection-demo" element={<PropertySelectionDemo />} />

@@ -158,7 +158,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
 const PricingDashboardInner: React.FC = () => {
   const { 
     selectedProperty, 
-    selectedDateRange, 
+    selectedDateRange: _selectedDateRange, 
     defaultNights,
     loading,
     refreshCalendarData,
@@ -213,10 +213,10 @@ const PricingDashboardInner: React.FC = () => {
   /**
    * Handle price edit from calendar
    */
-  const handlePriceEdit = async (date: Date, newPrice: number) => {
-    // This will be handled by the CalendarCell component with optimistic updates
-    console.log('Price edit:', date, newPrice)
-  }
+  // const _handlePriceEdit = async (date: Date, newPrice: number) => {
+  //   // This will be handled by the CalendarCell component with optimistic updates
+  //   console.log('Price edit:', date, newPrice)
+  // }
   
   /**
    * Close price detail modal
