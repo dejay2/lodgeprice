@@ -17,14 +17,19 @@
     "types:update": "npm run types:generate && npm run types:check"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@supabase/supabase-js": "^2.48.0",
     "@types/react-datepicker": "^6.2.0",
+    "@types/react-select": "^5.0.0",
     "date-fns": "^4.1.0",
     "react": "^18.2.0",
     "react-calendar": "^6.0.0",
     "react-datepicker": "^8.7.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0"
+    "react-hook-form": "^7.62.0",
+    "react-router-dom": "^6.20.0",
+    "react-select": "^5.10.2",
+    "yup": "^1.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^8.53.0",

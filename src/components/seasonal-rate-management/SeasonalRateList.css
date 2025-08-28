@@ -1,0 +1,265 @@
+/**
+ * SeasonalRateList styles
+ * Table and list view styling for seasonal rates
+ */
+
+.seasonal-rate-list {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Loading State */
+.seasonal-rate-list-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 102, 204, 0.2);
+  border-top-color: #0066cc;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* List Controls */
+.list-controls {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.selection-count {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+}
+
+.seasonal-rate-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.seasonal-rate-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.seasonal-rate-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.seasonal-rate-table th.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.seasonal-rate-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.sort-indicator {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: #0066cc;
+}
+
+.seasonal-rate-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.seasonal-rate-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.seasonal-rate-table tbody tr.has-overlap {
+  background-color: #fff3cd;
+}
+
+.seasonal-rate-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #212529;
+}
+
+.checkbox-column {
+  width: 40px;
+  text-align: center;
+}
+
+.name-column {
+  font-weight: 500;
+  position: relative;
+}
+
+.overlap-indicator {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  cursor: help;
+}
+
+.actions-column {
+  width: 120px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Rate Badge */
+.rate-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rate-badge--increase {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.rate-badge--decrease {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.rate-badge--neutral {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #0066cc;
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Empty State */
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* List Summary */
+.list-summary {
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .list-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+  
+  .seasonal-rate-table {
+    font-size: 0.8125rem;
+  }
+  
+  .seasonal-rate-table th,
+  .seasonal-rate-table td {
+    padding: 0.5rem;
+  }
+  
+  .actions-column {
+    width: auto;
+  }
+}

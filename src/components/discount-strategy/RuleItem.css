@@ -1,0 +1,142 @@
+.rule-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.rule-item:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rule-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rule-item-number {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+.rule-item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rule-action-button {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.rule-action-button:hover {
+  background-color: #f8f9fa;
+  border-color: #6c757d;
+  color: #495057;
+}
+
+.rule-action-remove {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.rule-action-remove:hover {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.rule-item-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .rule-item-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rule-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.rule-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.25rem;
+}
+
+.rule-input {
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.rule-input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.rule-input-error {
+  border-color: #dc3545;
+}
+
+.rule-input-error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.rule-percentage-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rule-percentage-input .rule-input {
+  flex: 1;
+}
+
+.rule-percentage-display {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #28a745;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.rule-error-message {
+  font-size: 0.75rem;
+  color: #dc3545;
+  margin-top: 0.25rem;
+}
+
+.rule-item-error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}

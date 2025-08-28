@@ -11,6 +11,8 @@ import { TestPricing } from '@/pages/TestPricing'
 import PropertySelectionDemo from '@/pages/PropertySelectionDemo'
 import PricingCalendarDemo from '@/pages/PricingCalendarDemo'
 import InlineEditingDemo from '@/pages/InlineEditingDemo'
+import DiscountStrategyDemo from '@/pages/DiscountStrategyDemo'
+import SeasonalRateManagementPage from '@/components/seasonal-rate-management/SeasonalRateManagementPage'
 
 function App() {
   return (
@@ -24,11 +26,13 @@ function App() {
                 <Route path="properties" element={<Properties />} />
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="calendar/:propertyId" element={<Calendar />} />
+                <Route path="seasonal-rates" element={<SeasonalRateManagementPage />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="test" element={<TestPricing />} />
                 <Route path="property-selection-demo" element={<PropertySelectionDemo />} />
                 <Route path="pricing-calendar-demo" element={<PricingCalendarDemo />} />
                 <Route path="inline-editing-demo" element={<InlineEditingDemo />} />
+                <Route path="discount-strategy-demo" element={<DiscountStrategyDemo />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

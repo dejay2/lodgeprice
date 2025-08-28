@@ -1,0 +1,235 @@
+/**
+ * SeasonalRateManagementPage styles
+ * Main page layout and styling
+ */
+
+.seasonal-rate-management-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.page-title-section h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #212529;
+}
+
+.page-subtitle {
+  margin: 0;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.page-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Error Banner */
+.error-banner {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-banner .btn-link {
+  color: #721c24;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* View Controls */
+.view-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.view-tabs {
+  display: flex;
+  background: #f0f0f0;
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.view-tab {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.view-tab:hover {
+  color: #212529;
+}
+
+.view-tab.active {
+  background: white;
+  color: #0066cc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Page Content */
+.page-content {
+  margin-bottom: 2rem;
+}
+
+/* Help Section */
+.help-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.help-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #495057;
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.help-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.help-item h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #212529;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.help-item p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+/* Button Styles */
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #0066cc;
+  color: white;
+  border-color: #0066cc;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0052a3;
+  border-color: #0052a3;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #495057;
+  border-color: #dee2e6;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  color: #212529;
+  border-color: #adb5bd;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .seasonal-rate-management-page {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .view-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .view-tabs {
+    justify-content: center;
+  }
+  
+  .view-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .page-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

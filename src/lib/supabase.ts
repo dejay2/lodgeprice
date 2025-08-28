@@ -3,45 +3,32 @@ import type { Database } from '../types/database.types'
 
 // Environment variable validation
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabaseServiceRoleKey) {
   throw new Error(
-    'Missing Supabase environment variables. Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.'
+    'Missing Supabase environment variables. Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_SERVICE_ROLE_KEY are set.'
   )
 }
 
-// Create Supabase client with enhanced configuration and full type safety
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+// Create Supabase client with service role key for full access
+// This bypasses RLS which is necessary for this personal tool application
+export const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
   },
   global: {
     headers: {
-      'x-client-info': 'lodgeprice-frontend'
+      'x-client-info': 'lodgeprice-admin'
     }
   }
 })
 
-// Create admin client with service role key for operations that need to bypass RLS
-// This client should only be used for admin operations like updating base prices
-export const supabaseAdmin = supabaseServiceRoleKey 
-  ? createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      },
-      global: {
-        headers: {
-          'x-client-info': 'lodgeprice-admin'
-        }
-      }
-    })
-  : supabase // Fallback to regular client if service role key not available
+// Export supabaseAdmin as an alias for backward compatibility
+// Both point to the same service role client
+export const supabaseAdmin = supabase
 
 // Enhanced error handling function
 export const handleSupabaseError = (error: any): string => {
