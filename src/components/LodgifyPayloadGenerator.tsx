@@ -10,6 +10,7 @@ import {
   exportStatistics
 } from '@/utils/payloadExporter'
 import { getDefaultStayLengthCategories } from '@/utils/dateRangeGenerator'
+import { lodgifyApi } from '@/services/api'
 import type { 
   LodgifyPayload, 
   PayloadGenerationOptions,
@@ -17,18 +18,21 @@ import type {
   GenerationStatistics,
   StayLengthCategory
 } from '@/types/lodgify'
+import type { BatchSyncResult } from '@/services/lodgify/lodgifyTypes'
 
 interface LodgifyPayloadGeneratorProps {
   className?: string
 }
 
 type GenerationState = 'idle' | 'generating' | 'completed' | 'error'
+type SyncState = 'idle' | 'syncing' | 'completed' | 'error'
 
 const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({ 
   className = '' 
 }) => {
   // State management
   const [state, setState] = useState<GenerationState>('idle')
+  const [syncState, setSyncState] = useState<SyncState>('idle')
   const [selectedProperties, setSelectedProperties] = useState<string[]>([])
   const [dateRangeOption, setDateRangeOption] = useState<'24-months' | '12-months' | '6-months' | 'custom'>('24-months')
   const [customStartDate, setCustomStartDate] = useState('')
@@ -43,6 +47,11 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
   const [progress, setProgress] = useState<GenerationProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [validationResults, setValidationResults] = useState<any>(null)
+  
+  // Sync state
+  const [syncResults, setSyncResults] = useState<BatchSyncResult | null>(null)
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const [syncProgress, setSyncProgress] = useState<number>(0)
 
   // Load properties
   const { properties, loading: propertiesLoading, error: propertiesError } = useProperties()
@@ -161,6 +170,104 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
     if (!statistics) return
     exportStatistics(statistics)
   }, [statistics])
+
+  // Sync to Lodgify API
+  const handleSyncToLodgify = useCallback(async () => {
+    if (payloads.length === 0) {
+      setSyncError('No payloads to sync. Please generate payloads first.')
+      return
+    }
+
+    setSyncState('syncing')
+    setSyncError(null)
+    setSyncResults(null)
+    setSyncProgress(0)
+
+    try {
+      // Map payloads to property IDs (need to get the UUID from property)
+      const propertyPayloads = payloads.map(payload => {
+        const property = properties.find(p => 
+          parseInt(p.lodgify_property_id) === payload.property_id
+        )
+        
+        if (!property) {
+          throw new Error(`Property not found for Lodgify ID ${payload.property_id}`)
+        }
+        
+        return {
+          propertyId: property.id, // UUID
+          payload
+        }
+      })
+
+      // Track progress
+      let processed = 0
+      const progressInterval = setInterval(() => {
+        setSyncProgress((processed / propertyPayloads.length) * 100)
+      }, 100)
+
+      // Perform batch sync
+      const result = await lodgifyApi.syncMultipleProperties(
+        propertyPayloads,
+        {
+          validatePayload: true,
+          maxRetries: 3,
+          timeout: 30000
+        }
+      )
+
+      clearInterval(progressInterval)
+      setSyncProgress(100)
+      setSyncResults(result)
+      setSyncState('completed')
+
+      // Show summary
+      if (result.failed > 0) {
+        setSyncError(`Sync completed with ${result.failed} failures. See details below.`)
+      }
+      
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown sync error occurred'
+      setSyncError(message)
+      setSyncState('error')
+    }
+  }, [payloads, properties])
+
+  // Test connection for selected properties
+  const handleTestConnection = useCallback(async () => {
+    if (selectedProperties.length === 0) {
+      setSyncError('Please select at least one property to test')
+      return
+    }
+
+    setSyncState('syncing')
+    setSyncError(null)
+    
+    try {
+      const property = properties.find(p => 
+        selectedProperties.includes(p.lodgify_property_id)
+      )
+      
+      if (!property) {
+        throw new Error('Selected property not found')
+      }
+
+      const result = await lodgifyApi.testConnection(property.id)
+      
+      if (result.success) {
+        setSyncError(null)
+        alert('Connection test successful! API key is valid and Lodgify API is accessible.')
+      } else {
+        setSyncError(`Connection test failed: ${result.message}`)
+      }
+      
+      setSyncState('idle')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Connection test failed'
+      setSyncError(message)
+      setSyncState('error')
+    }
+  }, [selectedProperties, properties])
 
   // Property selection handlers
   const handleSelectAll = useCallback(() => {
@@ -545,6 +652,122 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
                   Export Statistics
                 </button>
               </div>
+            </div>
+
+            {/* Lodgify API Sync Controls */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Lodgify API Sync</h3>
+              
+              {/* Test Connection Button */}
+              <div className="mb-4">
+                <button
+                  onClick={handleTestConnection}
+                  disabled={syncState === 'syncing' || selectedProperties.length === 0}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  data-testid="test-connection-button"
+                >
+                  {syncState === 'syncing' ? 'Testing...' : 'Test Connection'}
+                </button>
+                <span className="ml-3 text-sm text-gray-600">
+                  Test API key and connection for selected properties
+                </span>
+              </div>
+
+              {/* Sync Button */}
+              <div className="mb-4">
+                <button
+                  onClick={handleSyncToLodgify}
+                  disabled={syncState === 'syncing' || payloads.length === 0 || !validationResults?.valid}
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
+                  data-testid="sync-to-lodgify-button"
+                >
+                  {syncState === 'syncing' ? 'Syncing...' : 'Sync to Lodgify API'}
+                </button>
+                {!validationResults?.valid && payloads.length > 0 && (
+                  <span className="ml-3 text-sm text-red-600">
+                    Fix validation errors before syncing
+                  </span>
+                )}
+              </div>
+
+              {/* Sync Progress */}
+              {syncState === 'syncing' && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Syncing payloads to Lodgify...</span>
+                    <span>{Math.round(syncProgress)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${syncProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sync Error */}
+              {syncError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <p className="text-red-800">{syncError}</p>
+                </div>
+              )}
+
+              {/* Sync Results */}
+              {syncResults && (
+                <div className="space-y-4">
+                  {/* Summary */}
+                  <div className={`rounded-lg p-4 ${syncResults.failed === 0 ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}`}>
+                    <h4 className={`font-semibold mb-2 ${syncResults.failed === 0 ? 'text-green-800' : 'text-yellow-800'}`}>
+                      Sync Results
+                    </h4>
+                    <p className={syncResults.failed === 0 ? 'text-green-700' : 'text-yellow-700'}>
+                      {syncResults.summary}
+                    </p>
+                    <div className="mt-2 text-sm">
+                      <span className="text-green-700">✅ Successful: {syncResults.successful}</span>
+                      {syncResults.failed > 0 && (
+                        <span className="ml-4 text-red-700">❌ Failed: {syncResults.failed}</span>
+                      )}
+                      <span className="ml-4 text-gray-600">Duration: {(syncResults.duration / 1000).toFixed(1)}s</span>
+                    </div>
+                  </div>
+
+                  {/* Individual Results */}
+                  {syncResults.results.length > 0 && (
+                    <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                      <h5 className="font-medium text-gray-900 mb-2">Individual Property Results:</h5>
+                      {syncResults.results.map((result, index) => (
+                        <div 
+                          key={index}
+                          className={`mb-2 p-2 rounded ${result.success ? 'bg-green-50' : 'bg-red-50'}`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <span className={`font-medium ${result.success ? 'text-green-800' : 'text-red-800'}`}>
+                                Property {index + 1}
+                              </span>
+                              <p className="text-sm text-gray-600 mt-1">{result.message}</p>
+                              {result.error && (
+                                <p className="text-sm text-red-600 mt-1">
+                                  Error: {result.error.details}
+                                  {result.error.recoverable && ' (recoverable)'}
+                                </p>
+                              )}
+                            </div>
+                            <span className={`ml-2 ${result.success ? 'text-green-600' : 'text-red-600'}`}>
+                              {result.success ? '✅' : '❌'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Duration: {result.duration}ms | Retries: {result.retryCount}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Payload Preview */}
