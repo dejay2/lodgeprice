@@ -1,17 +1,60 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  const env = loadEnv(mode, process.cwd(), '')
+  
+  return {
   plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test-setup.ts'],
-  },
   resolve: {
     alias: {
-      '@': new URL('./src', import.meta.url).pathname,
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  test: {
+    globals: true,
+    environment: 'node', // Using 'node' for unit tests, 'jsdom' for component tests
+    setupFiles: './tests/setup.ts',
+    env: {
+      ...env
+    },
+    // Memory optimization settings
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+        isolate: true,
+      }
+    },
+    testTimeout: 10000,
+    hookTimeout: 10000,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        '*.config.*',
+        'src/test-setup.ts',
+        'tests/setup.ts',
+        '**/*.d.ts',
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/mocks/**',
+        '**/fixtures/**'
+      ],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80
+      }
+    },
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/**/*.spec.ts', 'tests/**/*.spec.tsx'],
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+  },
+}
 })
