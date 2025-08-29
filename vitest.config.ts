@@ -53,8 +53,8 @@ export default defineConfig(({ mode }) => {
         lines: 80
       }
     },
-    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/**/*.spec.ts', 'tests/**/*.spec.tsx'],
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+    include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx', 'tests/integration/**/*.test.ts', 'tests/integration/**/*.test.tsx'],
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'tests/e2e', 'playwright-report', 'test-results'],
   },
 }
 })
