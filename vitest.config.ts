@@ -5,7 +5,10 @@ import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
-  const env = loadEnv(mode, process.cwd(), '')
+  // For tests, also load .env.test.local if it exists
+  const env = mode === 'test' 
+    ? { ...loadEnv(mode, process.cwd(), ''), ...loadEnv('test', process.cwd(), '') }
+    : loadEnv(mode, process.cwd(), '')
   
   return {
   plugins: [react()],
@@ -16,8 +19,16 @@ export default defineConfig(({ mode }) => {
   },
   test: {
     globals: true,
-    environment: 'node', // Using 'node' for unit tests, 'jsdom' for component tests
-    setupFiles: './tests/setup.ts',
+    environment: 'node', // Default to node, override in test files as needed
+    setupFiles: ['./tests/setup.ts', './src/test/setup.ts'],
+    environmentMatchGlobs: [
+      // Use jsdom for component tests
+      ['**/*.test.tsx', 'jsdom'],
+      ['**/property-workflow.test.*', 'jsdom'],
+      // Use node for integration and performance tests
+      ['**/integration/**/*.test.ts', 'node'],
+      ['**/performance/**/*.test.ts', 'node']
+    ],
     env: {
       ...env
     },
@@ -53,7 +64,14 @@ export default defineConfig(({ mode }) => {
         lines: 80
       }
     },
-    include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx', 'tests/integration/**/*.test.ts', 'tests/integration/**/*.test.tsx'],
+    include: [
+      'tests/unit/**/*.test.ts', 
+      'tests/unit/**/*.test.tsx', 
+      'tests/integration/**/*.test.ts', 
+      'tests/integration/**/*.test.tsx',
+      'tests/performance/**/*.test.ts',
+      'tests/performance/**/*.test.tsx'
+    ],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'tests/e2e', 'playwright-report', 'test-results'],
   },
 }

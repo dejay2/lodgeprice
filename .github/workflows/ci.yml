@@ -1,0 +1,178 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  test:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      # Parallel quality gates
+      - name: Run linter
+        id: lint
+        run: npm run lint
+        continue-on-error: false
+      
+      - name: Run type check
+        id: typecheck
+        run: npm run typecheck
+        continue-on-error: false
+      
+      # Sequential test execution
+      - name: Run unit tests with coverage
+        id: unit-tests
+        run: npm run test:coverage
+        env:
+          NODE_ENV: test
+          CI: true
+      
+      - name: Run integration tests
+        id: integration-tests
+        run: npm run test:integration
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NODE_ENV: test
+          CI: true
+        continue-on-error: false
+        timeout-minutes: 5
+      
+      # Build verification
+      - name: Build application
+        id: build
+        run: npm run build
+        env:
+          NODE_ENV: production
+          CI: true
+      
+      # Upload coverage reports
+      - name: Upload coverage reports
+        if: always() && steps.unit-tests.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+      
+      # Upload build artifacts
+      - name: Upload build artifacts
+        if: always() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+      
+      # Report test results in PR
+      - name: Add PR comment with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const lintStatus = '${{ steps.lint.outcome }}';
+            const typecheckStatus = '${{ steps.typecheck.outcome }}';
+            const unitTestStatus = '${{ steps.unit-tests.outcome }}';
+            const integrationTestStatus = '${{ steps.integration-tests.outcome }}';
+            const buildStatus = '${{ steps.build.outcome }}';
+            
+            let comment = '## CI Pipeline Results\n\n';
+            comment += '| Check | Status |\n';
+            comment += '|-------|--------|\n';
+            comment += `| Lint | ${lintStatus === 'success' ? '✅' : '❌'} ${lintStatus} |\n`;
+            comment += `| Type Check | ${typecheckStatus === 'success' ? '✅' : '❌'} ${typecheckStatus} |\n`;
+            comment += `| Unit Tests | ${unitTestStatus === 'success' ? '✅' : '❌'} ${unitTestStatus} |\n`;
+            comment += `| Integration Tests | ${integrationTestStatus === 'success' ? '✅' : '❌'} ${integrationTestStatus} |\n`;
+            comment += `| Build | ${buildStatus === 'success' ? '✅' : '❌'} ${buildStatus} |\n`;
+            
+            const success = lintStatus === 'success' && 
+                          typecheckStatus === 'success' && 
+                          unitTestStatus === 'success' && 
+                          integrationTestStatus === 'success' && 
+                          buildStatus === 'success';
+            
+            if (success) {
+              comment += '\n✅ **All checks passed!**';
+            } else {
+              comment += '\n❌ **Some checks failed. Please review the logs above.**';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+  
+  # Optional: Run E2E tests (only on main branch to save resources)
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'e2e-required')
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          CI: true
+        timeout-minutes: 10
+      
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7

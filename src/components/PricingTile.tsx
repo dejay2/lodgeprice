@@ -29,27 +29,6 @@ const PricingTile: React.FC<PricingTileProps> = ({
   const [saveError, setSaveError] = useState<string | null>(null)
   const [recentlySaved, setRecentlySaved] = useState(false)
 
-  // Only show content in month view as per react-calendar best practices
-  if (view !== 'month') return null
-
-  // Loading state when price data is not yet available
-  if (!priceData) {
-    return (
-      <div className="pricing-tile loading" data-testid="price-tile-loading">
-        <div className="price-display">
-          <div className="spinner-border spinner-border-sm text-primary" role="status">
-            <span className="visually-hidden">Loading price...</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Calculate indicators based on price data
-  const hasSeasonalRate = Math.abs(priceData.seasonal_adjustment) > 0.01
-  const hasLastMinuteDiscount = priceData.last_minute_discount > 0.01
-  const isAtMinPrice = priceData.min_price_enforced
-
   /**
    * Handle click to start editing (FR-2)
    */
@@ -106,6 +85,27 @@ const PricingTile: React.FC<PricingTileProps> = ({
     setSaveError(error)
   }, [])
 
+  // Only show content in month view as per react-calendar best practices
+  if (view !== 'month') return null
+
+  // Loading state when price data is not yet available
+  if (!priceData) {
+    return (
+      <div className="pricing-tile loading" data-testid="price-tile-loading">
+        <div className="price-display">
+          <div className="spinner-border spinner-border-sm text-primary" role="status">
+            <span className="visually-hidden">Loading price...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Calculate indicators based on price data
+  const hasSeasonalRate = Math.abs(priceData.seasonal_adjustment) > 0.01
+  const hasLastMinuteDiscount = priceData.last_minute_discount > 0.01
+  const isAtMinPrice = priceData.min_price_enforced
+
   // Get test ID for current date (today vs other dates)
   const today = new Date()
   const isToday = date.toISOString().split('T')[0] === today.toISOString().split('T')[0]
@@ -140,7 +140,12 @@ const PricingTile: React.FC<PricingTileProps> = ({
             onKeyDown={isEditable ? (e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                handleEditStart(e as any)
+                const mouseEvent = new MouseEvent('click', {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window
+                })
+                handleEditStart(mouseEvent as unknown as React.MouseEvent<HTMLDivElement>)
               }
             } : undefined}
           >
