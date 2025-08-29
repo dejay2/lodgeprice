@@ -1,27 +1,67 @@
 import React, { Component, ReactNode } from 'react'
+import { createErrorState, sanitizeErrorForLogging } from '@/lib/errorHandling'
+import type { ErrorState } from '@/lib/errorTypes'
 
 interface Props {
   children: ReactNode
   fallback?: ReactNode
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onRetry?: () => void
+  showDetails?: boolean
 }
 
 interface State {
   hasError: boolean
   error?: Error
+  errorState?: ErrorState
+  retryCount: number
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { 
+      hasError: false,
+      retryCount: 0
+    }
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    const errorState = createErrorState(error, 'Component rendering')
+    return { 
+      hasError: true, 
+      error,
+      errorState
+    }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    // Log error safely (without sensitive data)
+    const errorState = createErrorState(error, errorInfo.componentStack || undefined)
+    const safeError = sanitizeErrorForLogging(errorState)
+    
+    console.error('ErrorBoundary caught an error:', safeError)
+    
+    // Call optional error handler
+    this.props.onError?.(error, errorInfo)
+    
+    // Store error info for potential monitoring/reporting
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const errorLog = {
+          ...safeError,
+          componentStack: errorInfo.componentStack,
+          timestamp: new Date().toISOString()
+        }
+        
+        // Store last 10 errors in localStorage for debugging
+        const existingLogs = JSON.parse(localStorage.getItem('errorLogs') || '[]')
+        const updatedLogs = [errorLog, ...existingLogs].slice(0, 10)
+        localStorage.setItem('errorLogs', JSON.stringify(updatedLogs))
+      } catch (storageError) {
+        console.warn('Failed to store error log:', storageError)
+      }
+    }
   }
 
   render() {
@@ -54,10 +94,24 @@ export class ErrorBoundary extends Component<Props, State> {
                     </details>
                   )}
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 space-x-2">
                   <button
                     type="button"
                     className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    onClick={this.handleRetry}
+                  >
+                    Try Again
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-gray-100 px-3 py-2 rounded-md text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    onClick={() => window.location.href = '/'}
+                  >
+                    Go Home
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-blue-100 px-3 py-2 rounded-md text-sm font-medium text-blue-800 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     onClick={() => window.location.reload()}
                   >
                     Refresh Page
@@ -71,5 +125,18 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     return this.props.children
+  }
+  
+  private handleRetry = () => {
+    // Increment retry count
+    this.setState(prevState => ({
+      hasError: false,
+      error: undefined,
+      errorState: undefined,
+      retryCount: prevState.retryCount + 1
+    }))
+    
+    // Call optional retry handler
+    this.props.onRetry?.()
   }
 }

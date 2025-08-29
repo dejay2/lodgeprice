@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider } from '@/context/AppContext'
 import { PricingProvider } from '@/context/PricingContext'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ToastContainer } from '@/components/ToastContainer'
 import Layout from '@/components/Layout'
 import Properties from '@/pages/Properties'
 import Calendar from '@/pages/Calendar'
@@ -21,6 +22,7 @@ function App() {
       <AppProvider>
         <PricingProvider>
           <Router>
+            <ToastContainer />
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Navigate to="/properties" replace />} />
