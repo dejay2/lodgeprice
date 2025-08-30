@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database.types'
+import { wrapSupabaseClient } from './logging/DatabaseLogger'
+import { getLogger } from './logging/LoggingService'
 
 // Enhanced environment variable validation interface
 interface ValidationResult {
@@ -59,10 +61,14 @@ if (!validation.success) {
   throw new Error(validation.error)
 }
 
+// Initialize logger for Supabase operations
+const logger = getLogger('Supabase')
+
 // Development-only logging for diagnostics
 if (import.meta.env.DEV) {
-  console.log('[Environment] Supabase environment variables validated successfully')
-  console.log('[Environment] Project:', import.meta.env.VITE_SUPABASE_URL?.split('.')[0]?.replace('https://', ''))
+  logger.debug('Supabase environment variables validated successfully', {
+    project: import.meta.env.VITE_SUPABASE_URL?.split('.')[0]?.replace('https://', '')
+  })
 }
 
 // Environment variable access
@@ -71,7 +77,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // Create Supabase client with anonymous key and RLS enabled
 // This is secure for client-side usage when RLS policies are properly configured
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+const baseSupabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
@@ -84,10 +90,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   }
 })
 
+// Wrap with logging capabilities
+export const supabase = wrapSupabaseClient(baseSupabaseClient)
+
 // For operations that require bypassing RLS (if needed), use service role key
 // This should only be used for specific admin operations
 const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-export const supabaseAdmin = supabaseServiceRoleKey ? createClient<Database>(
+const baseAdminClient = supabaseServiceRoleKey ? createClient<Database>(
   supabaseUrl, 
   supabaseServiceRoleKey,
   {
@@ -102,7 +111,10 @@ export const supabaseAdmin = supabaseServiceRoleKey ? createClient<Database>(
       }
     }
   }
-) : supabase // Fallback to anon client if service role key not provided
+) : baseSupabaseClient // Fallback to anon client if service role key not provided
+
+// Wrap admin client with logging
+export const supabaseAdmin = wrapSupabaseClient(baseAdminClient)
 
 // Enhanced error handling function
 export const handleSupabaseError = (error: unknown): string => {
@@ -270,19 +282,5 @@ export type PropertyPricing = Database['public']['Views']['property_pricing']['R
 export type ActiveDiscountStrategy = Database['public']['Views']['active_discount_strategies']['Row']
 export type DiscountRuleDetails = Database['public']['Views']['discount_rule_details']['Row']
 
-// Logging function for database operations
-export const logDatabaseOperation = (
-  operation: string, 
-  success: boolean, 
-  duration: number, 
-  error?: string
-) => {
-  console.log({
-    type: 'database_operation',
-    operation,
-    success,
-    duration,
-    error,
-    timestamp: new Date().toISOString()
-  })
-}
+// Export logger for database operations
+export { logger as databaseOperationLogger }

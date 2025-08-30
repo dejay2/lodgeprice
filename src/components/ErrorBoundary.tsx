@@ -1,6 +1,8 @@
 import React, { Component, ReactNode } from 'react'
 import { createErrorState, sanitizeErrorForLogging } from '@/lib/errorHandling'
 import type { ErrorState } from '@/lib/errorTypes'
+import { getLogger } from '@/lib/logging/LoggingService'
+import type { IErrorContext } from '@/lib/logging/types'
 
 interface Props {
   children: ReactNode
@@ -18,6 +20,8 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  private logger = getLogger('ErrorBoundary')
+  
   constructor(props: Props) {
     super(props)
     this.state = { 
@@ -40,6 +44,22 @@ export class ErrorBoundary extends Component<Props, State> {
     const errorState = createErrorState(error, errorInfo.componentStack || undefined)
     const safeError = sanitizeErrorForLogging(errorState)
     
+    // Create error context for structured logging
+    const errorContext: IErrorContext = {
+      errorType: error.name,
+      componentStack: errorInfo.componentStack || undefined,
+      severity: 'high',
+      metadata: {
+        retryCount: this.state.retryCount,
+        hasErrorBoundary: true,
+        errorState: safeError
+      }
+    }
+    
+    // Log with structured logging service
+    this.logger.error('Component error caught by ErrorBoundary', error, errorContext)
+    
+    // Also log to console for immediate visibility
     console.error('ErrorBoundary caught an error:', safeError)
     
     // Call optional error handler
@@ -51,15 +71,20 @@ export class ErrorBoundary extends Component<Props, State> {
         const errorLog = {
           ...safeError,
           componentStack: errorInfo.componentStack,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          retryCount: this.state.retryCount
         }
         
         // Store last 10 errors in localStorage for debugging
         const existingLogs = JSON.parse(localStorage.getItem('errorLogs') || '[]')
         const updatedLogs = [errorLog, ...existingLogs].slice(0, 10)
         localStorage.setItem('errorLogs', JSON.stringify(updatedLogs))
+        
+        this.logger.debug('Error stored in localStorage for debugging', {
+          errorCount: updatedLogs.length
+        })
       } catch (storageError) {
-        console.warn('Failed to store error log:', storageError)
+        this.logger.warn('Failed to store error log in localStorage', storageError)
       }
     }
   }
@@ -128,6 +153,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
   
   private handleRetry = () => {
+    // Log retry attempt
+    this.logger.info('User attempting to retry after error', {
+      retryCount: this.state.retryCount + 1,
+      errorMessage: this.state.error?.message
+    })
+    
     // Increment retry count
     this.setState(prevState => ({
       hasError: false,
