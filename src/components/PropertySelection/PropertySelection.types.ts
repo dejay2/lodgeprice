@@ -25,6 +25,10 @@ export interface PropertySelectionProps {
   helperText?: string
   /** Error message to display */
   error?: string
+  /** Component variant: standard (HTML select) or enhanced (react-select) */
+  variant?: 'standard' | 'enhanced'
+  /** Show global template option (for discount strategies) */
+  showGlobalTemplate?: boolean
 }
 
 /**

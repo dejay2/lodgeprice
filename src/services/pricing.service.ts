@@ -68,12 +68,21 @@ class PricingCache {
 const cache = new PricingCache()
 
 /**
+ * Conditional pricing options for toggle support
+ */
+export interface ConditionalPricingOptions extends CacheOptions {
+  includeSeasonalRates?: boolean
+  includeDiscountStrategies?: boolean
+}
+
+/**
  * Main pricing service class
  */
 export class PricingService {
   /**
    * Calculate detailed price for a specific date
    * Uses calculate_final_price database function
+   * Extended to support conditional pricing based on toggles (FR-3, FR-4)
    */
   async calculateDetailedPrice(
     propertyId: string,
@@ -125,13 +134,119 @@ export class PricingService {
   }
   
   /**
+   * Calculate conditional price with toggle support
+   * Supports excluding seasonal rates and discount strategies (FR-3, FR-4, FR-5)
+   */
+  async calculateConditionalPrice(
+    propertyId: string,
+    date: Date,
+    nights: number,
+    options: ConditionalPricingOptions = {}
+  ): Promise<CalculateFinalPriceReturn> {
+    // Default to including all components
+    const includeSeasonalRates = options.includeSeasonalRates ?? true
+    const includeDiscountStrategies = options.includeDiscountStrategies ?? true
+    
+    // Validate inputs
+    this.validatePricingParams(propertyId, date, nights)
+    
+    // Create cache key that includes toggle states
+    const cacheKey = `${CacheKeys.pricing(propertyId, date.toISOString().split('T')[0], nights)}-s${includeSeasonalRates ? '1' : '0'}-d${includeDiscountStrategies ? '1' : '0'}`
+    
+    if (!options.forceRefresh) {
+      const cached = cache.get(cacheKey)
+      if (cached) return cached
+    }
+    
+    try {
+      // Get lodgify property ID
+      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+      
+      // If both toggles are enabled, use standard calculation
+      if (includeSeasonalRates && includeDiscountStrategies) {
+        const result = await this.calculateDetailedPrice(propertyId, date, nights, options)
+        cache.set(cacheKey, result, options.expirationMinutes)
+        return result
+      }
+      
+      // Otherwise, calculate with modifications
+      const { data, error } = await supabase.rpc('calculate_final_price', {
+        p_property_id: lodgifyPropertyId,
+        p_check_date: date.toISOString().split('T')[0],
+        p_nights: nights,
+      })
+      
+      if (error) {
+        throw new PricingCalculationError(
+          `Failed to calculate conditional price: ${error.message}`,
+          error
+        )
+      }
+      
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        throw new PricingCalculationError('No pricing data returned')
+      }
+      
+      let result = data[0] as CalculateFinalPriceReturn
+      
+      // Modify result based on toggle settings
+      if (!includeSeasonalRates) {
+        // Remove seasonal adjustment (FR-3)
+        result = {
+          ...result,
+          seasonal_adjustment: 0,
+          final_price_per_night: result.base_price - (includeDiscountStrategies ? result.last_minute_discount : 0),
+          total_price: (result.base_price - (includeDiscountStrategies ? result.last_minute_discount : 0)) * nights
+        }
+      }
+      
+      if (!includeDiscountStrategies) {
+        // Remove discount (FR-4)
+        result = {
+          ...result,
+          last_minute_discount: 0,
+          final_price_per_night: result.base_price + (includeSeasonalRates ? result.seasonal_adjustment : 0),
+          total_price: (result.base_price + (includeSeasonalRates ? result.seasonal_adjustment : 0)) * nights
+        }
+      }
+      
+      // FR-5: Both toggles disabled shows only base pricing
+      if (!includeSeasonalRates && !includeDiscountStrategies) {
+        result = {
+          ...result,
+          seasonal_adjustment: 0,
+          last_minute_discount: 0,
+          final_price_per_night: result.base_price,
+          total_price: result.base_price * nights,
+          min_price_enforced: false
+        }
+      }
+      
+      // Ensure minimum price is still enforced if needed
+      if (result.min_price_enforced && result.final_price_per_night < result.base_price) {
+        // This would need property min_price, but we maintain the flag
+        result.min_price_enforced = true
+      }
+      
+      // Cache the result
+      cache.set(cacheKey, result, options.expirationMinutes)
+      
+      return result
+    } catch (error) {
+      return this.handlePricingError(error, 'calculate-conditional-price')
+    }
+  }
+  
+  /**
    * Load calendar data for a date range
    * Uses preview_pricing_calendar for bulk efficiency
+   * Extended to support conditional pricing based on toggles
    */
   async loadCalendarData(
     propertyId: string,
     dateRange: DateRange,
-    nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH
+    nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH,
+    options: ConditionalPricingOptions = {}
   ): Promise<PreviewPricingCalendarReturn[]> {
     // Validate inputs
     this.validateDateRange(dateRange)
@@ -152,7 +267,45 @@ export class PricingService {
         throw new DatabaseError(`Failed to load calendar data: ${error.message}`, 'CALENDAR_LOAD', error)
       }
       
-      return data || []
+      let results = data || []
+      
+      // Apply toggle modifications if needed
+      const includeSeasonalRates = options.includeSeasonalRates ?? true
+      const includeDiscountStrategies = options.includeDiscountStrategies ?? true
+      
+      if (!includeSeasonalRates || !includeDiscountStrategies) {
+        results = results.map(day => {
+          let modifiedDay = { ...day }
+          
+          if (!includeSeasonalRates) {
+            // Remove seasonal adjustment
+            modifiedDay.seasonal_adjustment_percent = 0
+            modifiedDay.final_price_per_night = modifiedDay.base_price - 
+              (includeDiscountStrategies ? (modifiedDay.base_price * modifiedDay.last_minute_discount_percent / 100) : 0)
+          }
+          
+          if (!includeDiscountStrategies) {
+            // Remove discount
+            modifiedDay.last_minute_discount_percent = 0
+            modifiedDay.final_price_per_night = modifiedDay.base_price + 
+              (includeSeasonalRates ? (modifiedDay.base_price * modifiedDay.seasonal_adjustment_percent / 100) : 0)
+          }
+          
+          if (!includeSeasonalRates && !includeDiscountStrategies) {
+            // Base price only
+            modifiedDay.seasonal_adjustment_percent = 0
+            modifiedDay.last_minute_discount_percent = 0
+            modifiedDay.final_price_per_night = modifiedDay.base_price
+            modifiedDay.min_price_enforced = false
+          }
+          
+          modifiedDay.total_price = modifiedDay.final_price_per_night * nights
+          
+          return modifiedDay
+        })
+      }
+      
+      return results
     } catch (error) {
       return this.handlePricingError(error, 'calendar-load')
     }
@@ -160,12 +313,14 @@ export class PricingService {
   
   /**
    * Transform calendar data for UI grid display
+   * Extended to support conditional pricing based on toggles
    */
   async loadPricingCalendar(
     propertyId: string,
     year: number,
     month: number,
-    nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH
+    nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH,
+    options: ConditionalPricingOptions = {}
   ): Promise<PricingCalendarData> {
     // Check cache
     const cacheKey = CacheKeys.calendar(propertyId, year, month)
@@ -178,8 +333,8 @@ export class PricingService {
     
     const dateRange: DateRange = { start: startDate, end: endDate }
     
-    // Load raw data
-    const rawData = await this.loadCalendarData(propertyId, dateRange, nights)
+    // Load raw data with toggle options
+    const rawData = await this.loadCalendarData(propertyId, dateRange, nights, options)
     
     // Transform to calendar grid
     const calendarData = this.transformToCalendarGrid(rawData, year, month)

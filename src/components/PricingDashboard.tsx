@@ -8,10 +8,11 @@ import React, { useState, useEffect } from 'react'
 import { usePricingContext } from '@/context/PricingContext'
 import { useAppContext } from '@/context/AppContext'
 import { PricingPreviewProvider, usePricingPreview } from '@/context/PricingPreviewContext'
-import { useProperties } from '@/hooks/useProperties'
 import PricingCalendarGrid from './PricingCalendarGrid'
-import SeasonalRatePanel from './SeasonalRatePanel'
-import DiscountStrategyPanel from './DiscountStrategyPanel'
+import PricingToggles from './PricingToggles'
+// Removed unused imports after calendar simplification
+// import SeasonalRatePanel from './SeasonalRatePanel'
+// import DiscountStrategyPanel from './DiscountStrategyPanel'
 import PriceDetailModal from './PriceDetailModal'
 import PreviewControls from './PreviewControls'
 import PreviewSummary from './PreviewSummary'
@@ -24,9 +25,8 @@ import './PricingPreview.css'
  * Dashboard header component for controls and summary
  */
 const DashboardHeader: React.FC = () => {
-  const { selectedProperty, setSelectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
+  const { selectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
   const { stayLength, setStayLength } = useAppContext()
-  const { properties } = useProperties()
   
   useEffect(() => {
     // Sync with app context
@@ -36,14 +36,6 @@ const DashboardHeader: React.FC = () => {
   const handleNightsChange = (nights: number) => {
     setStayLength(nights)
     setDefaultNights(nights)
-  }
-  
-  const handlePropertyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const propertyId = e.target.value
-    const property = properties.find(p => p.lodgify_property_id === propertyId)
-    if (property) {
-      setSelectedProperty(property)
-    }
   }
   
   return (
@@ -62,23 +54,6 @@ const DashboardHeader: React.FC = () => {
           <div className="col-md-8">
             <div className="d-flex justify-content-end align-items-center gap-3">
               <div className="d-flex align-items-center gap-2">
-                <label htmlFor="property-select" className="mb-0">Property:</label>
-                <select
-                  id="property-select"
-                  className="form-select form-select-sm"
-                  value={selectedProperty?.lodgify_property_id || ''}
-                  onChange={handlePropertyChange}
-                  style={{ width: 'auto' }}
-                >
-                  <option value="">Choose a property...</option>
-                  {properties.map((property) => (
-                    <option key={property.lodgify_property_id} value={property.lodgify_property_id}>
-                      {property.property_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="d-flex align-items-center gap-2">
                 <label htmlFor="nights-select" className="mb-0">Default nights:</label>
                 <select
                   id="nights-select"
@@ -91,6 +66,10 @@ const DashboardHeader: React.FC = () => {
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
+              </div>
+              {/* Pricing Toggles - FR-1: Add toggle switches to Calendar page header */}
+              <div className="d-flex align-items-center">
+                <PricingToggles className="ms-3" />
               </div>
             </div>
           </div>
@@ -111,46 +90,7 @@ const DashboardHeader: React.FC = () => {
   )
 }
 
-/**
- * Tab navigation for switching between views
- */
-type TabView = 'calendar' | 'seasonal' | 'discounts'
-
-interface TabNavigationProps {
-  activeTab: TabView
-  onTabChange: (tab: TabView) => void
-}
-
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
-  return (
-    <ul className="nav nav-tabs mb-4">
-      <li className="nav-item">
-        <button
-          className={`nav-link ${activeTab === 'calendar' ? 'active' : ''}`}
-          onClick={() => onTabChange('calendar')}
-        >
-          Calendar View
-        </button>
-      </li>
-      <li className="nav-item">
-        <button
-          className={`nav-link ${activeTab === 'seasonal' ? 'active' : ''}`}
-          onClick={() => onTabChange('seasonal')}
-        >
-          Seasonal Rates
-        </button>
-      </li>
-      <li className="nav-item">
-        <button
-          className={`nav-link ${activeTab === 'discounts' ? 'active' : ''}`}
-          onClick={() => onTabChange('discounts')}
-        >
-          Discount Strategies
-        </button>
-      </li>
-    </ul>
-  )
-}
+// Tab navigation removed - Calendar simplification (Tasks #034-036)
 
 /**
  * Inner dashboard component that uses preview context
@@ -161,15 +101,13 @@ const PricingDashboardInner: React.FC = () => {
     selectedDateRange: _selectedDateRange, 
     defaultNights,
     loading,
-    refreshCalendarData,
-    refreshSeasonalRates,
-    refreshDiscountStrategies
+    refreshCalendarData
   } = usePricingContext()
   
   // Preview context must be called at the top level to comply with Rules of Hooks
   const { isPreviewMode, pendingChanges } = usePricingPreview()
   
-  const [activeTab, setActiveTab] = useState<TabView>('calendar')
+  // Tab state removed - Calendar simplification (Tasks #034-036)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [priceDetailData, setPriceDetailData] = useState<CalculateFinalPriceReturn | null>(null)
   const [showPriceDetail, setShowPriceDetail] = useState(false)
@@ -179,16 +117,12 @@ const PricingDashboardInner: React.FC = () => {
    */
   useEffect(() => {
     if (selectedProperty) {
-      // Refresh all data for the selected property
-      Promise.all([
-        refreshCalendarData(),
-        refreshSeasonalRates(),
-        refreshDiscountStrategies()
-      ]).catch(err => {
+      // Refresh calendar data for the selected property
+      refreshCalendarData().catch(err => {
         console.error('Failed to refresh pricing data:', err)
       })
     }
-  }, [selectedProperty, refreshCalendarData, refreshSeasonalRates, refreshDiscountStrategies])
+  }, [selectedProperty, refreshCalendarData])
   
   /**
    * Handle date click from calendar
@@ -257,7 +191,7 @@ const PricingDashboardInner: React.FC = () => {
       <div className="container-fluid">
         <div className="row">
           <div className={isPreviewMode && pendingChanges.length > 0 ? 'col-lg-9' : 'col-12'}>
-            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            {/* Tab navigation removed - Calendar simplification */}
             
             {loading && (
               <div className="text-center p-5">
@@ -269,39 +203,19 @@ const PricingDashboardInner: React.FC = () => {
             )}
             
             {!loading && (
-              <div className="tab-content">
-                {activeTab === 'calendar' && (
-                  <div className="tab-pane active">
-                    <PricingCalendarGrid
-                      propertyId={selectedProperty.lodgify_property_id}
-                      selectedStayLength={defaultNights}
-                      onDateClick={handleDateClick}
-                      enableInlineEditing={true}
-                      onBasePriceChanged={(propertyId, newPrice) => {
-                        console.log('Base price changed:', propertyId, newPrice)
-                        // Refresh calendar data after base price change
-                        refreshCalendarData()
-                      }}
-                    />
-                  </div>
-                )}
-            
-            {activeTab === 'seasonal' && (
-              <div className="tab-pane active">
-                <SeasonalRatePanel
-                  onRateChange={() => refreshCalendarData()}
-                />
-              </div>
-            )}
-            
-            {activeTab === 'discounts' && (
-              <div className="tab-pane active">
-                <DiscountStrategyPanel
+              <div>
+                {/* Calendar View Only - Simplified Interface */}
+                <PricingCalendarGrid
                   propertyId={selectedProperty.lodgify_property_id}
-                  onStrategyChange={() => refreshCalendarData()}
+                  selectedStayLength={defaultNights}
+                  onDateClick={handleDateClick}
+                  enableInlineEditing={true}
+                  onBasePriceChanged={(propertyId, newPrice) => {
+                    console.log('Base price changed:', propertyId, newPrice)
+                    // Refresh calendar data after base price change
+                    refreshCalendarData()
+                  }}
                 />
-              </div>
-            )}
               </div>
             )}
           </div>

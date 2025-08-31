@@ -1,16 +1,19 @@
 import { useParams, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePricingContext } from '../context/PricingContext'
 import { useProperties } from '../hooks/useProperties'
 import PricingDashboard from '../components/PricingDashboard'
+import PropertySelection from '../components/PropertySelection/PropertySelection'
+import type { Property } from '../types/database'
 
 function Calendar() {
   const { propertyId } = useParams<{ propertyId?: string }>()
   const { properties, loading: propertiesLoading } = useProperties()
-  const { setSelectedProperty } = usePricingContext()
+  const { selectedProperty, setSelectedProperty } = usePricingContext()
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   
-  // Validate UUID format if propertyId is provided
-  const isValidUUID = propertyId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(propertyId)
+  // Validate propertyId format - accept numeric strings (lodgify_property_id)
+  const isValidPropertyId = propertyId && /^\d+$/.test(propertyId)
   
   // Update document title based on route
   useEffect(() => {
@@ -21,21 +24,36 @@ function Calendar() {
     }
   }, [propertyId])
   
+  // Handle property selection change
+  const handlePropertyChange = (propertyId: string, property: Property) => {
+    setSelectedPropertyId(propertyId)
+    setSelectedProperty(property)
+  }
+
   // Set selected property from URL or default to first property
   useEffect(() => {
-    if (propertyId && isValidUUID) {
+    if (propertyId && isValidPropertyId) {
       const property = properties.find(p => p.lodgify_property_id === propertyId)
       if (property) {
         setSelectedProperty(property)
+        setSelectedPropertyId(property.id)
       }
-    } else if (properties.length > 0) {
+    } else if (properties.length > 0 && !selectedProperty) {
       // Default to first property if none specified
       setSelectedProperty(properties[0])
+      setSelectedPropertyId(properties[0].id)
     }
-  }, [propertyId, isValidUUID, properties, setSelectedProperty])
+  }, [propertyId, isValidPropertyId, properties, setSelectedProperty, selectedProperty])
+
+  // Sync selectedPropertyId with selectedProperty
+  useEffect(() => {
+    if (selectedProperty && selectedPropertyId !== selectedProperty.id) {
+      setSelectedPropertyId(selectedProperty.id)
+    }
+  }, [selectedProperty, selectedPropertyId])
   
   // If propertyId is provided but invalid, redirect to general calendar
-  if (propertyId && !isValidUUID) {
+  if (propertyId && !isValidPropertyId) {
     return <Navigate to="/calendar" replace />
   }
   
@@ -52,7 +70,25 @@ function Calendar() {
   }
   
   // Use PricingDashboard which includes preview functionality
-  return <PricingDashboard />
+  return (
+    <div className="calendar-page space-y-6">
+      {/* Property Selection */}
+      <div className="property-selection-section">
+        <PropertySelection
+          value={selectedPropertyId || undefined}
+          onChange={handlePropertyChange}
+          placeholder="Select a property to view calendar..."
+          label="Select Property"
+          helperText="Choose a property to view its pricing calendar and manage rates."
+          variant="enhanced"
+          showGlobalTemplate={false}
+        />
+      </div>
+      
+      {/* Pricing Dashboard */}
+      <PricingDashboard />
+    </div>
+  )
 }
 
 export default Calendar

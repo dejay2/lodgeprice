@@ -22,6 +22,14 @@ export interface PricingData extends CalculateFinalPriceReturn {
 }
 
 /**
+ * Toggle state for pricing components
+ */
+export interface PricingToggles {
+  seasonalRatesEnabled: boolean
+  discountStrategiesEnabled: boolean
+}
+
+/**
  * Global pricing context state and actions
  */
 export interface PricingContextValue {
@@ -34,6 +42,9 @@ export interface PricingContextValue {
   calendarData: Map<string, PricingData>
   seasonalRates: SeasonalRate[]
   discountStrategies: DiscountStrategy[]
+  
+  // Toggle state (FR-1, FR-2)
+  toggles: PricingToggles
   
   // UI state
   loading: boolean
@@ -48,6 +59,7 @@ export interface PricingContextValue {
   refreshSeasonalRates: () => Promise<void>
   refreshDiscountStrategies: () => Promise<void>
   updateCalendarCell: (date: string, data: PricingData) => void
+  updateToggle: (type: 'seasonal' | 'discount', enabled: boolean) => void
   clearError: () => void
   clearCache: () => void
 }
@@ -76,6 +88,12 @@ export function PricingProvider({ children }: PricingProviderProps) {
   const [calendarData, setCalendarData] = useState<Map<string, PricingData>>(new Map())
   const [seasonalRates, setSeasonalRates] = useState<SeasonalRate[]>([])
   const [discountStrategies, setDiscountStrategies] = useState<DiscountStrategy[]>([])
+  
+  // Toggle state - FR-2: Both toggles default to enabled
+  const [toggles, setToggles] = useState<PricingToggles>({
+    seasonalRatesEnabled: true,
+    discountStrategiesEnabled: true
+  })
   
   // UI state
   const [loading, setLoading] = useState(false)
@@ -204,6 +222,20 @@ export function PricingProvider({ children }: PricingProviderProps) {
   }, [])
   
   /**
+   * Update toggle state - FR-7: Toggle states persist during property changes
+   */
+  const updateToggle = useCallback((type: 'seasonal' | 'discount', enabled: boolean) => {
+    setToggles(prev => ({
+      ...prev,
+      seasonalRatesEnabled: type === 'seasonal' ? enabled : prev.seasonalRatesEnabled,
+      discountStrategiesEnabled: type === 'discount' ? enabled : prev.discountStrategiesEnabled
+    }))
+    
+    // Trigger calendar refresh with new toggle settings
+    // This will be picked up by components listening to toggle changes
+  }, [])
+  
+  /**
    * Clear all cached data
    */
   const clearCache = useCallback(() => {
@@ -224,6 +256,7 @@ export function PricingProvider({ children }: PricingProviderProps) {
     calendarData,
     seasonalRates,
     discountStrategies,
+    toggles,
     loading,
     error,
     lastRefresh,
@@ -236,6 +269,7 @@ export function PricingProvider({ children }: PricingProviderProps) {
     refreshSeasonalRates,
     refreshDiscountStrategies,
     updateCalendarCell,
+    updateToggle,
     clearError,
     clearCache
   }), [
@@ -245,6 +279,7 @@ export function PricingProvider({ children }: PricingProviderProps) {
     calendarData,
     seasonalRates,
     discountStrategies,
+    toggles,
     loading,
     error,
     lastRefresh,
@@ -254,6 +289,7 @@ export function PricingProvider({ children }: PricingProviderProps) {
     refreshSeasonalRates,
     refreshDiscountStrategies,
     updateCalendarCell,
+    updateToggle,
     clearError,
     clearCache
   ])

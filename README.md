@@ -1,6 +1,36 @@
 # Lodgeprice 2.0 - Holiday Let Management System
 
-A comprehensive property management and dynamic pricing system built on Supabase for managing holiday let properties with advanced pricing strategies.
+A comprehensive React-based property management and dynamic pricing system built on Supabase for managing 8 holiday rental properties with advanced pricing strategies, seasonal rates, and discount management.
+
+## Features
+
+### 🏠 Property Management
+- Manage 8 holiday rental properties with dedicated interfaces
+- Property selection with URL parameter support
+- Consolidated navigation from Properties page to pricing management
+
+### 📅 Calendar Interface
+- Simplified calendar view showing calculated daily prices
+- Real-time pricing toggles for seasonal rates and discount strategies  
+- Property selection dropdown with session persistence
+- Interactive calendar grid with pricing calculations
+
+### 🎯 Discount Strategy Management
+- Dedicated Discount Strategies page with complete CRUD operations
+- Last-minute discount configuration with rule management
+- Apply strategies to individual properties or all properties
+- Global template support for bulk strategy application
+
+### 🌊 Seasonal Rate Management  
+- Configure seasonal pricing adjustments with date ranges
+- Prevent overlapping periods with database constraints
+- Real-time preview of seasonal rate impact on pricing
+
+### 🔧 Advanced Features
+- Pricing toggles to analyze individual component contributions
+- Property context preservation across page navigation
+- Comprehensive error handling and validation
+- Responsive design with Bootstrap styling
 
 ## Project Overview
 
@@ -284,15 +314,41 @@ All tables have automatic `updated_at` triggers that update on any row modificat
 - Status enums prevent invalid booking states
 - Unique constraints prevent double bookings
 
+## User Interface
+
+### Navigation Structure
+- **Properties**: Main property overview and management
+- **Calendar**: Simplified pricing calendar with toggles and inline editing
+- **Seasonal Rates**: Dedicated seasonal rate management interface
+- **Discount Strategies**: Comprehensive discount strategy CRUD operations
+- **Lodgify Export**: API integration for rate synchronization
+
+### Key Components
+- **PropertySelection**: Standardized property dropdown with session persistence
+- **PricingToggles**: Real-time toggles for seasonal rates and discount strategies
+- **PricingCalendarGrid**: Interactive calendar showing calculated daily prices
+- **DiscountStrategyPanel**: Complete discount strategy management interface
+- **SeasonalRateManagement**: Date range and rate adjustment configuration
+
+### Technology Stack
+- **Frontend**: React 18+ with TypeScript
+- **Styling**: Bootstrap 5 with Tailwind CSS utilities
+- **State Management**: React Context with custom hooks
+- **Database**: Supabase PostgreSQL with RLS
+- **Testing**: Playwright for E2E testing
+- **Build Tools**: Vite for development and production builds
+
 ## Future Enhancements
 
 Potential additions to consider:
+- Automated hourly sync to Lodgify API
+- Bulk operations for multiple property management
+- Advanced calendar filtering and navigation
+- Export functionality for pricing data
 - Guest information table
 - Payment tracking
 - Review/rating system
 - Occupancy analytics
-- Automated pricing optimization
-- Channel manager integration
 - Email notification system
 - Reporting dashboard views
 

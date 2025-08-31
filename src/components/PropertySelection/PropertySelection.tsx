@@ -4,12 +4,13 @@
  * Includes loading states, error handling, and accessibility features
  */
 
-import { ChangeEvent, useId, useEffect, useRef } from 'react'
+import React, { ChangeEvent, useId, useEffect, useRef } from 'react'
 import { usePropertySelection } from './usePropertySelection'
 import { PropertySelectionProps, ERROR_SCENARIOS } from './PropertySelection.types'
 
 /**
  * PropertySelection component for selecting a holiday rental property
+ * Supports both standard HTML select and enhanced react-select variants
  */
 export function PropertySelection({
   value,
@@ -19,14 +20,43 @@ export function PropertySelection({
   className = '',
   label = 'Select Property',
   helperText = 'Choose a property to manage pricing and bookings.',
-  error: externalError
+  error: externalError,
+  variant = 'standard',
+  showGlobalTemplate = false
 }: PropertySelectionProps) {
+  // Always call hooks at the top level
   const {
     properties,
     isLoading,
     error: fetchError,
     refetch
   } = usePropertySelection()
+  
+  // Lazy load the enhanced variant when needed
+  if (variant === 'enhanced') {
+    const PropertySelectionEnhanced = React.lazy(() => import('./PropertySelectionEnhanced'))
+    return (
+      <React.Suspense fallback={
+        <div className="flex items-center justify-center py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <span className="text-gray-600">Loading enhanced selector...</span>
+        </div>
+      }>
+        <PropertySelectionEnhanced
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={className}
+          label={label}
+          helperText={helperText}
+          error={externalError}
+          showGlobalTemplate={showGlobalTemplate}
+        />
+      </React.Suspense>
+    )
+  }
+  
+  // Standard variant implementation continues below
   
   // Generate unique IDs for accessibility
   const selectId = useId()
@@ -155,7 +185,7 @@ export function PropertySelection({
   ].join(' ')
   
   return (
-    <div className={containerClasses}>
+    <div className={containerClasses} data-testid="property-selection">
       {/* Label */}
       <label 
         htmlFor={selectId}

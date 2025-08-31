@@ -10,7 +10,9 @@ import SeasonalRateList from './SeasonalRateList'
 import SeasonalRateCalendar from './SeasonalRateCalendar'
 import BulkOperations from './BulkOperations'
 import ImportExport from './ImportExport'
+import PropertySelection from '@/components/PropertySelection/PropertySelection'
 import type { SeasonalRate } from './types/SeasonalRate'
+import type { Property } from '@/types/database'
 import './SeasonalRateManagementPage.css'
 
 type ViewMode = 'list' | 'calendar'
@@ -30,6 +32,8 @@ export default function SeasonalRateManagementPage() {
   const [editingRate, setEditingRate] = useState<SeasonalRate | undefined>()
   const [showBulkOperations, setShowBulkOperations] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+  const [_selectedProperty, setSelectedProperty] = useState<Property | null>(null)
 
   // Handle create new rate
   const handleCreate = () => {
@@ -75,6 +79,12 @@ export default function SeasonalRateManagementPage() {
     setShowImportExport(false)
   }
 
+  // Handle property selection change
+  const handlePropertyChange = (propertyId: string, property: Property) => {
+    setSelectedPropertyId(propertyId)
+    setSelectedProperty(property)
+  }
+
   return (
     <div className="seasonal-rate-management-page">
       {/* Page Header */}
@@ -94,6 +104,19 @@ export default function SeasonalRateManagementPage() {
             + Create Seasonal Rate
           </button>
         </div>
+      </div>
+
+      {/* Property Selection */}
+      <div className="property-selection-section mb-6">
+        <PropertySelection
+          value={selectedPropertyId || undefined}
+          onChange={handlePropertyChange}
+          placeholder="Select a property to manage seasonal rates..."
+          label="Select Property"
+          helperText="Choose a property to view and manage its seasonal rate adjustments. Or leave unselected to manage all properties."
+          variant="enhanced"
+          showGlobalTemplate={true}
+        />
       </div>
 
       {/* Error Display */}

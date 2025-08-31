@@ -1,0 +1,151 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications"
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e7]:
+        - heading "Lodgeprice" [level=1] [ref=e9]
+        - generic [ref=e10]:
+          - link "Properties" [ref=e11]:
+            - /url: /properties
+          - link "Calendar" [ref=e12]:
+            - /url: /calendar
+          - link "Seasonal Rates" [ref=e13]:
+            - /url: /seasonal-rates
+          - link "Discount Strategies" [ref=e14]:
+            - /url: /discount-strategies
+          - link "Lodgify Export" [ref=e15]:
+            - /url: /lodgify-payload-generator
+          - link "Settings" [ref=e16]:
+            - /url: /settings
+    - navigation "Breadcrumb" [ref=e18]:
+      - list [ref=e19]:
+        - listitem [ref=e20]:
+          - link "Home" [ref=e21]:
+            - /url: /properties
+        - listitem [ref=e22]:
+          - img [ref=e23]
+          - generic [ref=e25]: Properties
+    - main [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - heading "Property Management" [level=1] [ref=e29]
+          - paragraph [ref=e30]: Manage your 8 holiday rental properties and their pricing settings.
+        - generic [ref=e31]:
+          - generic [ref=e33] [cursor=pointer]:
+            - generic [ref=e34] [cursor=pointer]:
+              - heading "Beach House 1 - Studio apartment with stunning sea views" [level=3] [ref=e35] [cursor=pointer]
+              - generic [ref=e36] [cursor=pointer]: "Lodgify ID: 327021"
+            - generic [ref=e37] [cursor=pointer]:
+              - generic [ref=e38] [cursor=pointer]:
+                - paragraph [ref=e39] [cursor=pointer]: Base Price
+                - paragraph [ref=e40] [cursor=pointer]: €111/day
+              - generic [ref=e41] [cursor=pointer]:
+                - paragraph [ref=e42] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e43] [cursor=pointer]: €50/day
+            - generic [ref=e44] [cursor=pointer]:
+              - generic [ref=e45] [cursor=pointer]: "Last updated: 8/30/2025"
+              - button "View Details →" [ref=e46] [cursor=pointer]
+          - generic [ref=e48] [cursor=pointer]:
+            - generic [ref=e49] [cursor=pointer]:
+              - heading "Beach House 2 - Studio Apartment with stunning views" [level=3] [ref=e50] [cursor=pointer]
+              - generic [ref=e51] [cursor=pointer]: "Lodgify ID: 327020"
+            - generic [ref=e52] [cursor=pointer]:
+              - generic [ref=e53] [cursor=pointer]:
+                - paragraph [ref=e54] [cursor=pointer]: Base Price
+                - paragraph [ref=e55] [cursor=pointer]: €300/day
+              - generic [ref=e56] [cursor=pointer]:
+                - paragraph [ref=e57] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e58] [cursor=pointer]: €50/day
+            - generic [ref=e59] [cursor=pointer]:
+              - generic [ref=e60] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e61] [cursor=pointer]
+          - generic [ref=e63] [cursor=pointer]:
+            - generic [ref=e64] [cursor=pointer]:
+              - heading "Chy Mor Apartment 1 - Overlooking St. Ives Harbour" [level=3] [ref=e65] [cursor=pointer]
+              - generic [ref=e66] [cursor=pointer]: "Lodgify ID: 327168"
+            - generic [ref=e67] [cursor=pointer]:
+              - generic [ref=e68] [cursor=pointer]:
+                - paragraph [ref=e69] [cursor=pointer]: Base Price
+                - paragraph [ref=e70] [cursor=pointer]: €300/day
+              - generic [ref=e71] [cursor=pointer]:
+                - paragraph [ref=e72] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e73] [cursor=pointer]: €50/day
+            - generic [ref=e74] [cursor=pointer]:
+              - generic [ref=e75] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e76] [cursor=pointer]
+          - generic [ref=e78] [cursor=pointer]:
+            - generic [ref=e79] [cursor=pointer]:
+              - heading "Chy Mor Apartment 2 - Overlooking St. Ives Harbour" [level=3] [ref=e80] [cursor=pointer]
+              - generic [ref=e81] [cursor=pointer]: "Lodgify ID: 327169"
+            - generic [ref=e82] [cursor=pointer]:
+              - generic [ref=e83] [cursor=pointer]:
+                - paragraph [ref=e84] [cursor=pointer]: Base Price
+                - paragraph [ref=e85] [cursor=pointer]: €300/day
+              - generic [ref=e86] [cursor=pointer]:
+                - paragraph [ref=e87] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e88] [cursor=pointer]: €50/day
+            - generic [ref=e89] [cursor=pointer]:
+              - generic [ref=e90] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e91] [cursor=pointer]
+          - generic [ref=e93] [cursor=pointer]:
+            - generic [ref=e94] [cursor=pointer]:
+              - heading "Premier 1 - 2 Bedroom apartment with stunning views" [level=3] [ref=e95] [cursor=pointer]
+              - generic [ref=e96] [cursor=pointer]: "Lodgify ID: 327177"
+            - generic [ref=e97] [cursor=pointer]:
+              - generic [ref=e98] [cursor=pointer]:
+                - paragraph [ref=e99] [cursor=pointer]: Base Price
+                - paragraph [ref=e100] [cursor=pointer]: €300/day
+              - generic [ref=e101] [cursor=pointer]:
+                - paragraph [ref=e102] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e103] [cursor=pointer]: €50/day
+            - generic [ref=e104] [cursor=pointer]:
+              - generic [ref=e105] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e106] [cursor=pointer]
+          - generic [ref=e108] [cursor=pointer]:
+            - generic [ref=e109] [cursor=pointer]:
+              - heading "Premier 2 - Stunning Suite with Breathtaking Seaside Views" [level=3] [ref=e110] [cursor=pointer]
+              - generic [ref=e111] [cursor=pointer]: "Lodgify ID: 591981"
+            - generic [ref=e112] [cursor=pointer]:
+              - generic [ref=e113] [cursor=pointer]:
+                - paragraph [ref=e114] [cursor=pointer]: Base Price
+                - paragraph [ref=e115] [cursor=pointer]: €300/day
+              - generic [ref=e116] [cursor=pointer]:
+                - paragraph [ref=e117] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e118] [cursor=pointer]: €50/day
+            - generic [ref=e119] [cursor=pointer]:
+              - generic [ref=e120] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e121] [cursor=pointer]
+          - generic [ref=e123] [cursor=pointer]:
+            - generic [ref=e124] [cursor=pointer]:
+              - heading "Premier 3 - 2 bedroom apartment with stunning views" [level=3] [ref=e125] [cursor=pointer]
+              - generic [ref=e126] [cursor=pointer]: "Lodgify ID: 327178"
+            - generic [ref=e127] [cursor=pointer]:
+              - generic [ref=e128] [cursor=pointer]:
+                - paragraph [ref=e129] [cursor=pointer]: Base Price
+                - paragraph [ref=e130] [cursor=pointer]: €300/day
+              - generic [ref=e131] [cursor=pointer]:
+                - paragraph [ref=e132] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e133] [cursor=pointer]: €50/day
+            - generic [ref=e134] [cursor=pointer]:
+              - generic [ref=e135] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e136] [cursor=pointer]
+          - generic [ref=e138] [cursor=pointer]:
+            - generic [ref=e139] [cursor=pointer]:
+              - heading "Premier 4 - Stunning Suite, beautiful sea views" [level=3] [ref=e140] [cursor=pointer]
+              - generic [ref=e141] [cursor=pointer]: "Lodgify ID: 602278"
+            - generic [ref=e142] [cursor=pointer]:
+              - generic [ref=e143] [cursor=pointer]:
+                - paragraph [ref=e144] [cursor=pointer]: Base Price
+                - paragraph [ref=e145] [cursor=pointer]: €300/day
+              - generic [ref=e146] [cursor=pointer]:
+                - paragraph [ref=e147] [cursor=pointer]: Minimum Price
+                - paragraph [ref=e148] [cursor=pointer]: €50/day
+            - generic [ref=e149] [cursor=pointer]:
+              - generic [ref=e150] [cursor=pointer]: "Last updated: 8/27/2025"
+              - button "View Details →" [ref=e151] [cursor=pointer]
+    - contentinfo [ref=e152]:
+      - generic [ref=e154]: Lodgeprice 2.0 - Connected to Supabase (Connected)
+```

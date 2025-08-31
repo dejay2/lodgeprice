@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react'
 import { PricingFormatters } from '@/types/pricing'
+import { usePricingContext } from '@/context/PricingContext'
 import type { CalculateFinalPriceReturn } from '@/types/helpers'
 
 interface PriceDetailModalProps {
@@ -75,6 +76,8 @@ const PriceDetailModal: React.FC<PriceDetailModalProps> = ({
   priceData,
   onConfirm
 }) => {
+  // Get toggle states from context (FR-8)
+  const { toggles } = usePricingContext()
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -101,8 +104,9 @@ const PriceDetailModal: React.FC<PriceDetailModalProps> = ({
     day: 'numeric'
   })
   
-  const hasSeasonalAdjustment = priceData.seasonal_adjustment !== 0
-  const hasDiscount = priceData.last_minute_discount > 0
+  // FR-8: Price detail modal reflects current toggle settings
+  const hasSeasonalAdjustment = toggles.seasonalRatesEnabled && priceData.seasonal_adjustment !== 0
+  const hasDiscount = toggles.discountStrategiesEnabled && priceData.last_minute_discount > 0
   const isMinPriceEnforced = priceData.min_price_enforced
   
   // Calculate percentage changes
@@ -229,16 +233,15 @@ const PriceDetailModal: React.FC<PriceDetailModalProps> = ({
                 <p className="mb-1">
                   <strong>Property ID:</strong> {propertyId}
                 </p>
-                {hasSeasonalAdjustment && (
-                  <p className="mb-1">
-                    <strong>Seasonal Rate:</strong> Active
-                  </p>
-                )}
-                {hasDiscount && (
-                  <p className="mb-1">
-                    <strong>Discount Strategy:</strong> Active
-                  </p>
-                )}
+                {/* Show toggle states */}
+                <p className="mb-1">
+                  <strong>Seasonal Rates:</strong> {toggles.seasonalRatesEnabled ? 'Enabled' : 'Disabled'}
+                  {hasSeasonalAdjustment && ' (Active)'}
+                </p>
+                <p className="mb-1">
+                  <strong>Discount Strategies:</strong> {toggles.discountStrategiesEnabled ? 'Enabled' : 'Disabled'}
+                  {hasDiscount && ' (Active)'}
+                </p>
               </div>
             </div>
             

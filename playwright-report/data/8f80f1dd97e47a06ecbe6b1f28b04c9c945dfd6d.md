@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications"
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e7]:
+        - heading "Lodgeprice" [level=1] [ref=e9]
+        - generic [ref=e10]:
+          - link "Properties" [ref=e11]:
+            - /url: /properties
+          - link "Calendar" [ref=e12]:
+            - /url: /calendar
+          - link "Seasonal Rates" [ref=e13]:
+            - /url: /seasonal-rates
+          - link "Discount Strategies" [ref=e14]:
+            - /url: /discount-strategies
+          - link "Lodgify Export" [ref=e15]:
+            - /url: /lodgify-payload-generator
+          - link "Settings" [ref=e16]:
+            - /url: /settings
+    - navigation "Breadcrumb" [ref=e18]:
+      - list [ref=e19]:
+        - listitem [ref=e20]:
+          - link "Home" [ref=e21]:
+            - /url: /properties
+        - listitem [ref=e22]:
+          - img [ref=e23]
+          - generic [ref=e25]: Discount-strategies
+    - main [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e29]:
+          - heading "Discount Strategies Management" [level=1] [ref=e30]
+          - paragraph [ref=e31]: Create and manage last-minute discount strategies for your properties
+        - generic [ref=e33]:
+          - generic [ref=e34]: Select Property
+          - generic:
+            - log
+            - generic:
+              - generic:
+                - generic: Select a property to manage discount strategies...
+              - generic:
+                - generic:
+                  - img
+          - paragraph [ref=e35]: Choose a property to view and manage its discount strategies. You can also apply strategies to all properties.
+          - status [ref=e36]:
+            - paragraph [ref=e37]: No properties available. Please contact support if this issue persists.
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - heading "Last-Minute Discount Strategies" [level=4] [ref=e41]
+            - button "Create Strategy" [ref=e42] [cursor=pointer]
+          - status [ref=e44]:
+            - generic [ref=e45]: Loading strategies...
+          - generic [ref=e46]:
+            - paragraph [ref=e47]:
+              - strong [ref=e48]: "How it works:"
+              - text: Discount strategies apply automatically when bookings are made within the activation window.
+            - list [ref=e49]:
+              - listitem [ref=e50]: Define rules to specify discount percentages at different days before check-in
+              - listitem [ref=e51]: Rules can be limited to specific stay lengths using min/max nights
+              - listitem [ref=e52]: The most specific matching rule will be applied
+              - listitem [ref=e53]: Discounts never reduce prices below the property's minimum price
+        - generic [ref=e54]:
+          - heading "Quick Help" [level=3] [ref=e55]
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - heading "📅 Activation Window" [level=4] [ref=e58]
+              - paragraph [ref=e59]: Define how many days before check-in the discount strategy becomes active.
+            - generic [ref=e60]:
+              - heading "📊 Discount Range" [level=4] [ref=e61]
+              - paragraph [ref=e62]: Set minimum and maximum discount percentages. Rules within this range apply based on proximity to check-in.
+            - generic [ref=e63]:
+              - heading "📋 Rules Management" [level=4] [ref=e64]
+              - paragraph [ref=e65]: Add specific rules for different days before check-in. Rules can be limited to specific stay lengths.
+            - generic [ref=e66]:
+              - heading "🏠 Property Application" [level=4] [ref=e67]
+              - paragraph [ref=e68]: Apply strategies to individual properties or all properties at once for consistent discount policies.
+          - paragraph [ref=e70]:
+            - strong [ref=e71]: "Note:"
+            - text: Discounts are automatically applied when bookings are made within the activation window. The final price will never go below the property's minimum price per day.
+    - contentinfo [ref=e72]:
+      - generic [ref=e74]: Lodgeprice 2.0 - Connected to Supabase (Connected)
+```

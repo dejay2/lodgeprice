@@ -1,2 +1,1552 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.542066">
+<testsuites id="" name="" tests="40" failures="33" skipped="0" errors="0" time="80.13404700000001">
+<testsuite name="global.setup.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="setup" tests="1" failures="0" skipped="0" time="12.871" errors="0">
+<testcase name="authenticate" classname="global.setup.ts" time="12.871">
+<system-out>
+<![CDATA[No specific selectors found, continuing with basic setup
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="discount-strategies-navigation.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="chromium" tests="10" failures="10" skipped="0" time="26.504" errors="0">
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" classname="discount-strategies-navigation.spec.ts" time="1.862">
+<failure message="discount-strategies-navigation.spec.ts:17:3 FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:17:3 › Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs" classname="discount-strategies-navigation.spec.ts" time="2.662">
+<failure message="discount-strategies-navigation.spec.ts:44:3 FR-1: Navigation tab styling matches existing tabs" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:44:3 › Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page" classname="discount-strategies-navigation.spec.ts" time="2.842">
+<failure message="discount-strategies-navigation.spec.ts:61:3 FR-2: Route loads DiscountStrategies page" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:61:3 › Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-3: Property selection dropdown is visible" classname="discount-strategies-navigation.spec.ts" time="2.058">
+<failure message="discount-strategies-navigation.spec.ts:78:3 FR-3: Property selection dropdown is visible" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:78:3 › Discount Strategies Navigation › FR-3: Property selection dropdown is visible 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered" classname="discount-strategies-navigation.spec.ts" time="2.603">
+<failure message="discount-strategies-navigation.spec.ts:92:3 FR-4: DiscountStrategyPanel is rendered" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:92:3 › Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-9: Browser navigation works correctly" classname="discount-strategies-navigation.spec.ts" time="2.758">
+<failure message="discount-strategies-navigation.spec.ts:105:3 FR-9: Browser navigation works correctly" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:105:3 › Discount Strategies Navigation › FR-9: Browser navigation works correctly 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Help section is displayed" classname="discount-strategies-navigation.spec.ts" time="2.714">
+<failure message="discount-strategies-navigation.spec.ts:127:3 Help section is displayed" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:127:3 › Discount Strategies Navigation › Help section is displayed 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Error handling for property loading" classname="discount-strategies-navigation.spec.ts" time="1.824">
+<failure message="discount-strategies-navigation.spec.ts:143:3 Error handling for property loading" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:143:3 › Discount Strategies Navigation › Error handling for property loading 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Discount Strategies page visual consistency" classname="discount-strategies-navigation.spec.ts" time="5.6">
+<failure message="discount-strategies-navigation.spec.ts:150:3 Discount Strategies page visual consistency" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:150:3 › Visual Regression › Discount Strategies page visual consistency 
+
+    Error: expect(page).toHaveScreenshot(expected) failed
+
+      Expected an image 1280px by 2340px, received 1280px by 2338px. 56371 pixels (ratio 0.02 of all image pixels) are different.
+
+      Snapshot: discount-strategies-page.png
+
+    Call log:
+      - Expect "toHaveScreenshot(discount-strategies-page.png)" with timeout 5000ms
+        - verifying given screenshot expectation
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - Expected an image 1280px by 2340px, received 1280px by 2338px. 56371 pixels (ratio 0.02 of all image pixels) are different.
+      - waiting 100ms before taking screenshot
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - captured a stable screenshot
+      - Expected an image 1280px by 2340px, received 1280px by 2338px. 56371 pixels (ratio 0.02 of all image pixels) are different.
+
+
+      156 |     // Take screenshot for visual comparison
+      157 |     // Note: This would compare against a baseline in a real test
+    > 158 |     await expect(page).toHaveScreenshot('discount-strategies-page.png', {
+          |                        ^
+      159 |       fullPage: true,
+      160 |       animations: 'disabled'
+      161 |     })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:158:24
+
+    attachment #1: discount-strategies-page (image/png) ────────────────────────────────────────────
+    Expected: discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-chromium-linux.png
+    Received: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/discount-strategies-page-actual.png
+    Diff:     ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/discount-strategies-page-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../tests/e2e/discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-chromium-linux.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/discount-strategies-page-actual.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/discount-strategies-page-diff.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Navigation active state visual" classname="discount-strategies-navigation.spec.ts" time="1.581">
+<failure message="discount-strategies-navigation.spec.ts:164:3 Navigation active state visual" type="FAILURE">
+<![CDATA[  [chromium] › discount-strategies-navigation.spec.ts:164:3 › Visual Regression › Navigation active state visual 
+
+    Error: expect.toHaveScreenshot(nav-discount-strategies-active.png): Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toHaveScreenshot(nav-discount-strategies-active.png)" with timeout 5000ms
+        - generating new stable screenshot expectation
+      - waiting for locator('nav')
+
+
+      167 |     // Focus on navigation for screenshot
+      168 |     const nav = page.locator('nav')
+    > 169 |     await expect(nav).toHaveScreenshot('nav-discount-strategies-active.png')
+          |     ^
+      170 |   })
+      171 | })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:169:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="pricing-toggles.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="chromium" tests="1" failures="0" skipped="0" time="2.835" errors="0">
+<testcase name="Pricing Toggles E2E Tests › Accessibility: Keyboard navigation works" classname="pricing-toggles.spec.ts" time="2.835">
+</testcase>
+</testsuite>
+<testsuite name="workflows/pricing-calendar.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="chromium" tests="1" failures="0" skipped="0" time="5.015" errors="0">
+<testcase name="Pricing Calendar Workflows › Calendar navigation works correctly" classname="workflows/pricing-calendar.spec.ts" time="5.015">
+</testcase>
+</testsuite>
+<testsuite name="workflows/property-selection.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="chromium" tests="1" failures="1" skipped="0" time="31.861" errors="0">
+<testcase name="Property Management Workflows › Property selection persists through navigation" classname="workflows/property-selection.spec.ts" time="31.861">
+<failure message="property-selection.spec.ts:101:3 Property selection persists through navigation" type="FAILURE">
+<![CDATA[  [chromium] › workflows/property-selection.spec.ts:101:3 › Property Management Workflows › Property selection persists through navigation › PropertySelectionPage.selectProperty 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('property-selector')
+
+
+       at page-objects/property-selection-page.ts:20
+
+      18 |     // Click property selector dropdown
+      19 |     const selector = this.page.getByTestId('property-selector');
+    > 20 |     await selector.click();
+         |                    ^
+      21 |     
+      22 |     // Select property from dropdown
+      23 |     const propertyOption = this.page.getByTestId(`property-option-${propertyId}`);
+        at PropertySelectionPage.call (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:20:20)
+        at /home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:8:27
+        at PropertySelectionPage.selectProperty (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:7:17)
+        at /home/jay/projects/lodgeprice/tests/e2e/workflows/property-selection.spec.ts:103:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="discount-strategies-navigation.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="firefox" tests="10" failures="10" skipped="0" time="45.02" errors="0">
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" classname="discount-strategies-navigation.spec.ts" time="4.132">
+<failure message="discount-strategies-navigation.spec.ts:17:3 FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:17:3 › Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs" classname="discount-strategies-navigation.spec.ts" time="4.264">
+<failure message="discount-strategies-navigation.spec.ts:44:3 FR-1: Navigation tab styling matches existing tabs" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:44:3 › Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page" classname="discount-strategies-navigation.spec.ts" time="4.406">
+<failure message="discount-strategies-navigation.spec.ts:61:3 FR-2: Route loads DiscountStrategies page" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:61:3 › Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-3: Property selection dropdown is visible" classname="discount-strategies-navigation.spec.ts" time="4.494">
+<failure message="discount-strategies-navigation.spec.ts:78:3 FR-3: Property selection dropdown is visible" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:78:3 › Discount Strategies Navigation › FR-3: Property selection dropdown is visible 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered" classname="discount-strategies-navigation.spec.ts" time="4.035">
+<failure message="discount-strategies-navigation.spec.ts:92:3 FR-4: DiscountStrategyPanel is rendered" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:92:3 › Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-9: Browser navigation works correctly" classname="discount-strategies-navigation.spec.ts" time="3.721">
+<failure message="discount-strategies-navigation.spec.ts:105:3 FR-9: Browser navigation works correctly" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:105:3 › Discount Strategies Navigation › FR-9: Browser navigation works correctly 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Help section is displayed" classname="discount-strategies-navigation.spec.ts" time="3.664">
+<failure message="discount-strategies-navigation.spec.ts:127:3 Help section is displayed" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:127:3 › Discount Strategies Navigation › Help section is displayed 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Error handling for property loading" classname="discount-strategies-navigation.spec.ts" time="4.404">
+<failure message="discount-strategies-navigation.spec.ts:143:3 Error handling for property loading" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:143:3 › Discount Strategies Navigation › Error handling for property loading 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Discount Strategies page visual consistency" classname="discount-strategies-navigation.spec.ts" time="7.533">
+<failure message="discount-strategies-navigation.spec.ts:150:3 Discount Strategies page visual consistency" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:150:3 › Visual Regression › Discount Strategies page visual consistency 
+
+    Error: expect(page).toHaveScreenshot(expected) failed
+
+      1437 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: discount-strategies-page.png
+
+    Call log:
+      - Expect "toHaveScreenshot(discount-strategies-page.png)" with timeout 5000ms
+        - verifying given screenshot expectation
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - 1437 pixels (ratio 0.01 of all image pixels) are different.
+      - waiting 100ms before taking screenshot
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - captured a stable screenshot
+      - 1437 pixels (ratio 0.01 of all image pixels) are different.
+
+
+      156 |     // Take screenshot for visual comparison
+      157 |     // Note: This would compare against a baseline in a real test
+    > 158 |     await expect(page).toHaveScreenshot('discount-strategies-page.png', {
+          |                        ^
+      159 |       fullPage: true,
+      160 |       animations: 'disabled'
+      161 |     })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:158:24
+
+    attachment #1: discount-strategies-page (image/png) ────────────────────────────────────────────
+    Expected: discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-firefox-linux.png
+    Received: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/discount-strategies-page-actual.png
+    Diff:     ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/discount-strategies-page-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../tests/e2e/discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-firefox-linux.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/discount-strategies-page-actual.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/discount-strategies-page-diff.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Navigation active state visual" classname="discount-strategies-navigation.spec.ts" time="4.367">
+<failure message="discount-strategies-navigation.spec.ts:164:3 Navigation active state visual" type="FAILURE">
+<![CDATA[  [firefox] › discount-strategies-navigation.spec.ts:164:3 › Visual Regression › Navigation active state visual 
+
+    Error: expect.toHaveScreenshot(nav-discount-strategies-active.png): Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toHaveScreenshot(nav-discount-strategies-active.png)" with timeout 5000ms
+        - generating new stable screenshot expectation
+      - waiting for locator('nav')
+
+
+      167 |     // Focus on navigation for screenshot
+      168 |     const nav = page.locator('nav')
+    > 169 |     await expect(nav).toHaveScreenshot('nav-discount-strategies-active.png')
+          |     ^
+      170 |   })
+      171 | })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:169:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="pricing-toggles.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="firefox" tests="1" failures="0" skipped="0" time="5.431" errors="0">
+<testcase name="Pricing Toggles E2E Tests › Accessibility: Keyboard navigation works" classname="pricing-toggles.spec.ts" time="5.431">
+</testcase>
+</testsuite>
+<testsuite name="workflows/pricing-calendar.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="firefox" tests="1" failures="0" skipped="0" time="7.855" errors="0">
+<testcase name="Pricing Calendar Workflows › Calendar navigation works correctly" classname="workflows/pricing-calendar.spec.ts" time="7.855">
+</testcase>
+</testsuite>
+<testsuite name="workflows/property-selection.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="firefox" tests="1" failures="1" skipped="0" time="30.142" errors="0">
+<testcase name="Property Management Workflows › Property selection persists through navigation" classname="workflows/property-selection.spec.ts" time="30.142">
+<failure message="property-selection.spec.ts:101:3 Property selection persists through navigation" type="FAILURE">
+<![CDATA[  [firefox] › workflows/property-selection.spec.ts:101:3 › Property Management Workflows › Property selection persists through navigation › PropertySelectionPage.selectProperty 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('property-selector')
+
+
+       at page-objects/property-selection-page.ts:20
+
+      18 |     // Click property selector dropdown
+      19 |     const selector = this.page.getByTestId('property-selector');
+    > 20 |     await selector.click();
+         |                    ^
+      21 |     
+      22 |     // Select property from dropdown
+      23 |     const propertyOption = this.page.getByTestId(`property-option-${propertyId}`);
+        at PropertySelectionPage.call (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:20:20)
+        at /home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:8:27
+        at PropertySelectionPage.selectProperty (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:7:17)
+        at /home/jay/projects/lodgeprice/tests/e2e/workflows/property-selection.spec.ts:103:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="discount-strategies-navigation.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="webkit" tests="10" failures="10" skipped="0" time="38.94" errors="0">
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" classname="discount-strategies-navigation.spec.ts" time="4.326">
+<failure message="discount-strategies-navigation.spec.ts:17:3 FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:17:3 › Discount Strategies Navigation › FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a504e-al-Rates-and-Lodgify-Export-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs" classname="discount-strategies-navigation.spec.ts" time="4.659">
+<failure message="discount-strategies-navigation.spec.ts:44:3 FR-1: Navigation tab styling matches existing tabs" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:44:3 › Discount Strategies Navigation › FR-1: Navigation tab styling matches existing tabs 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-1d145-yling-matches-existing-tabs-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page" classname="discount-strategies-navigation.spec.ts" time="2.978">
+<failure message="discount-strategies-navigation.spec.ts:61:3 FR-2: Route loads DiscountStrategies page" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:61:3 › Discount Strategies Navigation › FR-2: Route loads DiscountStrategies page 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-3d186-ads-DiscountStrategies-page-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-3: Property selection dropdown is visible" classname="discount-strategies-navigation.spec.ts" time="3.142">
+<failure message="discount-strategies-navigation.spec.ts:78:3 FR-3: Property selection dropdown is visible" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:78:3 › Discount Strategies Navigation › FR-3: Property selection dropdown is visible 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-7fe46-lection-dropdown-is-visible-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered" classname="discount-strategies-navigation.spec.ts" time="3.156">
+<failure message="discount-strategies-navigation.spec.ts:92:3 FR-4: DiscountStrategyPanel is rendered" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:92:3 › Discount Strategies Navigation › FR-4: DiscountStrategyPanel is rendered 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-6bf75-ntStrategyPanel-is-rendered-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › FR-9: Browser navigation works correctly" classname="discount-strategies-navigation.spec.ts" time="3.378">
+<failure message="discount-strategies-navigation.spec.ts:105:3 FR-9: Browser navigation works correctly" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:105:3 › Discount Strategies Navigation › FR-9: Browser navigation works correctly 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a43d4--navigation-works-correctly-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Help section is displayed" classname="discount-strategies-navigation.spec.ts" time="3.206">
+<failure message="discount-strategies-navigation.spec.ts:127:3 Help section is displayed" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:127:3 › Discount Strategies Navigation › Help section is displayed 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-08628-n-Help-section-is-displayed-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Discount Strategies Navigation › Error handling for property loading" classname="discount-strategies-navigation.spec.ts" time="3.682">
+<failure message="discount-strategies-navigation.spec.ts:143:3 Error handling for property loading" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:143:3 › Discount Strategies Navigation › Error handling for property loading 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('nav')
+
+
+      12 |     
+      13 |     // Wait for navigation to be visible
+    > 14 |     await expect(page.locator('nav')).toBeVisible()
+         |                                       ^
+      15 |   })
+      16 |
+      17 |   test('FR-1: Navigation tab appears between Seasonal Rates and Lodgify Export', async ({ page }) => {
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:14:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-c5c9f-ndling-for-property-loading-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Discount Strategies page visual consistency" classname="discount-strategies-navigation.spec.ts" time="7.01">
+<failure message="discount-strategies-navigation.spec.ts:150:3 Discount Strategies page visual consistency" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:150:3 › Visual Regression › Discount Strategies page visual consistency 
+
+    Error: expect(page).toHaveScreenshot(expected) failed
+
+      Expected an image 1280px by 2346px, received 1280px by 2336px. 82108 pixels (ratio 0.03 of all image pixels) are different.
+
+      Snapshot: discount-strategies-page.png
+
+    Call log:
+      - Expect "toHaveScreenshot(discount-strategies-page.png)" with timeout 5000ms
+        - verifying given screenshot expectation
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - Expected an image 1280px by 2346px, received 1280px by 2336px. 82108 pixels (ratio 0.03 of all image pixels) are different.
+      - waiting 100ms before taking screenshot
+      - taking page screenshot
+        - disabled all CSS animations
+      - waiting for fonts to load...
+      - fonts loaded
+      - captured a stable screenshot
+      - Expected an image 1280px by 2346px, received 1280px by 2336px. 82108 pixels (ratio 0.03 of all image pixels) are different.
+
+
+      156 |     // Take screenshot for visual comparison
+      157 |     // Note: This would compare against a baseline in a real test
+    > 158 |     await expect(page).toHaveScreenshot('discount-strategies-page.png', {
+          |                        ^
+      159 |       fullPage: true,
+      160 |       animations: 'disabled'
+      161 |     })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:158:24
+
+    attachment #1: discount-strategies-page (image/png) ────────────────────────────────────────────
+    Expected: discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-webkit-linux.png
+    Received: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/discount-strategies-page-actual.png
+    Diff:     ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/discount-strategies-page-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../tests/e2e/discount-strategies-navigation.spec.ts-snapshots/discount-strategies-page-webkit-linux.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/discount-strategies-page-actual.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/discount-strategies-page-diff.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a99c6-ies-page-visual-consistency-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Visual Regression › Navigation active state visual" classname="discount-strategies-navigation.spec.ts" time="3.403">
+<failure message="discount-strategies-navigation.spec.ts:164:3 Navigation active state visual" type="FAILURE">
+<![CDATA[  [webkit] › discount-strategies-navigation.spec.ts:164:3 › Visual Regression › Navigation active state visual 
+
+    Error: expect.toHaveScreenshot(nav-discount-strategies-active.png): Error: strict mode violation: locator('nav') resolved to 2 elements:
+        1) <nav class="bg-white shadow-sm border-b">…</nav> aka getByRole('navigation').filter({ hasText: 'LodgepricePropertiesCalendarSeasonal RatesDiscount StrategiesLodgify' })
+        2) <nav class="flex" aria-label="Breadcrumb">…</nav> aka getByRole('navigation', { name: 'Breadcrumb' })
+
+    Call log:
+      - Expect "toHaveScreenshot(nav-discount-strategies-active.png)" with timeout 5000ms
+        - generating new stable screenshot expectation
+      - waiting for locator('nav')
+
+
+      167 |     // Focus on navigation for screenshot
+      168 |     const nav = page.locator('nav')
+    > 169 |     await expect(nav).toHaveScreenshot('nav-discount-strategies-active.png')
+          |     ^
+      170 |   })
+      171 | })
+        at /home/jay/projects/lodgeprice/tests/e2e/discount-strategies-navigation.spec.ts:169:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/discount-strategies-naviga-a8583-igation-active-state-visual-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="pricing-toggles.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="webkit" tests="1" failures="0" skipped="0" time="4.378" errors="0">
+<testcase name="Pricing Toggles E2E Tests › Accessibility: Keyboard navigation works" classname="pricing-toggles.spec.ts" time="4.378">
+</testcase>
+</testsuite>
+<testsuite name="workflows/pricing-calendar.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="webkit" tests="1" failures="0" skipped="0" time="7.635" errors="0">
+<testcase name="Pricing Calendar Workflows › Calendar navigation works correctly" classname="workflows/pricing-calendar.spec.ts" time="7.635">
+</testcase>
+</testsuite>
+<testsuite name="workflows/property-selection.spec.ts" timestamp="2025-08-31T18:53:59.113Z" hostname="webkit" tests="1" failures="1" skipped="0" time="31.398" errors="0">
+<testcase name="Property Management Workflows › Property selection persists through navigation" classname="workflows/property-selection.spec.ts" time="31.398">
+<failure message="property-selection.spec.ts:101:3 Property selection persists through navigation" type="FAILURE">
+<![CDATA[  [webkit] › workflows/property-selection.spec.ts:101:3 › Property Management Workflows › Property selection persists through navigation › PropertySelectionPage.selectProperty 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('property-selector')
+
+
+       at page-objects/property-selection-page.ts:20
+
+      18 |     // Click property selector dropdown
+      19 |     const selector = this.page.getByTestId('property-selector');
+    > 20 |     await selector.click();
+         |                    ^
+      21 |     
+      22 |     // Select property from dropdown
+      23 |     const propertyOption = this.page.getByTestId(`property-option-${propertyId}`);
+        at PropertySelectionPage.call (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:20:20)
+        at /home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:8:27
+        at PropertySelectionPage.selectProperty (/home/jay/projects/lodgeprice/tests/e2e/page-objects/property-selection-page.ts:7:17)
+        at /home/jay/projects/lodgeprice/tests/e2e/workflows/property-selection.spec.ts:103:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/workflows-property-selecti-17bd6-persists-through-navigation-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
 </testsuites>

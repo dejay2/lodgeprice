@@ -4,7 +4,7 @@
 export interface Property {
   id: string
   lodgify_property_id: string  // The lodgify property ID (e.g. "327020") 
-  property_id: string  // Alias for lodgify_property_id for backward compatibility
+  // Note: property_id doesn't exist in database, use lodgify_property_id instead
   lodgify_room_type_id: number | null
   property_name: string
   base_price_per_day: number

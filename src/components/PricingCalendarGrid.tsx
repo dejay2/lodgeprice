@@ -8,6 +8,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Calendar from 'react-calendar'
 import { handleSupabaseError } from '@/lib/supabase'
 import { pricingService } from '@/services/pricing.service'
+import { usePricingContext } from '@/context/PricingContext'
+import { useDebounce } from '@/hooks/useDebounce'
 import PricingTile from './PricingTile'
 import StayLengthSelector from './StayLengthSelector'
 import PricingLegend from './PricingLegend'
@@ -86,6 +88,12 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     error: null
   })
   
+  // Get toggle state from context (FR-3, FR-4)
+  const { toggles } = usePricingContext()
+  
+  // Debounce toggle changes to prevent excessive API calls (FR-6)
+  const debouncedToggles = useDebounce(toggles, 300)
+  
   // Inline editing state and handlers (PRP-11)
   const inlineEditing = useInlineEditing({
     propertyId,
@@ -108,8 +116,8 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
           endDate.setDate(endDate.getDate() + daysToAdd)
         }
         
-        // Reload calendar pricing with updated base price
-        loadCalendarPricing(propId, startDate, endDate, selectedStayLength)
+        // Reload calendar pricing with updated base price and current toggle states
+        loadCalendarPricing(propId, startDate, endDate, selectedStayLength, toggles)
         
         // Notify parent component about the change
         if (onBasePriceChanged) {
@@ -141,21 +149,31 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   /**
    * Load pricing data using pricing service for proper UUID conversion
    * Implements bulk loading as specified in PRP-10 with proper service layer
+   * Extended to support conditional pricing based on toggles (FR-3, FR-4, FR-5)
    */
   const loadCalendarPricing = useCallback(async (
     propId: string,
     startDate: Date,
     endDate: Date,
-    stayLength: number
+    stayLength: number,
+    toggleStates = { seasonalRatesEnabled: true, discountStrategiesEnabled: true }
   ) => {
     if (!propId) return
     
     setLoadingState(prev => ({ ...prev, isLoadingPrices: true, error: null }))
     
     try {
-      // Use pricing service which handles UUID to lodgify_property_id conversion
+      // Use pricing service with toggle options for conditional pricing
       const dateRange = { start: startDate, end: endDate }
-      const result = await pricingService.loadCalendarData(propId, dateRange, stayLength)
+      const result = await pricingService.loadCalendarData(
+        propId, 
+        dateRange, 
+        stayLength,
+        {
+          includeSeasonalRates: toggleStates.seasonalRatesEnabled,
+          includeDiscountStrategies: toggleStates.discountStrategiesEnabled
+        }
+      )
       
       // Convert to pricing data map
       const newPricingData = new Map<string, CalculateFinalPriceResult>()
@@ -185,7 +203,8 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   }, [])
   
   /**
-   * Load pricing data when property, stay length, or visible month changes
+   * Load pricing data when property, stay length, visible month, or toggles change
+   * FR-6: Calendar grid updates within 500ms of toggle state change
    */
   useEffect(() => {
     if (!propertyId) return
@@ -209,8 +228,9 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
       endDate.setDate(endDate.getDate() + daysToAdd)
     }
     
-    loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength)
-  }, [propertyId, selectedStayLength, calendarValue, loadCalendarPricing])
+    // Load with current toggle states (uses debounced values to prevent excessive calls)
+    loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength, debouncedToggles)
+  }, [propertyId, selectedStayLength, calendarValue, debouncedToggles, loadCalendarPricing])
   
   /**
    * Handle property selection change

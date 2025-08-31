@@ -131,12 +131,12 @@ export const propertyApi = {
     return data
   },
 
-  // Get single property by property_id (lodgify ID)
+  // Get single property by lodgify_property_id (lodgify ID)
   async getByPropertyId(propertyId: string): Promise<Property | null> {
     const { data, error } = await supabase
       .from('properties')
       .select('*')
-      .eq('property_id', propertyId)
+      .eq('lodgify_property_id', propertyId)
       .single()
 
     if (error) {

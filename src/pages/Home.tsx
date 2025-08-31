@@ -129,7 +129,7 @@ export default function Home() {
                       Base: €{property.base_price_per_day}/day
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      Lodgify ID: {property.property_id}
+                      Lodgify ID: {property.lodgify_property_id}
                     </p>
                   </div>
                 ))}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProperties } from '@/hooks/useProperties'
 import { formatCurrency } from '@/utils/dateHelpers'
 import type { Property } from '@/types/database'
@@ -8,6 +9,7 @@ export default function Properties() {
   useEffect(() => {
     document.title = 'Properties - Lodgeprice'
   }, [])
+  const navigate = useNavigate()
   const { properties, loading, error, refetch } = useProperties()
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
 
@@ -75,7 +77,7 @@ export default function Properties() {
                   {property.property_name}
                 </h3>
                 <span className="text-sm text-gray-500">
-                  Lodgify ID: {property.property_id}
+                  Lodgify ID: {property.lodgify_property_id}
                 </span>
               </div>
               
@@ -151,7 +153,7 @@ export default function Properties() {
                     <label className="block text-sm font-medium text-gray-700">
                       Lodgify Property ID
                     </label>
-                    <p className="mt-1 text-sm text-gray-900 font-semibold">{selectedProperty.property_id}</p>
+                    <p className="mt-1 text-sm text-gray-900 font-semibold">{selectedProperty.lodgify_property_id}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -193,16 +195,12 @@ export default function Properties() {
                     <button
                       type="button"
                       className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      disabled
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/calendar/${selectedProperty.lodgify_property_id}`)
+                      }}
                     >
-                      Edit Pricing (Coming Soon)
-                    </button>
-                    <button
-                      type="button"
-                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      disabled
-                    >
-                      View Calendar (Coming Soon)
+                      Manage Pricing
                     </button>
                   </div>
                 </div>
