@@ -11,6 +11,21 @@ import type {
 import { usePricingContext } from '@/context/PricingContext'
 
 /**
+ * Transform database response to match component interface
+ */
+function transformPricingResult(dbResult: any, propertyId: string): CalculateFinalPriceReturn {
+  return {
+    ...dbResult,
+    // Create aliases for component compatibility
+    base_price: dbResult.base_price_per_night,
+    min_price_enforced: dbResult.at_minimum_price,
+    // Ensure all required fields are present
+    property_id: propertyId,
+    property_name: dbResult.property_name || 'Unknown Property',
+  }
+}
+
+/**
  * Price calculation request parameters
  */
 export interface PriceCalculationParams {
@@ -89,14 +104,20 @@ export function usePricingCalculation(): UsePricingCalculation {
         throw new DatabaseError('No pricing data returned')
       }
       
+      // Transform data for consistency
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new DatabaseError('Invalid data format returned')
+      }
+      const transformedData = transformPricingResult(data[0], propertyId)
+      
       // Update cache with calculated price
       updateCalendarCell(dateString, {
-        ...data,
+        ...transformedData,
         date: dateString,
         nights
       })
       
-      return data
+      return transformedData
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(errorMessage)
@@ -158,11 +179,27 @@ export function usePricingCalculation(): UsePricingCalculation {
         
         // Transform to CalculateFinalPriceReturn structure
         const priceData: CalculateFinalPriceReturn = {
-          base_price: row.base_price,
+          property_id: propertyId,
+          property_name: 'Unknown Property', // Would need to be populated from property data
+          check_date: row.check_date,
+          nights,
+          base_price_per_night: row.base_price,
           seasonal_adjustment: (row.seasonal_adjustment_percent || 0) * row.base_price / 100,
+          seasonal_rate: 0,
+          adjusted_price_per_night: row.base_price + (row.seasonal_adjustment_percent || 0) * row.base_price / 100,
           last_minute_discount: row.savings_amount || 0,
+          discounted_price_per_night: row.final_price_per_night,
           final_price_per_night: row.final_price_per_night,
           total_price: row.total_price,
+          min_price_per_night: row.base_price,
+          savings_amount: row.savings_amount || 0,
+          savings_percentage: row.savings_percent || 0,
+          has_seasonal_rate: (row.seasonal_adjustment_percent || 0) !== 0,
+          has_last_minute_discount: (row.savings_amount || 0) > 0,
+          at_minimum_price: row.min_price_enforced || false,
+          is_overridden: false,
+          // Compatibility aliases
+          base_price: row.base_price,
           min_price_enforced: row.min_price_enforced || false
         }
         

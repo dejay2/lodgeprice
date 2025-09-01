@@ -14,12 +14,14 @@ import UnifiedPropertyControls from './unified-property-controls/UnifiedProperty
 // import SeasonalRatePanel from './SeasonalRatePanel'
 // import DiscountStrategyPanel from './DiscountStrategyPanel'
 import PriceDetailModal from './PriceDetailModal'
+import OverridePriceModal from './OverridePriceModal'
 import PreviewControls from './PreviewControls'
 import PreviewSummary from './PreviewSummary'
 import PricingConfirmationModal from './PricingConfirmationModal'
 import type { CalculateFinalPriceReturn } from '@/types/helpers'
 import type { CalculateFinalPriceResult } from '@/types/pricing-calendar.types'
 import type { Property } from '@/types/database'
+import type { PriceOverride } from './OverridePriceModal.types'
 import './PricingPreview.css'
 
 /**
@@ -126,6 +128,10 @@ const PricingDashboardInner: React.FC = () => {
   const [priceDetailData, setPriceDetailData] = useState<CalculateFinalPriceReturn | null>(null)
   const [showPriceDetail, setShowPriceDetail] = useState(false)
   
+  // Override Price Modal state
+  const [showOverrideModal, setShowOverrideModal] = useState(false)
+  const [existingOverride, setExistingOverride] = useState<PriceOverride | null>(null)
+  
   /**
    * Refresh data when property changes
    */
@@ -142,20 +148,81 @@ const PricingDashboardInner: React.FC = () => {
    * Handle date click from calendar
    */
   const handleDateClick = (date: Date, priceData: CalculateFinalPriceResult | null) => {
-    if (priceData) {
+    if (priceData && selectedProperty) {
       setSelectedDate(date)
       // Convert to the expected format for PriceDetailModal
       const convertedData: CalculateFinalPriceReturn = {
-        base_price: priceData.base_price,
+        property_id: selectedProperty.lodgify_property_id,
+        property_name: selectedProperty.property_name,
+        check_date: date.toISOString().split('T')[0],
+        nights: defaultNights,
+        base_price_per_night: priceData.base_price,
         seasonal_adjustment: priceData.seasonal_adjustment,
+        seasonal_rate: 0, // Not available in CalculateFinalPriceResult
+        adjusted_price_per_night: priceData.base_price + priceData.seasonal_adjustment,
         last_minute_discount: priceData.last_minute_discount,
+        discounted_price_per_night: priceData.base_price + priceData.seasonal_adjustment - priceData.last_minute_discount,
         final_price_per_night: priceData.final_price_per_night,
         total_price: priceData.total_price,
+        min_price_per_night: priceData.base_price, // Assuming base price is minimum
+        savings_amount: priceData.last_minute_discount,
+        savings_percentage: priceData.base_price > 0 ? (priceData.last_minute_discount / priceData.base_price) * 100 : 0,
+        has_seasonal_rate: Math.abs(priceData.seasonal_adjustment) > 0.01,
+        has_last_minute_discount: priceData.last_minute_discount > 0.01,
+        at_minimum_price: priceData.min_price_enforced,
+        is_overridden: priceData.is_override || false,
+        // Add required compatibility fields
+        base_price: priceData.base_price,
         min_price_enforced: priceData.min_price_enforced
       }
       setPriceDetailData(convertedData)
       setShowPriceDetail(true)
     }
+  }
+
+  /**
+   * Open override modal for the currently selected date
+   */
+  const handleOpenOverrideModal = () => {
+    if (selectedDate && priceDetailData) {
+      // Close detail modal first
+      setShowPriceDetail(false)
+      
+      // Check if there's an existing override for this date
+      // For now, we'll set it to null and let the service handle it
+      setExistingOverride(null)
+      setShowOverrideModal(true)
+    }
+  }
+
+  /**
+   * Handle successful override creation/update
+   */
+  const handleOverrideSet = (_override: PriceOverride) => {
+    // Refresh calendar data to show the new override
+    refreshCalendarData().catch(err => {
+      console.error('Failed to refresh calendar after override set:', err)
+    })
+    
+    // Close override modal
+    setShowOverrideModal(false)
+    setSelectedDate(null)
+    setPriceDetailData(null)
+  }
+
+  /**
+   * Handle override removal
+   */
+  const handleOverrideRemoved = (_dateString: string) => {
+    // Refresh calendar data to remove the override
+    refreshCalendarData().catch(err => {
+      console.error('Failed to refresh calendar after override removed:', err)
+    })
+    
+    // Close override modal
+    setShowOverrideModal(false)
+    setSelectedDate(null)
+    setPriceDetailData(null)
   }
   
   /**
@@ -173,6 +240,15 @@ const PricingDashboardInner: React.FC = () => {
     setShowPriceDetail(false)
     setSelectedDate(null)
     setPriceDetailData(null)
+  }
+
+  /**
+   * Close override modal
+   */
+  const handleCloseOverrideModal = () => {
+    setShowOverrideModal(false)
+    setExistingOverride(null)
+    // Keep selected date and price data in case user wants to reopen
   }
   
   if (!selectedProperty) {
@@ -223,12 +299,6 @@ const PricingDashboardInner: React.FC = () => {
                   propertyId={selectedProperty.lodgify_property_id}
                   selectedStayLength={defaultNights}
                   onDateClick={handleDateClick}
-                  enableInlineEditing={true}
-                  onBasePriceChanged={(propertyId, newPrice) => {
-                    console.log('Base price changed:', propertyId, newPrice)
-                    // Refresh calendar data after base price change
-                    refreshCalendarData()
-                  }}
                 />
               </div>
             )}
@@ -254,6 +324,21 @@ const PricingDashboardInner: React.FC = () => {
           isOpen={showPriceDetail}
           onClose={handleClosePriceDetail}
           priceData={priceDetailData}
+          onOverridePrice={handleOpenOverrideModal}
+        />
+      )}
+
+      {/* Override Price Modal */}
+      {selectedDate && priceDetailData && (
+        <OverridePriceModal
+          isOpen={showOverrideModal}
+          onClose={handleCloseOverrideModal}
+          propertyId={selectedProperty.lodgify_property_id}
+          date={selectedDate}
+          currentPrice={priceDetailData}
+          existingOverride={existingOverride}
+          onOverrideSet={handleOverrideSet}
+          onOverrideRemoved={handleOverrideRemoved}
         />
       )}
       

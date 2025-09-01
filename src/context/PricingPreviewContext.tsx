@@ -144,7 +144,10 @@ export function PricingPreviewProvider({ children }: PricingPreviewProviderProps
           newMap.set(dateKey, {
             ...existingPricing,
             base_price: change.newValue,
-            final_price_per_night: change.newValue // Simplified for preview
+            base_price_per_night: change.newValue,
+            final_price_per_night: change.newValue, // Simplified for preview
+            min_price_enforced: false,
+            at_minimum_price: false
           })
         }
         return newMap
@@ -225,8 +228,14 @@ export function PricingPreviewProvider({ children }: PricingPreviewProviderProps
           continue // Skip this date but continue with others
         }
         
-        if (data && data) {
-          previewResults.set(dateString, data)
+        if (data && Array.isArray(data) && data.length > 0) {
+          const transformedData = {
+            ...data[0],
+            // Add compatibility aliases
+            base_price: data[0].base_price_per_night,
+            min_price_enforced: data[0].at_minimum_price,
+          }
+          previewResults.set(dateString, transformedData)
         }
       }
       

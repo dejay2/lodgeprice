@@ -80,6 +80,30 @@ export interface ConditionalPricingOptions extends CacheOptions {
  */
 export class PricingService {
   /**
+   * Transform database response to match component interface
+   * Maps database field names to component-expected field names
+   */
+  private transformPricingResult(dbResult: any): CalculateFinalPriceReturn {
+    return {
+      ...dbResult,
+      // Create aliases for component compatibility
+      base_price: dbResult.base_price_per_night,
+      min_price_enforced: dbResult.at_minimum_price,
+    }
+  }
+  
+  /**
+   * Transform preview calendar result for consistency
+   */
+  private transformPreviewResult(dbResult: any): PreviewPricingCalendarReturn {
+    return {
+      ...dbResult,
+      // Create aliases for consistency
+      base_price_per_night: dbResult.base_price,
+      at_minimum_price: dbResult.min_price_enforced,
+    }
+  }
+  /**
    * Calculate detailed price for a specific date
    * Uses calculate_final_price database function
    * Extended to support conditional pricing based on toggles (FR-3, FR-4)
@@ -122,7 +146,7 @@ export class PricingService {
         throw new PricingCalculationError('No pricing data returned')
       }
       
-      const result = data[0] as CalculateFinalPriceReturn
+      const result = this.transformPricingResult(data[0])
       
       // Cache the result
       cache.set(cacheKey, result, options.expirationMinutes)
@@ -187,7 +211,7 @@ export class PricingService {
         throw new PricingCalculationError('No pricing data returned')
       }
       
-      let result = data[0] as CalculateFinalPriceReturn
+      let result = this.transformPricingResult(data[0])
       
       // Modify result based on toggle settings
       if (!includeSeasonalRates) {
@@ -305,7 +329,7 @@ export class PricingService {
         })
       }
       
-      return results
+      return results.map(result => this.transformPreviewResult(result))
     } catch (error) {
       return this.handlePricingError(error, 'calendar-load')
     }

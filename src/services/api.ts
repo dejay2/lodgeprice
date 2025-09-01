@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase'
 import type { Property, DateRange } from '@/types/database'
-import type { CalculateFinalPriceReturn } from '@/types/helpers'
 import { 
   syncPricingToLodgify, 
   syncMultiplePropertiesToLodgify,
@@ -178,7 +177,7 @@ export const pricingApi = {
     propertyId: string,  // This is the TEXT property_id, e.g. "327020"
     checkDate: string, 
     nights: number
-  ): Promise<CalculateFinalPriceReturn> {
+  ): Promise<any> {
     // Validate input parameters - note: propertyId here is NOT a UUID, it's a TEXT field
     // Using a custom validation since propertyId is not a UUID in this context
     const validatedPayload = {

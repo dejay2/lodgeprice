@@ -18,11 +18,27 @@ export interface CalculateFinalPriceParams {
 }
 
 export interface CalculateFinalPriceReturn {
-  base_price: number
+  property_id: string
+  property_name: string
+  check_date: string
+  nights: number
+  base_price_per_night: number
   seasonal_adjustment: number
+  seasonal_rate: number
+  adjusted_price_per_night: number
   last_minute_discount: number
+  discounted_price_per_night: number
   final_price_per_night: number
   total_price: number
+  min_price_per_night: number
+  savings_amount: number
+  savings_percentage: number
+  has_seasonal_rate: boolean
+  has_last_minute_discount: boolean
+  at_minimum_price: boolean
+  is_overridden: boolean
+  // Aliases for component compatibility
+  base_price: number
   min_price_enforced: boolean
 }
 
@@ -47,6 +63,9 @@ export interface PreviewPricingCalendarReturn {
   savings_percent: number
   seasonal_adjustment_percent: number
   total_price: number
+  // Aliases for consistency with CalculateFinalPriceReturn
+  base_price_per_night: number
+  at_minimum_price: boolean
 }
 
 /**
@@ -206,9 +225,14 @@ export function isPricingCalculationResult(value: unknown): value is CalculateFi
   return (
     typeof value === 'object' &&
     value !== null &&
-    'base_price' in value &&
+    'property_id' in value &&
+    'property_name' in value &&
+    'check_date' in value &&
+    'nights' in value &&
+    ('base_price_per_night' in value || 'base_price' in value) &&
     'final_price_per_night' in value &&
-    'total_price' in value
+    'total_price' in value &&
+    'is_overridden' in value
   )
 }
 
