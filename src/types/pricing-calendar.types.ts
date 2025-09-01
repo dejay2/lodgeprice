@@ -14,6 +14,7 @@ export interface CalculateFinalPriceResult {
   final_price_per_night: number
   total_price: number
   min_price_enforced: boolean
+  is_override?: boolean  // Added for override price support
 }
 
 export interface PreviewPricingCalendarResult {
@@ -27,13 +28,14 @@ export interface PreviewPricingCalendarResult {
   savings_amount: number
   savings_percent: number
   min_price_enforced: boolean
+  is_override?: boolean  // Added for override price support
 }
 
 // Props for the main PricingCalendarGrid component
 export interface PricingCalendarGridProps {
   propertyId: string
   selectedStayLength: number
-  onPropertyChange?: (propertyId: string) => void
+  // Property selection removed - now handled by parent component
   onStayLengthChange?: (nights: number) => void
   onDateClick?: (date: Date, priceData: CalculateFinalPriceResult | null) => void
   className?: string
@@ -51,6 +53,7 @@ export interface PricingTileProps {
   hasSeasonalAdjustment?: boolean
   hasDiscount?: boolean
   isMinPriceEnforced?: boolean
+  isOverride?: boolean  // Added for override price visual distinction
   // Inline editing support (PRP-11)
   isEditable?: boolean
   isEditing?: boolean
@@ -71,12 +74,7 @@ export interface StayLengthSelectorProps {
 }
 
 // Props for calendar controls
-export interface CalendarControlsProps {
-  propertyId: string
-  selectedStayLength: number
-  onPropertyChange: (propertyId: string) => void
-  onStayLengthChange: (nights: number) => void
-}
+// CalendarControlsProps removed - property selection now handled by parent component
 
 // Props for pricing legend
 export interface PricingLegendProps {

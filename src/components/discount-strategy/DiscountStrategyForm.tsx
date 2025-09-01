@@ -6,7 +6,7 @@ import { useDiscountStrategy } from '../../hooks/useDiscountStrategy';
 import { usePricingPreview } from '../../hooks/usePricingPreview';
 import { useProperties } from '../../hooks/useProperties';
 import { formatErrorMessage } from '../../utils/discountErrorHandling';
-import DiscountPropertySelector from './DiscountPropertySelector';
+import PropertySelection from '../PropertySelection/PropertySelection';
 import DiscountRulesEditor from './DiscountRulesEditor';
 import PricingPreview from './PricingPreview';
 import type { DiscountStrategy, DiscountRule, Property } from '../../types/database.types';
@@ -229,12 +229,14 @@ const DiscountStrategyForm: React.FC<DiscountStrategyFormProps> = ({
                   name="property_internal_id"
                   control={control}
                   render={({ field }) => (
-                    <DiscountPropertySelector
+                    <PropertySelection
                       value={field.value ?? null}
-                      onChange={field.onChange}
-                      properties={properties}
-                      loading={propertiesLoading}
+                      onChange={(propertyId) => field.onChange(propertyId)}
+                      placeholder="Select property or create global template..."
+                      disabled={propertiesLoading}
                       error={errors.property_internal_id?.message}
+                      variant="enhanced"
+                      showGlobalTemplate={true}
                     />
                   )}
                 />

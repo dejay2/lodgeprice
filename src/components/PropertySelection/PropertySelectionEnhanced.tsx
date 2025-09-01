@@ -95,20 +95,8 @@ export function PropertySelectionEnhanced({
    */
   const handleChange = (newValue: SingleValue<PropertyOption>) => {
     if (newValue?.value === null && showGlobalTemplate) {
-      // Handle global template selection - use special property object
-      const globalProperty: Property = {
-        id: 'global',
-        lodgify_property_id: '0',
-        property_id: 'global-template',
-        lodgify_room_type_id: null,
-        property_name: 'Global Template',
-        base_price_per_day: 0,
-        min_price_per_day: 0,
-        active_discount_strategy_id: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-      onChange('global', globalProperty)
+      // Handle global template selection - pass null for global template
+      onChange(null, undefined)
     } else if (newValue?.property) {
       onChange(newValue.value!, newValue.property)
       

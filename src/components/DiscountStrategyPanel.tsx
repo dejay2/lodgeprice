@@ -523,7 +523,7 @@ const DiscountStrategyPanel: React.FC<DiscountStrategyPanelProps> = ({
   }
   
   return (
-    <div className="discount-strategy-panel">
+    <div className="discount-strategy-panel" data-testid="discount-strategies-list">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Last-Minute Discount Strategies</h4>
         {!showForm && (

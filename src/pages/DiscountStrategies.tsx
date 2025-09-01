@@ -3,23 +3,58 @@
  * Provides complete CRUD operations for discount strategies across all properties
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useProperties } from '@/hooks/useProperties'
 import DiscountStrategyPanel from '@/components/DiscountStrategyPanel'
 import PropertySelection from '@/components/PropertySelection/PropertySelection'
 import type { Property } from '@/types/database'
 
 export default function DiscountStrategies() {
+  const location = useLocation()
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [_selectedProperty, setSelectedProperty] = useState<Property | null>(null)
-  const { loading: propertiesLoading, error: propertiesError, refetch } = useProperties()
+  const { properties, loading: propertiesLoading, error: propertiesError, refetch } = useProperties()
+
+  // Handle incoming property context from navigation state (FR-3)
+  useEffect(() => {
+    if (location.state && location.state.propertyId) {
+      const { propertyId } = location.state as {
+        propertyId: string
+        lodgifyPropertyId?: string
+        propertyName?: string
+        fromCalendar?: boolean
+      }
+      
+      // Set the property ID from navigation state
+      setSelectedPropertyId(propertyId)
+      
+      // Find and set the full property object
+      const property = properties.find(p => p.id === propertyId)
+      if (property) {
+        setSelectedProperty(property)
+      }
+    } else {
+      // Fallback to sessionStorage if no navigation state
+      const storedPropertyId = sessionStorage.getItem('selectedPropertyId')
+      if (storedPropertyId) {
+        setSelectedPropertyId(storedPropertyId)
+        const property = properties.find(p => p.id === storedPropertyId)
+        if (property) {
+          setSelectedProperty(property)
+        }
+      }
+    }
+  }, [location.state, properties])
 
   /**
    * Handle property selection change
    */
-  const handlePropertyChange = (propertyId: string, property: Property) => {
-    setSelectedPropertyId(propertyId)
-    setSelectedProperty(property)
+  const handlePropertyChange = (propertyId: string | null, property?: Property) => {
+    if (propertyId && property) {
+      setSelectedPropertyId(propertyId)
+      setSelectedProperty(property)
+    }
   }
 
   /**

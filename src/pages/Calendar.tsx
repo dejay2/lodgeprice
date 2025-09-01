@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react'
 import { usePricingContext } from '../context/PricingContext'
 import { useProperties } from '../hooks/useProperties'
 import PricingDashboard from '../components/PricingDashboard'
-import PropertySelection from '../components/PropertySelection/PropertySelection'
-import type { Property } from '../types/database'
 
 function Calendar() {
   const { propertyId } = useParams<{ propertyId?: string }>()
@@ -24,11 +22,6 @@ function Calendar() {
     }
   }, [propertyId])
   
-  // Handle property selection change
-  const handlePropertyChange = (propertyId: string, property: Property) => {
-    setSelectedPropertyId(propertyId)
-    setSelectedProperty(property)
-  }
 
   // Set selected property from URL or default to first property
   useEffect(() => {
@@ -69,23 +62,10 @@ function Calendar() {
     )
   }
   
-  // Use PricingDashboard which includes preview functionality
+  // Render PricingDashboard which now contains unified property controls in its header
   return (
-    <div className="calendar-page space-y-6">
-      {/* Property Selection */}
-      <div className="property-selection-section">
-        <PropertySelection
-          value={selectedPropertyId || undefined}
-          onChange={handlePropertyChange}
-          placeholder="Select a property to view calendar..."
-          label="Select Property"
-          helperText="Choose a property to view its pricing calendar and manage rates."
-          variant="enhanced"
-          showGlobalTemplate={false}
-        />
-      </div>
-      
-      {/* Pricing Dashboard */}
+    <div className="calendar-page">
+      {/* Pricing Dashboard with integrated unified property controls in header */}
       <PricingDashboard />
     </div>
   )

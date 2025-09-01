@@ -9,10 +9,10 @@ import type { Property } from '../../lib/supabase'
  * Props for the PropertySelection component
  */
 export interface PropertySelectionProps {
-  /** Currently selected property ID */
-  value?: string
+  /** Currently selected property ID (null for global template) */
+  value?: string | null
   /** Callback fired when a property is selected */
-  onChange: (propertyId: string, property: Property) => void
+  onChange: (propertyId: string | null, property?: Property) => void
   /** Placeholder text when no property is selected */
   placeholder?: string
   /** Whether the dropdown is disabled */

@@ -9,7 +9,7 @@ import { usePricingContext } from '@/context/PricingContext'
 import { useAppContext } from '@/context/AppContext'
 import { PricingPreviewProvider, usePricingPreview } from '@/context/PricingPreviewContext'
 import PricingCalendarGrid from './PricingCalendarGrid'
-import PricingToggles from './PricingToggles'
+import UnifiedPropertyControls from './unified-property-controls/UnifiedPropertyControls'
 // Removed unused imports after calendar simplification
 // import SeasonalRatePanel from './SeasonalRatePanel'
 // import DiscountStrategyPanel from './DiscountStrategyPanel'
@@ -19,13 +19,20 @@ import PreviewSummary from './PreviewSummary'
 import PricingConfirmationModal from './PricingConfirmationModal'
 import type { CalculateFinalPriceReturn } from '@/types/helpers'
 import type { CalculateFinalPriceResult } from '@/types/pricing-calendar.types'
+import type { Property } from '@/types/database'
 import './PricingPreview.css'
 
 /**
- * Dashboard header component for controls and summary
+ * Dashboard header component with integrated unified property controls
+ * Modified for Task 54: Integrates unified property controls section
+ * Maintains existing functionality while eliminating redundant interfaces
  */
-const DashboardHeader: React.FC = () => {
-  const { selectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
+interface DashboardHeaderProps {
+  className?: string
+}
+
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ className = '' }) => {
+  const { setSelectedProperty, defaultNights, setDefaultNights, error, clearError } = usePricingContext()
   const { stayLength, setStayLength } = useAppContext()
   
   useEffect(() => {
@@ -37,22 +44,30 @@ const DashboardHeader: React.FC = () => {
     setStayLength(nights)
     setDefaultNights(nights)
   }
+
+  const handlePropertyChange = (property: Property | null) => {
+    if (property) {
+      setSelectedProperty(property)
+    }
+  }
   
   return (
-    <div className="dashboard-header bg-white shadow-sm border-bottom p-3 mb-4">
+    <div className={`dashboard-header bg-white shadow-sm border-bottom p-4 mb-4 ${className}`} data-testid="pricing-dashboard">
       <div className="container-fluid">
-        <div className="row align-items-center">
-          <div className="col-md-4">
-            <h2 className="h4 mb-0">
-              {selectedProperty ? (
-                <>Pricing Dashboard</>
-              ) : (
-                <>Select a property to manage pricing</>
-              )}
-            </h2>
+        {/* Unified Property Controls Section - Replaces title and integrates all property controls */}
+        <div className="row mb-3">
+          <div className="col-12">
+            <UnifiedPropertyControls 
+              onPropertyChange={handlePropertyChange}
+              className="property-controls-section"
+            />
           </div>
-          <div className="col-md-8">
-            <div className="d-flex justify-content-end align-items-center gap-3">
+        </div>
+        
+        {/* Header Controls Section - Stay Length Only */}
+        <div className="row align-items-center">
+          <div className="col-md-6">
+            <div className="d-flex align-items-center gap-3">
               <div className="d-flex align-items-center gap-2">
                 <label htmlFor="nights-select" className="mb-0">Default nights:</label>
                 <select
@@ -61,26 +76,25 @@ const DashboardHeader: React.FC = () => {
                   value={defaultNights}
                   onChange={(e) => handleNightsChange(Number(e.target.value))}
                   style={{ width: 'auto' }}
+                  data-testid="stay-length-selector"
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 14, 21, 28].map(n => (
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
               </div>
-              {/* Pricing Toggles - FR-1: Add toggle switches to Calendar page header */}
-              <div className="d-flex align-items-center">
-                <PricingToggles className="ms-3" />
-              </div>
             </div>
           </div>
         </div>
+        
+        {/* Error Display Section */}
         {error && (
-          <div className="alert alert-danger mt-3 mb-0 d-flex justify-content-between align-items-center">
+          <div className="alert alert-danger mt-3 mb-0 d-flex justify-content-between align-items-center" role="alert">
             <span>{error}</span>
             <button 
               type="button" 
               className="btn-close" 
-              aria-label="Close"
+              aria-label="Close error message"
               onClick={clearError}
             />
           </div>

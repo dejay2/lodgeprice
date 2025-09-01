@@ -1,8 +1,8 @@
 /**
- * Base Price Service
+ * Minimum Price Service
  * 
- * Service layer for managing property base price updates with optimistic UI patterns
- * Implements database integration as specified in PRP-11
+ * Service layer for managing property minimum price updates with optimistic UI patterns
+ * Implements database integration and constraint validation as specified in PRP-49
  */
 
 import { supabase, supabaseAdmin } from '@/lib/supabase'
@@ -12,9 +12,9 @@ type PropertiesRow = Database['public']['Tables']['properties']['Row']
 type PropertiesUpdate = Database['public']['Tables']['properties']['Update']
 
 /**
- * Error types for base price operations
+ * Error types for minimum price operations
  */
-export class BasePriceError extends Error {
+export class MinPriceError extends Error {
   constructor(
     message: string,
     public code: string,
@@ -22,14 +22,14 @@ export class BasePriceError extends Error {
     public constraint?: string
   ) {
     super(message)
-    this.name = 'BasePriceError'
+    this.name = 'MinPriceError'
   }
 }
 
 /**
- * Result type for base price updates
+ * Result type for minimum price updates
  */
-export interface BasePriceUpdateResult {
+export interface MinPriceUpdateResult {
   success: boolean
   property: PropertiesRow
   previousPrice: number
@@ -53,37 +53,38 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 }
 
 /**
- * Base Price Service class
+ * Minimum Price Service class
  * 
- * Provides methods for updating property base prices with proper error handling
- * and retry logic as specified in PRP-11 requirements
+ * Provides methods for updating property minimum prices with proper constraint validation
+ * and retry logic as specified in PRP-49 requirements
  */
-export class BasePriceService {
+export class MinPriceService {
   /**
-   * Update base price for a property with optimistic update support
+   * Update minimum price for a property with optimistic update support
+   * Enforces constraint: min_price_per_day <= base_price_per_day
    * 
    * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
-   * @param newBasePrice - New base price per day
+   * @param newMinPrice - New minimum price per day
    * @param retryConfig - Optional retry configuration
    * @returns Promise with update result
-   * @throws BasePriceError for various failure scenarios
+   * @throws MinPriceError for various failure scenarios
    */
-  static async updateBasePrice(
+  static async updateMinPrice(
     propertyId: string,
-    newBasePrice: number,
+    newMinPrice: number,
     retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG
-  ): Promise<BasePriceUpdateResult> {
+  ): Promise<MinPriceUpdateResult> {
     // Validate inputs
     if (!propertyId || typeof propertyId !== 'string') {
-      throw new BasePriceError('Invalid property ID provided', 'INVALID_PROPERTY_ID')
+      throw new MinPriceError('Invalid property ID provided', 'INVALID_PROPERTY_ID')
     }
 
-    if (typeof newBasePrice !== 'number' || newBasePrice <= 0) {
-      throw new BasePriceError('Base price must be a positive number', 'INVALID_PRICE', propertyId)
+    if (typeof newMinPrice !== 'number' || newMinPrice <= 0) {
+      throw new MinPriceError('Minimum price must be a positive number', 'INVALID_PRICE', propertyId)
     }
 
     // Ensure precision (database stores 2 decimal places)
-    const roundedPrice = Math.round(newBasePrice * 100) / 100
+    const roundedPrice = Math.round(newMinPrice * 100) / 100
 
     return this.retryOperation(async () => {
       // Convert propertyId to UUID if it's a lodgify_property_id
@@ -98,32 +99,33 @@ export class BasePriceService {
 
       if (fetchError) {
         if (fetchError.code === 'PGRST116') {
-          throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+          throw new MinPriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
         }
-        throw new BasePriceError(`Failed to fetch property: ${fetchError.message}`, 'FETCH_ERROR', propertyId)
+        throw new MinPriceError(`Failed to fetch property: ${fetchError.message}`, 'FETCH_ERROR', propertyId)
       }
 
       if (!currentProperty) {
-        throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+        throw new MinPriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
       }
 
-      // Validate against minimum price constraint (client-side pre-validation)
-      if (roundedPrice < currentProperty.min_price_per_day) {
-        throw new BasePriceError(
-          `Price €${roundedPrice.toFixed(2)} is below minimum price €${currentProperty.min_price_per_day.toFixed(2)}`,
-          'PRICE_BELOW_MINIMUM',
+      // CRITICAL: Validate against base price constraint (client-side pre-validation)
+      // min_price_per_day must be <= base_price_per_day
+      if (roundedPrice > currentProperty.base_price_per_day) {
+        throw new MinPriceError(
+          `Minimum price €${roundedPrice.toFixed(2)} cannot exceed base price €${currentProperty.base_price_per_day.toFixed(2)}`,
+          'PRICE_EXCEEDS_BASE',
           propertyId,
           'base_price_gte_min'
         )
       }
 
       // Check if price actually changed
-      if (roundedPrice === currentProperty.base_price_per_day) {
+      if (roundedPrice === currentProperty.min_price_per_day) {
         // Return success without update if price hasn't changed
         return {
           success: true,
           property: currentProperty as PropertiesRow,
-          previousPrice: currentProperty.base_price_per_day,
+          previousPrice: currentProperty.min_price_per_day,
           newPrice: roundedPrice,
           updatedAt: currentProperty.updated_at || new Date().toISOString()
         }
@@ -131,7 +133,7 @@ export class BasePriceService {
 
       // Perform the update
       const updateData: PropertiesUpdate = {
-        base_price_per_day: roundedPrice
+        min_price_per_day: roundedPrice
       }
 
       const { data: updatedProperty, error: updateError } = await supabaseAdmin
@@ -144,8 +146,8 @@ export class BasePriceService {
       if (updateError) {
         // Handle specific database constraint errors
         if (updateError.code === '23514' && updateError.message.includes('base_price_gte_min')) {
-          throw new BasePriceError(
-            `Price €${roundedPrice.toFixed(2)} violates minimum price constraint`,
+          throw new MinPriceError(
+            `Minimum price €${roundedPrice.toFixed(2)} violates base price constraint. Please check current base price.`,
             'CONSTRAINT_VIOLATION',
             propertyId,
             'base_price_gte_min'
@@ -153,14 +155,14 @@ export class BasePriceService {
         }
 
         if (updateError.code === '23502') {
-          throw new BasePriceError(
-            'Base price cannot be null',
+          throw new MinPriceError(
+            'Minimum price cannot be null',
             'NULL_CONSTRAINT_VIOLATION',
             propertyId
           )
         }
 
-        throw new BasePriceError(
+        throw new MinPriceError(
           `Database update failed: ${updateError.message}`,
           'UPDATE_ERROR',
           propertyId
@@ -168,14 +170,14 @@ export class BasePriceService {
       }
 
       if (!updatedProperty) {
-        throw new BasePriceError('Update succeeded but no property returned', 'UPDATE_NO_RESULT', propertyId)
+        throw new MinPriceError('Update succeeded but no property returned', 'UPDATE_NO_RESULT', propertyId)
       }
 
       return {
         success: true,
         property: updatedProperty,
-        previousPrice: currentProperty.base_price_per_day,
-        newPrice: updatedProperty.base_price_per_day,
+        previousPrice: currentProperty.min_price_per_day,
+        newPrice: updatedProperty.min_price_per_day,
         updatedAt: updatedProperty.updated_at || new Date().toISOString()
       }
     }, retryConfig)
@@ -185,7 +187,7 @@ export class BasePriceService {
    * Get property information for validation
    * 
    * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
-   * @returns Property data including minimum price constraints
+   * @returns Property data including base and minimum price constraints
    */
   static async getPropertyInfo(propertyId: string): Promise<PropertiesRow> {
     // Convert propertyId to UUID if it's a lodgify_property_id
@@ -199,9 +201,9 @@ export class BasePriceService {
 
     if (error) {
       if (error.code === 'PGRST116') {
-        throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+        throw new MinPriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
       }
-      throw new BasePriceError(`Failed to fetch property info: ${error.message}`, 'FETCH_ERROR', propertyId)
+      throw new MinPriceError(`Failed to fetch property info: ${error.message}`, 'FETCH_ERROR', propertyId)
     }
 
     return data
@@ -227,12 +229,12 @@ export class BasePriceService {
         lastError = error as Error
 
         // Don't retry certain types of errors
-        if (error instanceof BasePriceError) {
+        if (error instanceof MinPriceError) {
           const nonRetryableCodes = [
             'INVALID_PROPERTY_ID',
             'INVALID_PRICE', 
             'PROPERTY_NOT_FOUND',
-            'PRICE_BELOW_MINIMUM',
+            'PRICE_EXCEEDS_BASE',
             'CONSTRAINT_VIOLATION',
             'NULL_CONSTRAINT_VIOLATION'
           ]
@@ -257,38 +259,40 @@ export class BasePriceService {
         const jitter = delay * 0.25 * (Math.random() * 2 - 1)
         const finalDelay = Math.max(0, delay + jitter)
 
-        console.warn(`Base price update attempt ${attempt} failed, retrying in ${Math.round(finalDelay)}ms:`, error)
+        console.warn(`Minimum price update attempt ${attempt} failed, retrying in ${Math.round(finalDelay)}ms:`, error)
         
         await new Promise(resolve => setTimeout(resolve, finalDelay))
       }
     }
 
     // If we get here, all retries failed
-    throw lastError || new BasePriceError('Max retry attempts exceeded', 'MAX_RETRIES_EXCEEDED')
+    throw lastError || new MinPriceError('Max retry attempts exceeded', 'MAX_RETRIES_EXCEEDED')
   }
 
   /**
-   * Validate price against property constraints without updating
+   * Validate minimum price against property constraints without updating
+   * Ensures min_price <= base_price constraint
    * 
    * @param propertyId - Property ID (can be UUID or lodgify_property_id string like "327020")
-   * @param newPrice - Price to validate
+   * @param newMinPrice - Minimum price to validate
    * @returns Validation result with specific error messages
    */
-  static async validatePrice(
+  static async validateMinPrice(
     propertyId: string,
-    newPrice: number
+    newMinPrice: number
   ): Promise<{ valid: boolean; error?: string }> {
     try {
       const property = await this.getPropertyInfo(propertyId)
       
-      if (newPrice <= 0) {
-        return { valid: false, error: 'Price must be a positive number' }
+      if (newMinPrice <= 0) {
+        return { valid: false, error: 'Minimum price must be a positive number' }
       }
 
-      if (newPrice < property.min_price_per_day) {
+      // CRITICAL: Check base price constraint
+      if (newMinPrice > property.base_price_per_day) {
         return { 
           valid: false, 
-          error: `Price must be at least €${property.min_price_per_day.toFixed(2)}` 
+          error: `Minimum price cannot exceed base price of €${property.base_price_per_day.toFixed(2)}` 
         }
       }
 
@@ -296,15 +300,45 @@ export class BasePriceService {
     } catch (error) {
       return { 
         valid: false, 
-        error: error instanceof BasePriceError ? error.message : 'Validation failed' 
+        error: error instanceof MinPriceError ? error.message : 'Validation failed' 
       }
     }
   }
 
   /**
+   * Check if a minimum price update would violate constraints
+   * Useful for pre-validation before attempting database update
+   * 
+   * @param propertyId - Property ID
+   * @param newMinPrice - Proposed minimum price
+   * @param currentBasePrice - Optional current base price (will be fetched if not provided)
+   * @returns True if update would be valid
+   */
+  static async canUpdateMinPrice(
+    propertyId: string,
+    newMinPrice: number,
+    currentBasePrice?: number
+  ): Promise<boolean> {
+    if (newMinPrice <= 0) {
+      return false
+    }
+
+    let basePrice = currentBasePrice
+    if (basePrice === undefined) {
+      try {
+        const property = await this.getPropertyInfo(propertyId)
+        basePrice = property.base_price_per_day
+      } catch {
+        return false
+      }
+    }
+
+    return newMinPrice <= basePrice
+  }
+
+  /**
    * Convert property ID to UUID for database operations
    * Handles both UUID (returns as-is) and lodgify_property_id (converts to UUID)
-   * This mirrors how PricingService.getLodgifyPropertyId() works but in reverse
    * 
    * @param propertyId - Either UUID or lodgify_property_id string
    * @returns Property UUID for database queries
@@ -323,7 +357,7 @@ export class BasePriceService {
       .single()
 
     if (error) {
-      throw new BasePriceError(
+      throw new MinPriceError(
         `Failed to find property with lodgify_property_id: ${propertyId}`,
         'PROPERTY_LOOKUP_FAILED',
         propertyId
@@ -331,11 +365,11 @@ export class BasePriceService {
     }
 
     if (!data?.id) {
-      throw new BasePriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
+      throw new MinPriceError(`Property not found: ${propertyId}`, 'PROPERTY_NOT_FOUND', propertyId)
     }
 
     return data.id
   }
 }
 
-export default BasePriceService
+export default MinPriceService

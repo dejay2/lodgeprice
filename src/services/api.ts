@@ -9,17 +9,14 @@ import {
 } from './lodgify/lodgifyApiClient'
 import {
   uuidSchema,
-  priceSchema,
   dateSchema,
-  pricingCalculationSchema,
   basePriceUpdateSchema,
   seasonalRateCreateSchema,
   supabasePropertyUpdateSchema,
-  lodgifyRateSchema,
-  safeValidate,
-  formatValidationError
+  safeValidate
 } from '../lib/validation'
 import { sanitizeFormData } from '../lib/sanitization'
+import { z } from 'zod'
 
 // =============================================================================
 // Validation Wrapper Functions
@@ -28,11 +25,11 @@ import { sanitizeFormData } from '../lib/sanitization'
 /**
  * Validate and sanitize API payload before database operations
  */
-function validateApiPayload<T>(
-  schema: any,
+function validateApiPayload<T extends z.ZodTypeAny>(
+  schema: T,
   data: unknown,
   sanitize: boolean = false
-): T {
+): z.infer<T> {
   let processedData = data
 
   // Apply sanitization if requested
@@ -60,7 +57,7 @@ function validateApiPayload<T>(
     throw new Error(errorMessage)
   }
 
-  return result.data as T
+  return result.data as z.infer<T>
 }
 
 /**
@@ -71,20 +68,9 @@ function validateUuid(uuid: string, paramName: string = 'id'): string {
   if (!result.success) {
     throw new Error(`Invalid ${paramName}: must be a valid UUID`)
   }
-  return result.data
+  return result.data as string
 }
 
-/**
- * Validate price parameter
- */
-function validatePrice(price: number, paramName: string = 'price'): number {
-  const result = safeValidate(priceSchema, price)
-  if (!result.success) {
-    const errors = result.errors || {}
-    throw new Error(`Invalid ${paramName}: ${Object.values(errors).join(', ')}`)
-  }
-  return result.data
-}
 
 /**
  * Validate date parameter
@@ -95,7 +81,7 @@ function validateDate(date: string, paramName: string = 'date'): string {
     const errors = result.errors || {}
     throw new Error(`Invalid ${paramName}: ${Object.values(errors).join(', ')}`)
   }
-  return result.data
+  return result.data as string
 }
 
 // =============================================================================
@@ -152,11 +138,11 @@ export const propertyApi = {
     const validatedPayload = validateApiPayload(basePriceUpdateSchema, {
       propertyId: id,
       newPrice: newPrice
-    })
+    }, true)
 
     const { error } = await supabase
       .from('properties')
-      .update({ base_price_per_day: validatedPayload.newPrice } as any)
+      .update({ base_price_per_day: validatedPayload.newPrice })
       .eq('id', validatedPayload.propertyId)
 
     if (error) throw new Error(`Failed to update property price: ${error.message}`)
@@ -177,7 +163,7 @@ export const propertyApi = {
 
     const { error } = await supabase
       .from('properties')
-      .update(validatedPayload as any)
+      .update(validatedPayload)
       .eq('id', validatedId)
 
     if (error) throw new Error(`Failed to update property: ${error.message}`)
@@ -193,12 +179,17 @@ export const pricingApi = {
     checkDate: string, 
     nights: number
   ): Promise<CalculateFinalPriceReturn> {
-    // Validate input parameters
-    const validatedPayload = validateApiPayload(pricingCalculationSchema, {
-      propertyId,
-      checkInDate: checkDate,
+    // Validate input parameters - note: propertyId here is NOT a UUID, it's a TEXT field
+    // Using a custom validation since propertyId is not a UUID in this context
+    const validatedPayload = {
+      propertyId: propertyId,  // Pass through as-is, it's the lodgify property ID
+      checkInDate: validateDate(checkDate, 'check-in date'),
       stayLength: nights
-    })
+    }
+
+    if (nights < 1 || nights > 365) {
+      throw new Error('Stay length must be between 1 and 365 days')
+    }
 
     const result = await supabase
       .rpc('calculate_final_price', {
@@ -266,7 +257,7 @@ export const dateRangesApi = {
       startDate: dateRange.start_date,
       endDate: dateRange.end_date,
       rateAdjustment: dateRange.discount_rate,
-      propertyId: dateRange.property_id
+      propertyId: (dateRange as any).property_id || (dateRange as any).id
     }, true)
 
     // Map back to database format
@@ -280,7 +271,7 @@ export const dateRangesApi = {
 
     const { data, error } = await supabase
       .from('date_ranges')
-      .insert([dbPayload as any])
+      .insert([dbPayload])
       .select()
       .single()
 
@@ -297,7 +288,10 @@ export const dateRangesApi = {
     const sanitizedUpdates: any = {}
     
     if (updates.rate_name) {
-      sanitizedUpdates.rate_name = validateApiPayload({ parse: (v: string) => v }, updates.rate_name, true)
+      const nameResult = safeValidate(z.string().min(1).max(200), updates.rate_name)
+      if (nameResult.success && nameResult.data) {
+        sanitizedUpdates.rate_name = nameResult.data
+      }
     }
     if (updates.start_date) {
       sanitizedUpdates.start_date = validateDate(updates.start_date, 'start date')

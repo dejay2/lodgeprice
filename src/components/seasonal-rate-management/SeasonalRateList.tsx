@@ -164,7 +164,7 @@ export default function SeasonalRateList({
 
       {/* Table */}
       <div className="table-container">
-        <table className="seasonal-rate-table">
+        <table className="seasonal-rate-table" data-testid="seasonal-rates-table">
           <thead>
             <tr>
               <th className="checkbox-column">

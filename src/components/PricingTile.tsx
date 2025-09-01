@@ -7,6 +7,7 @@
 
 import React, { useState, useCallback } from 'react'
 import InlinePriceEditor from './InlinePriceEditor'
+import { Tooltip } from './contextual-help'
 import type { PricingTileProps } from '@/types/pricing-calendar.types'
 import './InlinePriceEditor.css'
 
@@ -15,6 +16,10 @@ const PricingTile: React.FC<PricingTileProps> = ({
   view,
   priceData,
   stayLength,
+  hasSeasonalAdjustment,
+  hasDiscount,
+  isMinPriceEnforced,
+  isOverride = false,
   isEditable = false,
   isEditing = false,
   minPrice = 0,
@@ -113,11 +118,12 @@ const PricingTile: React.FC<PricingTileProps> = ({
 
   return (
     <div 
-      className={`pricing-tile ${isEditable ? 'editable' : ''} ${isEditing ? 'editing' : ''} ${recentlySaved ? 'success-highlight' : ''}`}
+      className={`pricing-tile ${isEditable ? 'editable' : ''} ${isEditing ? 'editing' : ''} ${recentlySaved ? 'success-highlight' : ''} ${isOverride ? 'has-override' : ''}`}
       data-testid={testId}
       data-price={priceData.final_price_per_night}
       data-stay-length={stayLength}
       data-date={date.toISOString().split('T')[0]}
+      data-is-override={isOverride}
     >
       {/* Main price display or inline editor */}
       <div className="price-display">
@@ -131,26 +137,36 @@ const PricingTile: React.FC<PricingTileProps> = ({
             className="tile-price-editor"
           />
         ) : (
-          <div 
-            className={`price-amount ${isEditable ? 'clickable' : ''}`}
-            onClick={handleEditStart}
-            role={isEditable ? 'button' : undefined}
-            tabIndex={isEditable ? 0 : undefined}
-            aria-label={isEditable ? `Edit price €${Math.round(priceData.final_price_per_night)}` : undefined}
-            onKeyDown={isEditable ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                const mouseEvent = new MouseEvent('click', {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window
-                })
-                handleEditStart(mouseEvent as unknown as React.MouseEvent<HTMLDivElement>)
-              }
-            } : undefined}
+          <Tooltip
+            content={isOverride 
+              ? "Override price - manually set and bypasses normal pricing calculations" 
+              : "Shows final calculated price including all adjustments (base + seasonal + discounts)"}
+            placement="top"
+            delay={300}
           >
-            €{Math.round(priceData.final_price_per_night)}
-          </div>
+            <div 
+              className={`price-amount ${isEditable ? 'clickable' : ''}`}
+              onClick={handleEditStart}
+              role={isEditable ? 'button' : undefined}
+              tabIndex={isEditable ? 0 : undefined}
+              aria-label={isEditable ? `Edit price €${Math.round(priceData.final_price_per_night)}` : undefined}
+              data-testid="calendar-price-cell"
+              onKeyDown={isEditable ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  const mouseEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                  })
+                  handleEditStart(mouseEvent as unknown as React.MouseEvent<HTMLDivElement>)
+                }
+              } : undefined}
+            >
+              €{Math.round(priceData.final_price_per_night)}
+              {isOverride && <span className="override-indicator" title="Override price">⚡</span>}
+            </div>
+          </Tooltip>
         )}
         
         {/* Total price for multi-night stays */}

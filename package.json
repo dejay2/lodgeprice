@@ -1,7 +1,10 @@
 {
-  "name": "lodgeprice-frontend",
+  "name": "lodgeprice",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
+  "description": "Holiday rental property management and dynamic pricing system",
+  "author": "Lodgeprice Team",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -29,9 +32,16 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "test:validation": "playwright test --config=playwright.validation.config.ts",
+    "test:validation:regression": "playwright test --config=playwright.validation.config.ts tests/integration-validation/regression/",
+    "test:validation:performance": "playwright test --config=playwright.validation.config.ts tests/integration-validation/performance/",
+    "test:validation:accessibility": "playwright test --config=playwright.validation.config.ts tests/integration-validation/accessibility/",
+    "test:validation:cross-browser": "playwright test --config=playwright.validation.config.ts tests/integration-validation/cross-browser/",
+    "test:validation:final": "playwright test --config=playwright.validation.config.ts tests/integration-validation/final-validation.spec.ts"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.16",
     "@hookform/resolvers": "^5.2.1",
     "@supabase/supabase-js": "^2.48.0",
     "@types/dompurify": "^3.0.5",
@@ -54,6 +64,7 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/js": "^8.53.0",
     "@playwright/test": "^1.55.0",
     "@testing-library/jest-dom": "^6.8.0",
@@ -76,6 +87,7 @@
     "msw": "^2.10.5",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
+    "terser": "^5.43.1",
     "typescript": "^5.9.2",
     "vite": "^5.0.0",
     "vitest": "^3.2.4"

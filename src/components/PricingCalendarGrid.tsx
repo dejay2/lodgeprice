@@ -13,7 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import PricingTile from './PricingTile'
 import StayLengthSelector from './StayLengthSelector'
 import PricingLegend from './PricingLegend'
-import { PropertySelection } from './PropertySelection'
+// Removed PropertySelection import - now handled by parent component
 import { useInlineEditing } from '@/hooks/useInlineEditing'
 import type {
   PricingCalendarGridProps,
@@ -23,43 +23,8 @@ import type {
 } from '@/types/pricing-calendar.types'
 import './PricingCalendarGrid.css'
 
-/**
- * Calendar Controls Component
- * Property selection and stay length controls as per PRP-10 architecture
- */
-interface CalendarControlsComponentProps {
-  propertyId: string
-  selectedStayLength: number
-  onPropertyChange: (propertyId: string) => void
-  onStayLengthChange: (nights: number) => void
-}
-
-const CalendarControlsComponent: React.FC<CalendarControlsComponentProps> = ({
-  propertyId,
-  selectedStayLength,
-  onPropertyChange,
-  onStayLengthChange
-}) => {
-  return (
-    <div className="calendar-controls">
-      <div className="row g-3">
-        <div className="col-md-6">
-          <PropertySelection
-            value={propertyId}
-            onChange={(newPropertyId, _property) => onPropertyChange(newPropertyId)}
-          />
-        </div>
-        <div className="col-md-6">
-          <StayLengthSelector
-            selectedLength={selectedStayLength}
-            onLengthChange={onStayLengthChange}
-            availableLengths={[1, 2, 3, 4, 5, 6, 7, 14, 21, 30]}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
+// CalendarControlsComponent removed - property selection now handled by parent component
+// Stay length selector is integrated directly into the grid
 
 
 /**
@@ -69,15 +34,14 @@ const CalendarControlsComponent: React.FC<CalendarControlsComponentProps> = ({
 const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   propertyId: initialPropertyId,
   selectedStayLength: initialStayLength = 3,
-  onPropertyChange,
   onStayLengthChange,
   onDateClick,
   className = '',
   enableInlineEditing = false,
   onBasePriceChanged
 }) => {
-  // Component state
-  const [propertyId, setPropertyId] = useState(initialPropertyId)
+  // Component state - property selection removed as it's handled by parent
+  const [propertyId] = useState(initialPropertyId)
   const [selectedStayLength, setSelectedStayLength] = useState(initialStayLength)
   const [calendarValue, setCalendarValue] = useState<CalendarValue>(new Date())
   const [pricingData, setPricingData] = useState<Map<string, CalculateFinalPriceResult>>(new Map())
@@ -185,7 +149,8 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
           last_minute_discount: dayData.last_minute_discount_percent * dayData.base_price / 100,
           final_price_per_night: dayData.final_price_per_night,
           total_price: dayData.total_price,
-          min_price_enforced: dayData.min_price_enforced
+          min_price_enforced: dayData.min_price_enforced,
+          is_override: (dayData as any).is_override || false
         })
       })
       
@@ -232,15 +197,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength, debouncedToggles)
   }, [propertyId, selectedStayLength, calendarValue, debouncedToggles, loadCalendarPricing])
   
-  /**
-   * Handle property selection change
-   */
-  const handlePropertyChange = useCallback((newPropertyId: string) => {
-    setPropertyId(newPropertyId)
-    if (onPropertyChange) {
-      onPropertyChange(newPropertyId)
-    }
-  }, [onPropertyChange])
+  // Property selection now handled by parent component
   
   /**
    * Handle stay length change with loading state
@@ -294,6 +251,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
         hasSeasonalAdjustment={priceData ? Math.abs(priceData.seasonal_adjustment) > 0.01 : false}
         hasDiscount={priceData ? priceData.last_minute_discount > 0.01 : false}
         isMinPriceEnforced={priceData ? priceData.min_price_enforced : false}
+        isOverride={priceData ? priceData.is_override : false}
         // Inline editing props (PRP-11)
         isEditable={enableInlineEditing && Boolean(inlineEditing.propertyInfo)}
         isEditing={Boolean(isThisTileEditing)}
@@ -350,14 +308,15 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   const isLoading = loadingState.isLoadingPrices || loadingState.isChangingStayLength || inlineEditing.isLoadingProperty
   
   return (
-    <div className={`pricing-calendar-grid ${className}`} data-testid="pricing-calendar">
-      {/* Calendar Controls */}
-      <CalendarControlsComponent
-        propertyId={propertyId}
-        selectedStayLength={selectedStayLength}
-        onPropertyChange={handlePropertyChange}
-        onStayLengthChange={handleStayLengthChange}
-      />
+    <div className={`pricing-calendar-grid ${className}`} data-testid="calendar-grid">
+      {/* Stay Length Selector - Property selection now handled by parent */}
+      <div className="calendar-controls mb-3">
+        <StayLengthSelector
+          selectedLength={selectedStayLength}
+          onLengthChange={handleStayLengthChange}
+          availableLengths={[1, 2, 3, 4, 5, 6, 7, 14, 21, 30]}
+        />
+      </div>
       
       {/* Error Display */}
       {(loadingState.error || inlineEditing.propertyError || inlineEditing.editingError) && (

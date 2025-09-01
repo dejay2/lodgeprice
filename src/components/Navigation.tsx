@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 export function Navigation() {
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-white shadow-sm border-b" data-testid="navigation-bar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -11,20 +11,8 @@ export function Navigation() {
             </div>
             <div className="ml-6 flex space-x-8">
               <NavLink
-                to="/properties"
-                end
-                className={({ isActive }) =>
-                  `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    isActive
-                      ? 'border-indigo-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`
-                }
-              >
-                Properties
-              </NavLink>
-              <NavLink
                 to="/calendar"
+                data-testid="nav-calendar"
                 className={({ isActive }) =>
                   `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive
@@ -37,6 +25,7 @@ export function Navigation() {
               </NavLink>
               <NavLink
                 to="/seasonal-rates"
+                data-testid="nav-seasonal-rates"
                 className={({ isActive }) =>
                   `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive
@@ -49,6 +38,7 @@ export function Navigation() {
               </NavLink>
               <NavLink
                 to="/discount-strategies"
+                data-testid="nav-discount-strategies"
                 className={({ isActive }) =>
                   `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive
@@ -61,6 +51,7 @@ export function Navigation() {
               </NavLink>
               <NavLink
                 to="/lodgify-payload-generator"
+                data-testid="nav-lodgify-export"
                 className={({ isActive }) =>
                   `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive
@@ -74,6 +65,7 @@ export function Navigation() {
               <NavLink
                 to="/settings"
                 end
+                data-testid="nav-settings"
                 className={({ isActive }) =>
                   `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive

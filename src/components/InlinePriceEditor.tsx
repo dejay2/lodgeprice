@@ -20,6 +20,7 @@ export interface InlinePriceEditorProps {
   autoFocus?: boolean
   date?: Date  // Added for preview mode tracking
   propertyId?: string  // Added for preview mode tracking
+  dataTestId?: string  // Added for custom test IDs
 }
 
 interface ValidationState {
@@ -45,7 +46,8 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
   className = '',
   autoFocus = true,
   date,
-  propertyId
+  propertyId,
+  dataTestId = 'inline-price-input'
 }) => {
   const [inputValue, setInputValue] = useState(value.toString())
   const [validation, setValidation] = useState<ValidationState>({
@@ -236,7 +238,7 @@ const InlinePriceEditor: React.FC<InlinePriceEditorProps> = ({
         onBlur={handleBlur}
         disabled={isSaving}
         className={`inline-price-input ${!validation.isValid ? 'error' : ''} ${isSaving ? 'saving' : ''}`}
-        data-testid="inline-price-input"
+        data-testid={dataTestId}
         aria-label={`Edit price (minimum €${minPrice.toFixed(2)})`}
         aria-describedby={!validation.isValid ? 'price-error' : undefined}
       />

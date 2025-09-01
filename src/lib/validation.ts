@@ -120,10 +120,19 @@ export const propertyNameSchema = z.string()
 
 /**
  * UUID validation schema
- * For validating property IDs, user IDs, etc.
+ * For validating user IDs, etc. (NOT for property IDs)
  */
 export const uuidSchema = z.string()
   .uuid("Invalid UUID format")
+
+/**
+ * Lodgify Property ID validation schema
+ * Validates 6-digit numeric property IDs used by Lodgify
+ * Examples: '327020', '327021', etc.
+ */
+export const lodgifyPropertyIdSchema = z.string()
+  .regex(/^\d{6}$/, "Property ID must be 6 digits (e.g., 327020)")
+  .refine((id) => parseInt(id) >= 100000, "Property ID must be valid")
 
 // =============================================================================
 // Form Data Validation Schemas
@@ -133,7 +142,7 @@ export const uuidSchema = z.string()
  * Base price update form validation
  */
 export const basePriceUpdateSchema = z.object({
-  propertyId: uuidSchema,
+  propertyId: lodgifyPropertyIdSchema,
   newPrice: priceSchema,
   effectiveDate: dateSchema.optional()
 })
@@ -146,7 +155,7 @@ export const seasonalRateCreateSchema = z.object({
   startDate: dateSchema,
   endDate: dateSchema,
   rateAdjustment: rateAdjustmentSchema,
-  propertyId: uuidSchema.optional()
+  propertyId: lodgifyPropertyIdSchema.optional()
 }).refine(
   (data) => new Date(data.startDate) < new Date(data.endDate),
   { 
@@ -159,7 +168,7 @@ export const seasonalRateCreateSchema = z.object({
  * Property selection form validation
  */
 export const propertySelectionSchema = z.object({
-  propertyId: uuidSchema,
+  propertyId: lodgifyPropertyIdSchema,
   dateRange: dateRangeSchema.optional()
 })
 
@@ -167,7 +176,7 @@ export const propertySelectionSchema = z.object({
  * Pricing calculation request validation
  */
 export const pricingCalculationSchema = z.object({
-  propertyId: uuidSchema,
+  propertyId: lodgifyPropertyIdSchema,
   checkInDate: dateSchema,
   stayLength: z.number().min(1, "Stay length must be at least 1 day").max(365, "Stay length cannot exceed 365 days"),
   guestCount: z.number().min(1, "Guest count must be at least 1").max(20, "Guest count cannot exceed 20").optional()
@@ -252,6 +261,7 @@ export type PriceInput = z.infer<typeof priceSchema>
 export type DateInput = z.infer<typeof dateSchema>
 export type DateRangeInput = z.infer<typeof dateRangeSchema>
 export type SafeTextInput = z.infer<typeof safeTextSchema>
+export type LodgifyPropertyIdInput = z.infer<typeof lodgifyPropertyIdSchema>
 export type BasePriceUpdateInput = z.infer<typeof basePriceUpdateSchema>
 export type SeasonalRateCreateInput = z.infer<typeof seasonalRateCreateSchema>
 export type PropertySelectionInput = z.infer<typeof propertySelectionSchema>
@@ -272,6 +282,7 @@ export const validationSchemas = {
   safeText: safeTextSchema,
   propertyName: propertyNameSchema,
   uuid: uuidSchema,
+  lodgifyPropertyId: lodgifyPropertyIdSchema,
   basePriceUpdate: basePriceUpdateSchema,
   seasonalRateCreate: seasonalRateCreateSchema,
   propertySelection: propertySelectionSchema,

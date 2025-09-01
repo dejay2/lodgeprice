@@ -11,10 +11,12 @@ export default function PropertySelectionDemo() {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
 
-  const handlePropertyChange = (propertyId: string, property: Property) => {
-    setSelectedPropertyId(propertyId)
-    setSelectedProperty(property)
-    console.log('Property selected:', property)
+  const handlePropertyChange = (propertyId: string | null, property?: Property) => {
+    if (propertyId && property) {
+      setSelectedPropertyId(propertyId)
+      setSelectedProperty(property)
+      console.log('Property selected:', property)
+    }
   }
 
   return (

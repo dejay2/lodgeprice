@@ -20,16 +20,16 @@ else
 fi
 
 # Test a nested route (simulating SPA routing)
-echo "Testing nested route (/properties)..."
-if curl -s http://localhost:4173/properties | grep -q "</html>"; then
+echo "Testing nested route (/calendar)..."
+if curl -s http://localhost:4173/calendar | grep -q "</html>"; then
     echo "✅ SPA routing works (returns index.html for nested routes)"
 else
     echo "❌ SPA routing failed"
 fi
 
 # Test a deep nested route
-echo "Testing deep nested route (/properties/123/edit)..."
-if curl -s http://localhost:4173/properties/123/edit | grep -q "</html>"; then
+echo "Testing deep nested route (/calendar/123)..."
+if curl -s http://localhost:4173/calendar/123 | grep -q "</html>"; then
     echo "✅ Deep nested routing works"
 else
     echo "❌ Deep nested routing failed"

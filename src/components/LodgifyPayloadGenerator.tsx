@@ -312,7 +312,7 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
   }
 
   return (
-    <div className={`lodgify-payload-generator ${className}`}>
+    <div className={`lodgify-payload-generator ${className}`} data-testid="lodgify-export-form">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">

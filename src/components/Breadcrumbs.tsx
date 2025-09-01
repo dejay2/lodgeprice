@@ -15,7 +15,7 @@ export function Breadcrumbs() {
     const breadcrumbs: BreadcrumbItem[] = []
     
     // Always start with Home
-    breadcrumbs.push({ label: 'Home', path: '/properties' })
+    breadcrumbs.push({ label: 'Home', path: '/calendar' })
     
     if (pathSegments.length === 0) {
       return breadcrumbs
@@ -25,10 +25,6 @@ export function Breadcrumbs() {
     const firstSegment = pathSegments[0]
     
     switch (firstSegment) {
-      case 'properties':
-        breadcrumbs.push({ label: 'Properties', current: true })
-        break
-        
       case 'calendar':
         if (propertyId) {
           breadcrumbs.push({ label: 'Calendar', path: '/calendar' })

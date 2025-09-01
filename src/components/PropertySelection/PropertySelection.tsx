@@ -24,7 +24,7 @@ export function PropertySelection({
   variant = 'standard',
   showGlobalTemplate = false
 }: PropertySelectionProps) {
-  // Always call hooks at the top level
+  // Always call ALL hooks at the top level before any conditionals
   const {
     properties,
     isLoading,
@@ -32,38 +32,12 @@ export function PropertySelection({
     refetch
   } = usePropertySelection()
   
-  // Lazy load the enhanced variant when needed
-  if (variant === 'enhanced') {
-    const PropertySelectionEnhanced = React.lazy(() => import('./PropertySelectionEnhanced'))
-    return (
-      <React.Suspense fallback={
-        <div className="flex items-center justify-center py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <span className="text-gray-600">Loading enhanced selector...</span>
-        </div>
-      }>
-        <PropertySelectionEnhanced
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={className}
-          label={label}
-          helperText={helperText}
-          error={externalError}
-          showGlobalTemplate={showGlobalTemplate}
-        />
-      </React.Suspense>
-    )
-  }
-  
-  // Standard variant implementation continues below
-  
-  // Generate unique IDs for accessibility
+  // Generate unique IDs for accessibility (must be before any returns)
   const selectId = useId()
   const helperId = useId()
   const errorId = useId()
   
-  // Ref for managing focus
+  // Ref for managing focus (must be before any returns)
   const selectRef = useRef<HTMLSelectElement>(null)
   
   // Determine which error to display (external error takes precedence)
@@ -77,6 +51,12 @@ export function PropertySelection({
     
     if (!propertyId) {
       // Handle empty selection if needed
+      return
+    }
+    
+    // Handle global template selection
+    if (propertyId === 'global' && showGlobalTemplate) {
+      onChange(null, undefined)
       return
     }
     
@@ -184,6 +164,30 @@ export function PropertySelection({
     displayError ? 'border-red-500' : 'border-gray-300'
   ].join(' ')
   
+  // Lazy load the enhanced variant when needed
+  if (variant === 'enhanced') {
+    const PropertySelectionEnhanced = React.lazy(() => import('./PropertySelectionEnhanced'))
+    return (
+      <React.Suspense fallback={
+        <div className="flex items-center justify-center py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <span className="text-gray-600">Loading enhanced selector...</span>
+        </div>
+      }>
+        <PropertySelectionEnhanced
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={className}
+          label={label}
+          helperText={helperText}
+          error={externalError}
+          showGlobalTemplate={showGlobalTemplate}
+        />
+      </React.Suspense>
+    )
+  }
+  
   return (
     <div className={containerClasses} data-testid="property-selection">
       {/* Label */}
@@ -270,7 +274,8 @@ export function PropertySelection({
           <select
             ref={selectRef}
             id={selectId}
-            value={value || ''}
+            data-testid="selected-property"
+            value={value === null ? 'global' : (value || '')}
             onChange={handleChange}
             disabled={disabled || properties.length === 0}
             className={selectClasses}
@@ -279,10 +284,16 @@ export function PropertySelection({
             aria-busy={isLoading}
           >
             <option value="">{placeholder}</option>
+            {showGlobalTemplate && (
+              <option value="global">
+                🌍 Global Template (All Properties)
+              </option>
+            )}
             {properties.map(property => (
               <option 
                 key={property.id} 
                 value={property.id}
+                data-testid={`property-option-${property.id}`}
               >
                 {formatOptionText(property)}
               </option>
@@ -297,6 +308,21 @@ export function PropertySelection({
             >
               {helperText}
             </p>
+          )}
+          
+          {/* Global Template Info */}
+          {showGlobalTemplate && value !== undefined && (
+            <div className="mt-2">
+              {value === null ? (
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  This strategy will be a template that can be applied to all properties
+                </div>
+              ) : value && (
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  This strategy will apply only to selected property
+                </div>
+              )}
+            </div>
           )}
         </>
       )}

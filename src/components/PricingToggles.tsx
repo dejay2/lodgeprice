@@ -6,6 +6,7 @@
 
 import React, { useCallback, memo } from 'react'
 import { usePricingContext } from '@/context/PricingContext'
+import { Tooltip } from './contextual-help'
 
 /**
  * Props for PricingToggles component
@@ -44,68 +45,80 @@ const PricingToggles: React.FC<PricingTogglesProps> = memo(({
   return (
     <div className={`pricing-toggles d-flex gap-4 ${className}`}>
       {/* Seasonal Rates Toggle */}
-      <div className="form-check form-switch">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="seasonal-rates-toggle"
-          data-testid="seasonal-rates-toggle"
-          checked={toggles.seasonalRatesEnabled}
-          onChange={handleSeasonalToggle}
-          disabled={disabled}
-          aria-checked={toggles.seasonalRatesEnabled}
-          aria-label="Toggle seasonal rates"
-        />
-        <label 
-          className="form-check-label" 
-          htmlFor="seasonal-rates-toggle"
-        >
-          <span className="d-flex align-items-center gap-1">
-            <span>Seasonal Rates</span>
-            {!toggles.seasonalRatesEnabled && (
-              <span 
-                className="badge bg-secondary"
-                data-testid="seasonal-rates-indicator"
-              >
-                Off
-              </span>
-            )}
-          </span>
-        </label>
-      </div>
+      <Tooltip
+        content="Enable/disable seasonal rate adjustments in calendar pricing calculations"
+        placement="top"
+        delay={200}
+      >
+        <div className="form-check form-switch" data-testid="pricing-toggle-seasonal">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="seasonal-rates-toggle"
+            data-testid="seasonal-rates-toggle"
+            checked={toggles.seasonalRatesEnabled}
+            onChange={handleSeasonalToggle}
+            disabled={disabled}
+            aria-checked={toggles.seasonalRatesEnabled}
+            aria-label="Toggle seasonal rates"
+          />
+          <label 
+            className="form-check-label" 
+            htmlFor="seasonal-rates-toggle"
+          >
+            <span className="d-flex align-items-center gap-1">
+              <span>Seasonal Rates</span>
+              {!toggles.seasonalRatesEnabled && (
+                <span 
+                  className="badge bg-secondary"
+                  data-testid="seasonal-rates-indicator"
+                >
+                  Off
+                </span>
+              )}
+            </span>
+          </label>
+        </div>
+      </Tooltip>
 
       {/* Discount Strategies Toggle */}
-      <div className="form-check form-switch">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="discount-strategies-toggle"
-          data-testid="discount-strategies-toggle"
-          checked={toggles.discountStrategiesEnabled}
-          onChange={handleDiscountToggle}
-          disabled={disabled}
-          aria-checked={toggles.discountStrategiesEnabled}
-          aria-label="Toggle discount strategies"
-        />
-        <label 
-          className="form-check-label" 
-          htmlFor="discount-strategies-toggle"
-        >
-          <span className="d-flex align-items-center gap-1">
-            <span>Discount Strategies</span>
-            {!toggles.discountStrategiesEnabled && (
-              <span 
-                className="badge bg-secondary"
-                data-testid="discount-strategies-indicator"
-              >
-                Off
-              </span>
-            )}
-          </span>
-        </label>
-      </div>
+      <Tooltip
+        content="Enable/disable last-minute discounts in final price calculations"
+        placement="top"
+        delay={200}
+      >
+        <div className="form-check form-switch" data-testid="pricing-toggle-discounts">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="discount-strategies-toggle"
+            data-testid="discount-strategies-toggle"
+            checked={toggles.discountStrategiesEnabled}
+            onChange={handleDiscountToggle}
+            disabled={disabled}
+            aria-checked={toggles.discountStrategiesEnabled}
+            aria-label="Toggle discount strategies"
+          />
+          <label 
+            className="form-check-label" 
+            htmlFor="discount-strategies-toggle"
+          >
+            <span className="d-flex align-items-center gap-1">
+              <span>Discount Strategies</span>
+              {!toggles.discountStrategiesEnabled && (
+                <span 
+                  className="badge bg-secondary"
+                  data-testid="discount-strategies-indicator"
+                >
+                  Off
+                </span>
+              )}
+            </span>
+          </label>
+        </div>
+      </Tooltip>
 
       {/* Visual indicator when both are disabled */}
       {!toggles.seasonalRatesEnabled && !toggles.discountStrategiesEnabled && (

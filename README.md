@@ -4,16 +4,17 @@ A comprehensive React-based property management and dynamic pricing system built
 
 ## Features
 
-### 🏠 Property Management
-- Manage 8 holiday rental properties with dedicated interfaces
-- Property selection with URL parameter support
-- Consolidated navigation from Properties page to pricing management
+### 🏠 Unified Property Management
+- **Calendar-Centric Design**: Single unified interface for all property management
+- **Consolidated Controls**: One property dropdown controlling all functionality
+- **Inline Rate Editing**: Direct editing of base/minimum rates within property controls
+- **Quick Management Access**: Streamlined navigation to seasonal rates and discounts
 
-### 📅 Calendar Interface
-- Simplified calendar view showing calculated daily prices
-- Real-time pricing toggles for seasonal rates and discount strategies  
-- Property selection dropdown with session persistence
-- Interactive calendar grid with pricing calculations
+### 📅 Enhanced Calendar Interface  
+- **Calculated Final Prices**: Display actual pricing with seasonal adjustments and discounts applied
+- **Real-time Pricing Toggles**: Toggle seasonal rates and discount strategies on/off
+- **Property Selection**: Single dropdown with session persistence and URL parameter support
+- **Performance Optimized**: Sub-200ms pricing updates with debounced calculations
 
 ### 🎯 Discount Strategy Management
 - Dedicated Discount Strategies page with complete CRUD operations
@@ -27,10 +28,11 @@ A comprehensive React-based property management and dynamic pricing system built
 - Real-time preview of seasonal rate impact on pricing
 
 ### 🔧 Advanced Features
-- Pricing toggles to analyze individual component contributions
-- Property context preservation across page navigation
-- Comprehensive error handling and validation
-- Responsive design with Bootstrap styling
+- **Component-Level Analysis**: Pricing toggles to analyze individual pricing contributions
+- **Context Preservation**: Property selection maintained across page navigation  
+- **Unified Interface**: Single control section eliminating redundant navigation
+- **Quick Actions**: "Manage" buttons for immediate access to specialized interfaces
+- **Comprehensive Validation**: Error handling and input sanitization at all levels
 
 ## Project Overview
 
@@ -317,18 +319,22 @@ All tables have automatic `updated_at` triggers that update on any row modificat
 ## User Interface
 
 ### Navigation Structure
-- **Properties**: Main property overview and management
-- **Calendar**: Simplified pricing calendar with toggles and inline editing
-- **Seasonal Rates**: Dedicated seasonal rate management interface
-- **Discount Strategies**: Comprehensive discount strategy CRUD operations
-- **Lodgify Export**: API integration for rate synchronization
+**Navigation:** Calendar (default) | Seasonal Rates | Discount Strategies | Lodgify Export | Settings
+
+- **Calendar** (Default Landing): Unified property management with inline rate editing and quick management buttons
+- **Seasonal Rates**: Dedicated seasonal rate management interface with complete CRUD operations
+- **Discount Strategies**: Comprehensive discount strategy configuration and rule management
+- **Lodgify Export**: API integration for rate synchronization with external systems
+- **Settings**: Application configuration and preferences
 
 ### Key Components
-- **PropertySelection**: Standardized property dropdown with session persistence
-- **PricingToggles**: Real-time toggles for seasonal rates and discount strategies
-- **PricingCalendarGrid**: Interactive calendar showing calculated daily prices
-- **DiscountStrategyPanel**: Complete discount strategy management interface
-- **SeasonalRateManagement**: Date range and rate adjustment configuration
+- **Unified Property Controls**: Single control section with property dropdown, inline rate editing, and quick management
+- **PricingToggles**: Real-time toggles for seasonal rates and discount strategies with immediate calculation updates
+- **PricingCalendarGrid**: Interactive calendar displaying calculated final prices
+- **MinimumRateEditor**: Inline click-to-edit functionality for minimum rates
+- **Quick Management Buttons**: Direct navigation to Seasonal Rates and Discount Strategies with context preservation
+- **DiscountStrategyPanel**: Complete discount strategy management interface on dedicated page
+- **SeasonalRateManagement**: Comprehensive date range and rate adjustment configuration
 
 ### Technology Stack
 - **Frontend**: React 18+ with TypeScript
@@ -338,19 +344,29 @@ All tables have automatic `updated_at` triggers that update on any row modificat
 - **Testing**: Playwright for E2E testing
 - **Build Tools**: Vite for development and production builds
 
+## Current Status
+
+### ✅ Completed: Major Interface Consolidation
+The application has successfully completed a major layout restructuring that eliminated redundancy and created a unified user experience:
+
+**Completed Improvements:**
+- ✅ Removed redundant Properties page and made Calendar the default landing
+- ✅ Consolidated duplicate property dropdowns into single unified control
+- ✅ Added inline minimum rate editing within property controls
+- ✅ Implemented quick management buttons for immediate access to specialized functions
+- ✅ Streamlined navigation to 5 core sections: Calendar | Seasonal Rates | Discount Strategies | Lodgify Export | Settings
+
+**Result:** A clean, intuitive interface with all property management centralized in the Calendar view
+
 ## Future Enhancements
 
-Potential additions to consider:
-- Automated hourly sync to Lodgify API
+Planned additions after restructuring completion:
+- Automated hourly sync to Lodgify API with rate limiting and authentication
 - Bulk operations for multiple property management
-- Advanced calendar filtering and navigation
-- Export functionality for pricing data
-- Guest information table
-- Payment tracking
-- Review/rating system
-- Occupancy analytics
-- Email notification system
-- Reporting dashboard views
+- Advanced calendar filtering and navigation enhancements
+- Enhanced export functionality for pricing data
+- Advanced reporting and analytics dashboard
+- Automated scheduling for Lodgify synchronization
 
 ## Support
 

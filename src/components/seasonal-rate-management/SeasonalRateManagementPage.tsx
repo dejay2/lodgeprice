@@ -3,7 +3,8 @@
  * Coordinates all seasonal rate management components and state
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSeasonalRates } from './hooks/useSeasonalRates'
 import SeasonalRateForm from './SeasonalRateForm'
 import SeasonalRateList from './SeasonalRateList'
@@ -11,6 +12,7 @@ import SeasonalRateCalendar from './SeasonalRateCalendar'
 import BulkOperations from './BulkOperations'
 import ImportExport from './ImportExport'
 import PropertySelection from '@/components/PropertySelection/PropertySelection'
+import { useProperties } from '@/hooks/useProperties'
 import type { SeasonalRate } from './types/SeasonalRate'
 import type { Property } from '@/types/database'
 import './SeasonalRateManagementPage.css'
@@ -18,6 +20,8 @@ import './SeasonalRateManagementPage.css'
 type ViewMode = 'list' | 'calendar'
 
 export default function SeasonalRateManagementPage() {
+  const location = useLocation()
+  const { properties } = useProperties()
   const {
     seasonalRates,
     isLoading,
@@ -34,6 +38,37 @@ export default function SeasonalRateManagementPage() {
   const [showImportExport, setShowImportExport] = useState(false)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [_selectedProperty, setSelectedProperty] = useState<Property | null>(null)
+
+  // Handle incoming property context from navigation state (FR-3)
+  useEffect(() => {
+    if (location.state && location.state.propertyId) {
+      const { propertyId } = location.state as {
+        propertyId: string
+        lodgifyPropertyId?: string
+        propertyName?: string
+        fromCalendar?: boolean
+      }
+      
+      // Set the property ID from navigation state
+      setSelectedPropertyId(propertyId)
+      
+      // Find and set the full property object
+      const property = properties.find(p => p.id === propertyId)
+      if (property) {
+        setSelectedProperty(property)
+      }
+    } else {
+      // Fallback to sessionStorage if no navigation state
+      const storedPropertyId = sessionStorage.getItem('selectedPropertyId')
+      if (storedPropertyId) {
+        setSelectedPropertyId(storedPropertyId)
+        const property = properties.find(p => p.id === storedPropertyId)
+        if (property) {
+          setSelectedProperty(property)
+        }
+      }
+    }
+  }, [location.state, properties])
 
   // Handle create new rate
   const handleCreate = () => {
@@ -80,9 +115,11 @@ export default function SeasonalRateManagementPage() {
   }
 
   // Handle property selection change
-  const handlePropertyChange = (propertyId: string, property: Property) => {
-    setSelectedPropertyId(propertyId)
-    setSelectedProperty(property)
+  const handlePropertyChange = (propertyId: string | null, property?: Property) => {
+    if (propertyId && property) {
+      setSelectedPropertyId(propertyId)
+      setSelectedProperty(property)
+    }
   }
 
   return (

@@ -8,8 +8,7 @@ interface TitleMap {
 const DEFAULT_TITLE = 'Lodgeprice'
 
 const titleMap: TitleMap = {
-  '/': 'Properties - Lodgeprice',
-  '/properties': 'Properties - Lodgeprice',
+  '/': 'Calendar - Lodgeprice',
   '/calendar': 'Calendar - Lodgeprice',
   '/settings': 'Settings - Lodgeprice'
 }

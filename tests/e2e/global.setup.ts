@@ -8,7 +8,7 @@ const authFile = join(__dirname, '../../playwright/.auth/user.json');
 
 setup('authenticate', async ({ page }) => {
   // Navigate to application
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   
   // Wait for app to load
   await page.waitForLoadState('networkidle');

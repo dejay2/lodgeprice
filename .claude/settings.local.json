@@ -7,7 +7,17 @@
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_take_screenshot",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_navigate",
+      "Bash(npm run dev:*)",
+      "Bash(mkdir:*)",
+      "Bash(mkdir:*)",
+      "Bash(mkdir:*)",
+      "mcp__brave-search__brave_web_search",
+      "mcp__brave-search__brave_web_search",
+      "mcp__brave-search__brave_web_search",
+      "Bash(npm run typecheck:*)",
+      "mcp__context7__resolve-library-id"
     ],
     "deny": [],
     "ask": []
