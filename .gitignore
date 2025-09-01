@@ -54,6 +54,18 @@ project.md
 CLAUDE.md
 FRONTEND_SETUP.md
 database-schema.md
+archive/
+COMPLETED.md
+CHANGELOG.md
+
+# Playwright test artifacts
+playwright-report/
+test-results/
+playwright*.config.ts
+!playwright.config.ts
+
+# Scripts (development utilities)
+scripts/
 
 # Test files
 test-*.js
