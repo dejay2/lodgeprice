@@ -9,16 +9,8 @@ import React from 'react'
 import PricingCalendarGrid from '@/components/PricingCalendarGrid'
 
 const InlineEditingDemo: React.FC = () => {
-  const handlePropertyChange = (propertyId: string) => {
-    console.log('Property changed:', propertyId)
-  }
-
   const handleStayLengthChange = (nights: number) => {
     console.log('Stay length changed:', nights)
-  }
-
-  const handleBasePriceChanged = (propertyId: string, newPrice: number) => {
-    console.log('Base price updated:', { propertyId, newPrice })
   }
 
   const handleDateClick = (date: Date, priceData: any) => {
@@ -53,11 +45,8 @@ const InlineEditingDemo: React.FC = () => {
               <PricingCalendarGrid
                 propertyId="17bf7d28-b904-43ba-9903-a1bdc4a7ddd5"
                 selectedStayLength={3}
-                onPropertyChange={handlePropertyChange}
                 onStayLengthChange={handleStayLengthChange}
                 onDateClick={handleDateClick}
-                enableInlineEditing={true}
-                onBasePriceChanged={handleBasePriceChanged}
               />
             </div>
           </div>

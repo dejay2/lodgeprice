@@ -2,6 +2,7 @@
  * PricingCalendarGrid - React Calendar with Pricing Display
  * Implements react-calendar with custom tileContent for pricing as per PRP-10
  * Integrates with calculate_final_price and preview_pricing_calendar database functions
+ * Inline editing removed as per PRP-11 - now handled through modal
  */
 
 import React, { useState, useEffect, useCallback } from 'react'
@@ -14,7 +15,7 @@ import PricingTile from './PricingTile'
 import StayLengthSelector from './StayLengthSelector'
 import PricingLegend from './PricingLegend'
 // Removed PropertySelection import - now handled by parent component
-import { useInlineEditing } from '@/hooks/useInlineEditing'
+// Removed useInlineEditing import - inline editing now handled through modal
 import type {
   PricingCalendarGridProps,
   CalculateFinalPriceResult,
@@ -36,9 +37,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   selectedStayLength: initialStayLength = 3,
   onStayLengthChange,
   onDateClick,
-  className = '',
-  enableInlineEditing = false,
-  onBasePriceChanged
+  className = ''
 }) => {
   // Component state - property selection removed as it's handled by parent
   const [propertyId] = useState(initialPropertyId)
@@ -57,58 +56,6 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   
   // Debounce toggle changes to prevent excessive API calls (FR-6)
   const debouncedToggles = useDebounce(toggles, 300)
-  
-  // Inline editing state and handlers (PRP-11)
-  const inlineEditing = useInlineEditing({
-    propertyId,
-    onPriceChanged: (propId, newPrice) => {
-      // Trigger pricing recalculation when base price changes (FR-10)
-      if (propId === propertyId) {
-        const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
-        const year = currentDate.getFullYear()
-        const month = currentDate.getMonth()
-        
-        const firstDay = new Date(year, month, 1)
-        const lastDay = new Date(year, month + 1, 0)
-        
-        const startDate = new Date(firstDay)
-        startDate.setDate(startDate.getDate() - firstDay.getDay())
-        
-        const endDate = new Date(lastDay)
-        const daysToAdd = (6 - lastDay.getDay())
-        if (daysToAdd > 0) {
-          endDate.setDate(endDate.getDate() + daysToAdd)
-        }
-        
-        // Reload calendar pricing with updated base price and current toggle states
-        loadCalendarPricing(propId, startDate, endDate, selectedStayLength, toggles)
-        
-        // Notify parent component about the change
-        if (onBasePriceChanged) {
-          onBasePriceChanged(propId, newPrice)
-        }
-      }
-    },
-    onValidationError: (error) => {
-      setLoadingState(prev => ({ ...prev, error }))
-    },
-    onEditingStateChange: (isEditing, date) => {
-      // Update calendar tiles to prevent navigation during editing (FR-8)
-      if (isEditing && date) {
-        // Add class to calendar to disable tile interactions except for editing tile
-        const calendar = document.querySelector('.pricing-calendar')
-        if (calendar) {
-          calendar.classList.add('has-editing-tile')
-        }
-      } else {
-        // Remove editing restriction
-        const calendar = document.querySelector('.pricing-calendar')
-        if (calendar) {
-          calendar.classList.remove('has-editing-tile')
-        }
-      }
-    }
-  })
   
   /**
    * Load pricing data using pricing service for proper UUID conversion
@@ -228,19 +175,13 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   
   /**
    * Custom tileContent function for react-calendar
-   * Renders PricingTile component for each date with inline editing support
+   * Renders PricingTile component for each date (display only)
    */
   const tileContent = useCallback(({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') return null
     
     const dateKey = date.toISOString().split('T')[0]
     const priceData = pricingData.get(dateKey)
-    
-    // Check if this tile is currently being edited
-    const isThisTileEditing = enableInlineEditing && 
-      inlineEditing.isEditing && 
-      inlineEditing.editingDate &&
-      inlineEditing.editingDate.toISOString().split('T')[0] === dateKey
     
     return (
       <PricingTile
@@ -252,31 +193,11 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
         hasDiscount={priceData ? priceData.last_minute_discount > 0.01 : false}
         isMinPriceEnforced={priceData ? priceData.min_price_enforced : false}
         isOverride={priceData ? priceData.is_override : false}
-        // Inline editing props (PRP-11)
-        isEditable={enableInlineEditing && Boolean(inlineEditing.propertyInfo)}
-        isEditing={Boolean(isThisTileEditing)}
-        minPrice={inlineEditing.propertyInfo?.min_price_per_day || 0}
-        propertyId={propertyId}
-        onEditStart={inlineEditing.startEdit}
-        onEditCancel={inlineEditing.cancelEdit}
-        onPriceSave={inlineEditing.savePrice}
-        onPriceChange={() => {
-          // This callback is handled by the useInlineEditing hook
-          // The pricing recalculation is triggered automatically
-        }}
       />
     )
   }, [
     pricingData, 
-    selectedStayLength, 
-    enableInlineEditing,
-    inlineEditing.isEditing,
-    inlineEditing.editingDate,
-    inlineEditing.propertyInfo,
-    inlineEditing.startEdit,
-    inlineEditing.cancelEdit,
-    inlineEditing.savePrice,
-    propertyId
+    selectedStayLength
   ])
   
   /**
@@ -305,7 +226,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     return classes.length > 0 ? classes.join(' ') : null
   }, [pricingData])
   
-  const isLoading = loadingState.isLoadingPrices || loadingState.isChangingStayLength || inlineEditing.isLoadingProperty
+  const isLoading = loadingState.isLoadingPrices || loadingState.isChangingStayLength
   
   return (
     <div className={`pricing-calendar-grid ${className}`} data-testid="calendar-grid">
@@ -319,46 +240,37 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
       </div>
       
       {/* Error Display */}
-      {(loadingState.error || inlineEditing.propertyError || inlineEditing.editingError) && (
+      {loadingState.error && (
         <div className="alert alert-danger mb-3">
-          <strong>
-            {loadingState.error && 'Error loading calendar data: '}
-            {inlineEditing.propertyError && 'Property error: '}
-            {inlineEditing.editingError && 'Editing error: '}
-          </strong>
-          {loadingState.error || inlineEditing.propertyError || inlineEditing.editingError}
+          <strong>Error loading calendar data: </strong>
+          {loadingState.error}
           <button 
             className="btn btn-link btn-sm ms-2"
             onClick={() => {
-              if (loadingState.error) {
-                setLoadingState(prev => ({ ...prev, error: null }))
-                // Retry loading
-                if (propertyId) {
-                  const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
-                  const year = currentDate.getFullYear()
-                  const month = currentDate.getMonth()
-                  
-                  const firstDay = new Date(year, month, 1)
-                  const lastDay = new Date(year, month + 1, 0)
-                  
-                  const startDate = new Date(firstDay)
-                  startDate.setDate(startDate.getDate() - firstDay.getDay())
-                  
-                  const endDate = new Date(lastDay)
-                  const daysToAdd = (6 - lastDay.getDay())
-                  if (daysToAdd > 0) {
-                    endDate.setDate(endDate.getDate() + daysToAdd)
-                  }
-                  
-                  loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength)
+              setLoadingState(prev => ({ ...prev, error: null }))
+              // Retry loading
+              if (propertyId) {
+                const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
+                const year = currentDate.getFullYear()
+                const month = currentDate.getMonth()
+                
+                const firstDay = new Date(year, month, 1)
+                const lastDay = new Date(year, month + 1, 0)
+                
+                const startDate = new Date(firstDay)
+                startDate.setDate(startDate.getDate() - firstDay.getDay())
+                
+                const endDate = new Date(lastDay)
+                const daysToAdd = (6 - lastDay.getDay())
+                if (daysToAdd > 0) {
+                  endDate.setDate(endDate.getDate() + daysToAdd)
                 }
-              } else {
-                // Clear inline editing errors
-                inlineEditing.clearError()
+                
+                loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength)
               }
             }}
           >
-            {loadingState.error ? 'Retry' : 'Dismiss'}
+            Retry
           </button>
         </div>
       )}

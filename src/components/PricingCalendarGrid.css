@@ -153,6 +153,25 @@
   margin-top: 0.125rem;
 }
 
+/* Override tile background with proper contrast */
+.pricing-tile.override-tile {
+  background-color: #e3f2fd; /* Light blue, 4.5:1 contrast with dark text */
+  border-left: 3px solid #1976d2; /* Visual accent */
+  position: relative;
+}
+
+/* Override badge styling */
+.indicator-badge.override {
+  background-color: #1565c0;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
 .indicator-dot.seasonal {
   color: #17a2b8;
   font-size: 0.75rem;
@@ -258,6 +277,16 @@
     align-items: flex-start;
     gap: 0.25rem !important;
   }
+  
+  /* Override indicator responsive scaling */
+  .indicator-badge.override {
+    font-size: 0.4rem;
+    padding: 1px 2px;
+  }
+  
+  .pricing-tile.override-tile {
+    border-left-width: 2px; /* Thinner border on mobile */
+  }
 }
 
 /* Tablet (576px - 991px) */
@@ -328,8 +357,17 @@
   
   .indicator-dot.seasonal,
   .indicator-symbol.discount,
-  .indicator-text.min-price {
+  .indicator-text.min-price,
+  .indicator-badge.override {
     color: #000;
+    background-color: #fff;
+    border: 1px solid #000;
+  }
+  
+  .pricing-tile.override-tile {
+    background-color: #fff;
+    border: 2px solid #000;
+    border-left-width: 4px;
   }
 }
 

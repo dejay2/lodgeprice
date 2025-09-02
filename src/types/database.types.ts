@@ -472,7 +472,7 @@ export interface Database {
       calculate_final_price: {
         Args: {
           p_property_id: string  // lodgify_property_id TEXT
-          p_check_date: string   // DATE in ISO format
+          p_check_date: string   // DATE in ISO format (can be date or text)
           p_nights: number       // INTEGER (no default value)
         }
         Returns: {
@@ -482,6 +482,9 @@ export interface Database {
           final_price_per_night: number
           total_price: number
           min_price_enforced: boolean
+          is_overridden: boolean
+          override_price: number | null
+          reason: string | null
         }
 
       }
@@ -523,6 +526,9 @@ export interface Database {
           savings_amount: number
           savings_percent: number
           min_price_enforced: boolean
+          is_overridden: boolean
+          override_price: number | null
+          reason: string | null
         }>
 
       }

@@ -2,7 +2,7 @@
   "config": {
     "configFile": "/home/jay/projects/lodgeprice/playwright.config.ts",
     "rootDir": "/home/jay/projects/lodgeprice/tests/e2e",
-    "forbidOnly": true,
+    "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
     "globalTeardown": null,
@@ -10,7 +10,9 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 8
+    },
     "preserveOutput": "always",
     "reporter": [
       [
@@ -39,8 +41,10 @@
       {
         "outputDir": "/home/jay/projects/lodgeprice/test-results",
         "repeatEach": 1,
-        "retries": 2,
-        "metadata": {},
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 8
+        },
         "id": "setup",
         "name": "setup",
         "testDir": "/home/jay/projects/lodgeprice/tests/e2e",
@@ -53,8 +57,10 @@
       {
         "outputDir": "/home/jay/projects/lodgeprice/test-results",
         "repeatEach": 1,
-        "retries": 2,
-        "metadata": {},
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 8
+        },
         "id": "chromium",
         "name": "chromium",
         "testDir": "/home/jay/projects/lodgeprice/tests/e2e",
@@ -67,8 +73,10 @@
       {
         "outputDir": "/home/jay/projects/lodgeprice/test-results",
         "repeatEach": 1,
-        "retries": 2,
-        "metadata": {},
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 8
+        },
         "id": "firefox",
         "name": "firefox",
         "testDir": "/home/jay/projects/lodgeprice/tests/e2e",
@@ -81,8 +89,10 @@
       {
         "outputDir": "/home/jay/projects/lodgeprice/test-results",
         "repeatEach": 1,
-        "retries": 2,
-        "metadata": {},
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 8
+        },
         "id": "webkit",
         "name": "webkit",
         "testDir": "/home/jay/projects/lodgeprice/tests/e2e",
@@ -97,26 +107,1204 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.55.0",
-    "workers": 1,
+    "workers": 8,
     "webServer": {
       "command": "npm run dev",
       "url": "http://localhost:3002",
-      "reuseExistingServer": false
+      "reuseExistingServer": true
     }
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: http://localhost:3002 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.",
-      "stack": "Error: http://localhost:3002 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      "title": "global.setup.ts",
+      "file": "global.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4187,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-09-02T02:33:20.966Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e4eb4d1272d956fb120f-8c4d7d1f7915be960f17",
+          "file": "global.setup.ts",
+          "line": 9,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "pricing-tile-override-indicators.spec.ts",
+      "file": "pricing-tile-override-indicators.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PricingTile Override Indicators",
+          "file": "pricing-tile-override-indicators.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "FR-1: Override tiles display with light blue background",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6211,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.037Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-e44dc4476964bf78557d",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "FR-2: Override badge displays with correct text and styling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6278,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.036Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-8ee1b27dc872204ae340",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "FR-3: Enhanced tooltip shows price comparison",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 7299,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.061Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-71d90dbaef1c1fc88824",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "Accessibility: Keyboard navigation and screen reader support",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 7360,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.053Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-9414c9eb69304ab39c06",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "Responsive: Mobile device compatibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 7769,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.067Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-45150f6f262b2b4bbd46",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 123,
+              "column": 3
+            },
+            {
+              "title": "Error Handling: Component handles missing override data gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 7625,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.064Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-dac3398f91a32ff41c04",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 147,
+              "column": 3
+            },
+            {
+              "title": "Visual Integration: Override indicators work with other indicators",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 6402,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Indicators present: {\n  hasOverride: \u001b[33mfalse\u001b[39m,\n  hasSeasonal: \u001b[33mfalse\u001b[39m,\n  hasDiscount: \u001b[33mfalse\u001b[39m,\n  hasMinPrice: \u001b[33mfalse\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.043Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-d8361ea2e6a0c55fb538",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 166,
+              "column": 3
+            },
+            {
+              "title": "Performance: Override detection completes quickly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 7,
+                      "status": "failed",
+                      "duration": 8490,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m50\u001b[39m\nReceived:   \u001b[31m52.22857142857143\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m50\u001b[39m\nReceived:   \u001b[31m52.22857142857143\u001b[39m\n    at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:221:27",
+                        "location": {
+                          "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                          "column": 27,
+                          "line": 221
+                        },
+                        "snippet": "  219 |       \n  220 |       // Verify average tile render time is under 50ms\n> 221 |       expect(avgTileTime).toBeLessThan(50)\n      |                           ^\n  222 |     }\n  223 |   })\n  224 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                            "column": 27,
+                            "line": 221
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m50\u001b[39m\nReceived:   \u001b[31m52.22857142857143\u001b[39m\n\n  219 |       \n  220 |       // Verify average tile render time is under 50ms\n> 221 |       expect(avgTileTime).toBeLessThan(50)\n      |                           ^\n  222 |     }\n  223 |   })\n  224 |\n    at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:221:27"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:27.081Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/jay/projects/lodgeprice/test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/jay/projects/lodgeprice/test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/jay/projects/lodgeprice/test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                        "column": 27,
+                        "line": 221
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-39d9a9f34f59bd997286",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 200,
+              "column": 3
+            },
+            {
+              "title": "Cross-browser: Override indicators display correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3030,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Testing on browser: chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:33.732Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-045967c86cafa884fb12",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 225,
+              "column": 3
+            },
+            {
+              "title": "FR-1: Override tiles display with light blue background",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 4924,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:36.771Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-ef752332c457128713e8",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "FR-2: Override badge displays with correct text and styling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 8275,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.174Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-abeb5aa4a0a02731e648",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "FR-3: Enhanced tooltip shows price comparison",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5528,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.279Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-72abc4a598f894eeaa96",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "Accessibility: Keyboard navigation and screen reader support",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 7979,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.318Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-6f2c9f8642babf7361d5",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "Responsive: Mobile device compatibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 7033,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.413Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-0b90ee960add31f13bd6",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 123,
+              "column": 3
+            },
+            {
+              "title": "Error Handling: Component handles missing override data gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 8416,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-c8f554385304ce72f4a8",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 147,
+              "column": 3
+            },
+            {
+              "title": "Visual Integration: Override indicators work with other indicators",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7722,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Indicators present: {\n  hasOverride: \u001b[33mfalse\u001b[39m,\n  hasSeasonal: \u001b[33mfalse\u001b[39m,\n  hasDiscount: \u001b[33mfalse\u001b[39m,\n  hasMinPrice: \u001b[33mfalse\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:37.996Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-0b4eb5fbd7834921e843",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 166,
+              "column": 3
+            },
+            {
+              "title": "Performance: Override detection completes quickly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 10380,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2632\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2632\u001b[39m\n    at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:212:22",
+                        "location": {
+                          "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                          "column": 22,
+                          "line": 212
+                        },
+                        "snippet": "  210 |     \n  211 |     // Verify total load time is acceptable (2 seconds as per requirements)\n> 212 |     expect(loadTime).toBeLessThan(2000)\n      |                      ^\n  213 |     \n  214 |     // Count tiles to calculate average render time\n  215 |     const tiles = await page.locator('.pricing-tile').count()"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                            "column": 22,
+                            "line": 212
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2632\u001b[39m\n\n  210 |     \n  211 |     // Verify total load time is acceptable (2 seconds as per requirements)\n> 212 |     expect(loadTime).toBeLessThan(2000)\n      |                      ^\n  213 |     \n  214 |     // Count tiles to calculate average render time\n  215 |     const tiles = await page.locator('.pricing-tile').count()\n    at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:212:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:38.093Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/jay/projects/lodgeprice/test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/jay/projects/lodgeprice/test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts",
+                        "column": 22,
+                        "line": 212
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-eefd31cdf70be94eaecf",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 200,
+              "column": 3
+            },
+            {
+              "title": "Cross-browser: Override indicators display correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 5623,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Testing on browser: firefox\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:43.170Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-39c708d3d5fd2b530493",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 225,
+              "column": 3
+            },
+            {
+              "title": "FR-1: Override tiles display with light blue background",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 11008,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:50.664Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-708bfa6b9b4e62899d98",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "FR-2: Override badge displays with correct text and styling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10523,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:51.751Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-4027ca7fdc30f0984015",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "FR-3: Enhanced tooltip shows price comparison",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 11064,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:52.239Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-7d47765b3fb43ae2ed1a",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "Accessibility: Keyboard navigation and screen reader support",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 10949,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:52.674Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-35cd548b43415db4c6e9",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "Responsive: Mobile device compatibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 10868,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:52.845Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-1656b28233f95884c5e0",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 123,
+              "column": 3
+            },
+            {
+              "title": "Error Handling: Component handles missing override data gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 10604,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:54.118Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-c677feeb7bb2330f4070",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 147,
+              "column": 3
+            },
+            {
+              "title": "Visual Integration: Override indicators work with other indicators",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 11048,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:54.907Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-7a01bf72880359249933",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 166,
+              "column": 3
+            },
+            {
+              "title": "Performance: Override detection completes quickly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 24,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 10951,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:58.145Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-152ce9e3e0a65bad0351",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 200,
+              "column": 3
+            },
+            {
+              "title": "Cross-browser: Override indicators display correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6253,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Testing on browser: webkit\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:34:03.183Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-12ba40b1e35ab9658e7f",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 225,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "High Contrast Mode",
+          "file": "pricing-tile-override-indicators.spec.ts",
+          "line": 252,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Override indicators are visible in high contrast mode",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3075,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:33.798Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-796b178babd83a707211",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 253,
+              "column": 3
+            },
+            {
+              "title": "Override indicators are visible in high contrast mode",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5545,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:33:44.282Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-61a1e52575be63722042",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 253,
+              "column": 3
+            },
+            {
+              "title": "Override indicators are visible in high contrast mode",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 5851,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-02T02:34:03.324Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7541effdcc2c31808837-70f11092fb21ee4c5cdc",
+              "file": "pricing-tile-override-indicators.spec.ts",
+              "line": 253,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-09-01T16:12:09.505Z",
-    "duration": 29.184999999999945,
-    "expected": 0,
+    "startTime": "2025-09-02T02:33:19.697Z",
+    "duration": 50946.837,
+    "expected": 29,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 2,
     "flaky": 0
   }
 }

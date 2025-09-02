@@ -8,13 +8,8 @@ import PricingCalendarGrid from '@/components/PricingCalendarGrid'
 import type { CalculateFinalPriceResult } from '@/types/pricing-calendar.types'
 
 const PricingCalendarDemo: React.FC = () => {
-  const [selectedProperty, setSelectedProperty] = useState('327020')
+  const [selectedProperty] = useState('327020')
   const [stayLength, setStayLength] = useState(3)
-
-  const handlePropertyChange = (propertyId: string) => {
-    console.log('Property changed to:', propertyId)
-    setSelectedProperty(propertyId)
-  }
 
   const handleStayLengthChange = (nights: number) => {
     console.log('Stay length changed to:', nights)
@@ -56,7 +51,6 @@ const PricingCalendarDemo: React.FC = () => {
               <PricingCalendarGrid
                 propertyId={selectedProperty}
                 selectedStayLength={stayLength}
-                onPropertyChange={handlePropertyChange}
                 onStayLengthChange={handleStayLengthChange}
                 onDateClick={handleDateClick}
                 className="demo-calendar"

@@ -15,6 +15,8 @@ export interface CalculateFinalPriceResult {
   total_price: number
   min_price_enforced: boolean
   is_override?: boolean  // Added for override price support
+  override_price?: number  // The override price value if applicable
+  calculated_price?: number  // The calculated price before override
 }
 
 export interface PreviewPricingCalendarResult {

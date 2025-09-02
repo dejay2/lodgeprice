@@ -1,2 +1,170 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.029184999999999947">
+<testsuites id="" name="" tests="31" failures="2" skipped="0" errors="0" time="50.946837">
+<testsuite name="global.setup.ts" timestamp="2025-09-02T02:33:20.349Z" hostname="setup" tests="1" failures="0" skipped="0" time="4.187" errors="0">
+<testcase name="authenticate" classname="global.setup.ts" time="4.187">
+</testcase>
+</testsuite>
+<testsuite name="pricing-tile-override-indicators.spec.ts" timestamp="2025-09-02T02:33:20.349Z" hostname="chromium" tests="10" failures="1" skipped="0" time="63.539" errors="0">
+<testcase name="PricingTile Override Indicators › FR-1: Override tiles display with light blue background" classname="pricing-tile-override-indicators.spec.ts" time="6.211">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-2: Override badge displays with correct text and styling" classname="pricing-tile-override-indicators.spec.ts" time="6.278">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-3: Enhanced tooltip shows price comparison" classname="pricing-tile-override-indicators.spec.ts" time="7.299">
+</testcase>
+<testcase name="PricingTile Override Indicators › Accessibility: Keyboard navigation and screen reader support" classname="pricing-tile-override-indicators.spec.ts" time="7.36">
+</testcase>
+<testcase name="PricingTile Override Indicators › Responsive: Mobile device compatibility" classname="pricing-tile-override-indicators.spec.ts" time="7.769">
+</testcase>
+<testcase name="PricingTile Override Indicators › Error Handling: Component handles missing override data gracefully" classname="pricing-tile-override-indicators.spec.ts" time="7.625">
+</testcase>
+<testcase name="PricingTile Override Indicators › Visual Integration: Override indicators work with other indicators" classname="pricing-tile-override-indicators.spec.ts" time="6.402">
+<system-out>
+<![CDATA[Indicators present: {
+  hasOverride: [33mfalse[39m,
+  hasSeasonal: [33mfalse[39m,
+  hasDiscount: [33mfalse[39m,
+  hasMinPrice: [33mfalse[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="PricingTile Override Indicators › Performance: Override detection completes quickly" classname="pricing-tile-override-indicators.spec.ts" time="8.49">
+<failure message="pricing-tile-override-indicators.spec.ts:200:3 Performance: Override detection completes quickly" type="FAILURE">
+<![CDATA[  [chromium] › pricing-tile-override-indicators.spec.ts:200:3 › PricingTile Override Indicators › Performance: Override detection completes quickly 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 50
+    Received:   52.22857142857143
+
+      219 |       
+      220 |       // Verify average tile render time is under 50ms
+    > 221 |       expect(avgTileTime).toBeLessThan(50)
+          |                           ^
+      222 |     }
+      223 |   })
+      224 |
+        at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:221:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="PricingTile Override Indicators › Cross-browser: Override indicators display correctly" classname="pricing-tile-override-indicators.spec.ts" time="3.03">
+<system-out>
+<![CDATA[Testing on browser: chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="High Contrast Mode › Override indicators are visible in high contrast mode" classname="pricing-tile-override-indicators.spec.ts" time="3.075">
+</testcase>
+</testsuite>
+<testsuite name="pricing-tile-override-indicators.spec.ts" timestamp="2025-09-02T02:33:20.349Z" hostname="firefox" tests="10" failures="1" skipped="0" time="71.425" errors="0">
+<testcase name="PricingTile Override Indicators › FR-1: Override tiles display with light blue background" classname="pricing-tile-override-indicators.spec.ts" time="4.924">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-2: Override badge displays with correct text and styling" classname="pricing-tile-override-indicators.spec.ts" time="8.275">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-3: Enhanced tooltip shows price comparison" classname="pricing-tile-override-indicators.spec.ts" time="5.528">
+</testcase>
+<testcase name="PricingTile Override Indicators › Accessibility: Keyboard navigation and screen reader support" classname="pricing-tile-override-indicators.spec.ts" time="7.979">
+</testcase>
+<testcase name="PricingTile Override Indicators › Responsive: Mobile device compatibility" classname="pricing-tile-override-indicators.spec.ts" time="7.033">
+</testcase>
+<testcase name="PricingTile Override Indicators › Error Handling: Component handles missing override data gracefully" classname="pricing-tile-override-indicators.spec.ts" time="8.416">
+</testcase>
+<testcase name="PricingTile Override Indicators › Visual Integration: Override indicators work with other indicators" classname="pricing-tile-override-indicators.spec.ts" time="7.722">
+<system-out>
+<![CDATA[Indicators present: {
+  hasOverride: [33mfalse[39m,
+  hasSeasonal: [33mfalse[39m,
+  hasDiscount: [33mfalse[39m,
+  hasMinPrice: [33mfalse[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="PricingTile Override Indicators › Performance: Override detection completes quickly" classname="pricing-tile-override-indicators.spec.ts" time="10.38">
+<failure message="pricing-tile-override-indicators.spec.ts:200:3 Performance: Override detection completes quickly" type="FAILURE">
+<![CDATA[  [firefox] › pricing-tile-override-indicators.spec.ts:200:3 › PricingTile Override Indicators › Performance: Override detection completes quickly 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 2000
+    Received:   2632
+
+      210 |     
+      211 |     // Verify total load time is acceptable (2 seconds as per requirements)
+    > 212 |     expect(loadTime).toBeLessThan(2000)
+          |                      ^
+      213 |     
+      214 |     // Count tiles to calculate average render time
+      215 |     const tiles = await page.locator('.pricing-tile').count()
+        at /home/jay/projects/lodgeprice/tests/e2e/pricing-tile-override-indicators.spec.ts:212:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/pricing-tile-override-indi-c9ae7-detection-completes-quickly-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="PricingTile Override Indicators › Cross-browser: Override indicators display correctly" classname="pricing-tile-override-indicators.spec.ts" time="5.623">
+<system-out>
+<![CDATA[Testing on browser: firefox
+]]>
+</system-out>
+</testcase>
+<testcase name="High Contrast Mode › Override indicators are visible in high contrast mode" classname="pricing-tile-override-indicators.spec.ts" time="5.545">
+</testcase>
+</testsuite>
+<testsuite name="pricing-tile-override-indicators.spec.ts" timestamp="2025-09-02T02:33:20.349Z" hostname="webkit" tests="10" failures="0" skipped="0" time="99.119" errors="0">
+<testcase name="PricingTile Override Indicators › FR-1: Override tiles display with light blue background" classname="pricing-tile-override-indicators.spec.ts" time="11.008">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-2: Override badge displays with correct text and styling" classname="pricing-tile-override-indicators.spec.ts" time="10.523">
+</testcase>
+<testcase name="PricingTile Override Indicators › FR-3: Enhanced tooltip shows price comparison" classname="pricing-tile-override-indicators.spec.ts" time="11.064">
+</testcase>
+<testcase name="PricingTile Override Indicators › Accessibility: Keyboard navigation and screen reader support" classname="pricing-tile-override-indicators.spec.ts" time="10.949">
+</testcase>
+<testcase name="PricingTile Override Indicators › Responsive: Mobile device compatibility" classname="pricing-tile-override-indicators.spec.ts" time="10.868">
+</testcase>
+<testcase name="PricingTile Override Indicators › Error Handling: Component handles missing override data gracefully" classname="pricing-tile-override-indicators.spec.ts" time="10.604">
+</testcase>
+<testcase name="PricingTile Override Indicators › Visual Integration: Override indicators work with other indicators" classname="pricing-tile-override-indicators.spec.ts" time="11.048">
+</testcase>
+<testcase name="PricingTile Override Indicators › Performance: Override detection completes quickly" classname="pricing-tile-override-indicators.spec.ts" time="10.951">
+</testcase>
+<testcase name="PricingTile Override Indicators › Cross-browser: Override indicators display correctly" classname="pricing-tile-override-indicators.spec.ts" time="6.253">
+<system-out>
+<![CDATA[Testing on browser: webkit
+]]>
+</system-out>
+</testcase>
+<testcase name="High Contrast Mode › Override indicators are visible in high contrast mode" classname="pricing-tile-override-indicators.spec.ts" time="5.851">
+</testcase>
+</testsuite>
 </testsuites>
