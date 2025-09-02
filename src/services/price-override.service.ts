@@ -831,36 +831,73 @@ export class PriceOverrideService {
   }
 
   /**
-   * Validate lodgify_property_id format and existence
-   * No UUID conversion - price_overrides table uses lodgify_property_id directly
-   * Modified per PRP-021 to eliminate UUID conversion issues
+   * Validate property ID format and prevent UUID usage where inappropriate
+   * Added per PRP-024 for TypeScript validation enforcement
    */
-  private static async getLodgifyPropertyId(propertyId: string): Promise<string> {
-    // Validate lodgify_property_id format (6-digit string like "327020")
-    if (!/^\d{6}$/.test(propertyId)) {
+  private static validatePropertyIdFormat(id: string, context: string): void {
+    if (this.isUuid(id) && context.includes('override')) {
       throw new PriceOverrideError(
-        `Invalid lodgify_property_id format: ${propertyId}. Expected 6-digit string.`,
-        'INVALID_PROPERTY_ID',
-        propertyId
+        `UUID format not recommended in ${context}. Use lodgify_property_id for better performance.`,
+        'UUID_FORMAT_WARNING',
+        id
       )
     }
+  }
+
+  /**
+   * Check if string is UUID format (36 chars with hyphens)
+   */
+  private static isUuid(id: string): boolean {
+    return id.length === 36 && id.includes('-')
+  }
+
+  /**
+   * Check if string is lodgify_property_id format (6-digit string)  
+   */
+  private static isLodgifyId(id: string): boolean {
+    return /^\d{6}$/.test(id)
+  }
+
+  /**
+   * Get lodgify_property_id from either UUID or lodgify_property_id format
+   * Follows pattern from pricing.service.ts for consistency
+   * Updated per PRP-024 to standardize property ID handling
+   */
+  private static async getLodgifyPropertyId(propertyId: string): Promise<string> {
+    if (propertyId.length === 6 && !propertyId.includes('-')) {
+      // Validate lodgify_property_id exists
+      const { data, error } = await supabase
+        .from('properties')
+        .select('lodgify_property_id')
+        .eq('lodgify_property_id', propertyId)
+        .single()
+      
+      if (error || !data) {
+        throw new PriceOverrideError(
+          `Property not found: ${propertyId}`,
+          'PROPERTY_NOT_FOUND',
+          propertyId
+        )
+      }
+      return propertyId
+    }
     
-    // Validate property exists by lodgify_property_id
+    // Convert UUID to lodgify_property_id
     const { data, error } = await supabase
       .from('properties')
       .select('lodgify_property_id')
-      .eq('lodgify_property_id', propertyId)
+      .eq('id', propertyId)
       .single()
-    
-    if (error || !data) {
+
+    if (error || !data?.lodgify_property_id) {
       throw new PriceOverrideError(
         `Property not found: ${propertyId}`,
         'PROPERTY_NOT_FOUND',
         propertyId
       )
     }
-    
-    return propertyId
+
+    return data.lodgify_property_id
   }
   
   /**
