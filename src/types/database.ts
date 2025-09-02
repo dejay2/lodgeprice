@@ -60,6 +60,17 @@ export interface DiscountRule {
   applicable_days?: string[]  // JSONB array
 }
 
+export interface PriceOverride {
+  id: string
+  property_id: string  // References properties.lodgify_property_id
+  override_date: string  // ISO date string
+  override_price: number
+  reason: string | null
+  is_active: boolean
+  created_at: string | null
+  updated_at: string | null
+}
+
 // Re-export function interfaces for consistency
 export {
   type PricingCalculationParams,

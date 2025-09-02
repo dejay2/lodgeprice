@@ -16,6 +16,7 @@ interface PriceDetailModalProps {
   onClose: () => void
   priceData?: CalculateFinalPriceReturn
   onConfirm?: (priceData: CalculateFinalPriceReturn) => void
+  onOverridePrice?: () => void
 }
 
 /**
@@ -74,7 +75,8 @@ const PriceDetailModal: React.FC<PriceDetailModalProps> = ({
   isOpen,
   onClose,
   priceData,
-  onConfirm
+  onConfirm,
+  onOverridePrice
 }) => {
   // Get toggle states from context (FR-8)
   const { toggles } = usePricingContext()
@@ -246,6 +248,16 @@ const PriceDetailModal: React.FC<PriceDetailModalProps> = ({
             </div>
             
             <div className="modal-footer">
+              {onOverridePrice && (
+                <button 
+                  type="button" 
+                  className="btn btn-warning"
+                  onClick={onOverridePrice}
+                >
+                  <i className="bi bi-pencil-square me-2"></i>
+                  Override Price
+                </button>
+              )}
               {onConfirm && (
                 <button 
                   type="button" 

@@ -30,6 +30,11 @@ export interface Database {
         Insert: Omit<import('./database').DiscountRule, 'rule_id'>
         Update: Partial<Omit<import('./database').DiscountRule, 'rule_id'>>
       }
+      price_overrides: {
+        Row: import('./database').PriceOverride
+        Insert: Omit<import('./database').PriceOverride, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<import('./database').PriceOverride, 'id' | 'created_at' | 'updated_at'>>
+      }
     }
     Views: {
       booking_summary: { Row: any }

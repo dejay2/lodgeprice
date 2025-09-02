@@ -182,6 +182,17 @@ export const pricingCalculationSchema = z.object({
   guestCount: z.number().min(1, "Guest count must be at least 1").max(20, "Guest count cannot exceed 20").optional()
 })
 
+/**
+ * Price override validation schema
+ * For the Override Price Modal component
+ */
+export const priceOverrideSchema = z.object({
+  overridePrice: priceSchema,
+  propertyId: lodgifyPropertyIdSchema,
+  date: dateSchema,
+  reason: z.string().max(500, "Reason cannot exceed 500 characters").optional()
+})
+
 // =============================================================================
 // API Payload Validation Schemas
 // =============================================================================
@@ -266,6 +277,7 @@ export type BasePriceUpdateInput = z.infer<typeof basePriceUpdateSchema>
 export type SeasonalRateCreateInput = z.infer<typeof seasonalRateCreateSchema>
 export type PropertySelectionInput = z.infer<typeof propertySelectionSchema>
 export type PricingCalculationInput = z.infer<typeof pricingCalculationSchema>
+export type PriceOverrideInput = z.infer<typeof priceOverrideSchema>
 export type SupabasePropertyUpdateInput = z.infer<typeof supabasePropertyUpdateSchema>
 export type LodgifyRateInput = z.infer<typeof lodgifyRateSchema>
 
@@ -287,6 +299,7 @@ export const validationSchemas = {
   seasonalRateCreate: seasonalRateCreateSchema,
   propertySelection: propertySelectionSchema,
   pricingCalculation: pricingCalculationSchema,
+  priceOverride: priceOverrideSchema,
   supabasePropertyUpdate: supabasePropertyUpdateSchema,
   lodgifyRate: lodgifyRateSchema
 } as const

@@ -39,9 +39,7 @@ export interface PricingCalendarGridProps {
   onStayLengthChange?: (nights: number) => void
   onDateClick?: (date: Date, priceData: CalculateFinalPriceResult | null) => void
   className?: string
-  // Inline editing support (PRP-11)
-  enableInlineEditing?: boolean
-  onBasePriceChanged?: (propertyId: string, newPrice: number) => void
+  // Inline editing removed (PRP-11) - handled through modal in task 12
 }
 
 // Props for individual pricing tile content
@@ -54,15 +52,7 @@ export interface PricingTileProps {
   hasDiscount?: boolean
   isMinPriceEnforced?: boolean
   isOverride?: boolean  // Added for override price visual distinction
-  // Inline editing support (PRP-11)
-  isEditable?: boolean
-  isEditing?: boolean
-  minPrice?: number
-  propertyId?: string
-  onEditStart?: (date: Date) => void
-  onEditCancel?: () => void
-  onPriceSave?: (propertyId: string, newBasePrice: number) => Promise<void>
-  onPriceChange?: () => void
+  // Inline editing removed in PRP-11 - calendar tiles display only
 }
 
 // Props for stay length selector component

@@ -385,6 +385,39 @@ export interface Database {
         }
         Relationships: []
       }
+      price_overrides: {
+        Row: {
+          id: string
+          property_id: string  // References properties.lodgify_property_id (TEXT)
+          override_date: string  // DATE in ISO format
+          override_price: number  // NUMERIC(10,2) 
+          reason: string | null
+          is_active: boolean
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          override_date: string
+          override_price: number
+          reason?: string | null
+          is_active?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          override_date?: string
+          override_price?: number
+          reason?: string | null
+          is_active?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       booking_summary: {
@@ -643,3 +676,8 @@ export type Booking = Tables<"bookings">
 export type DiscountStrategy = Tables<"discount_strategies">
 export type DiscountRule = Tables<"discount_rules">
 export type LodgifyIntegration = Tables<"lodgify_integrations">
+export type PriceOverride = Tables<"price_overrides">
+
+// Price Override type variants for CRUD operations
+export type PriceOverrideInsert = TablesInsert<"price_overrides">
+export type PriceOverrideUpdate = TablesUpdate<"price_overrides">
