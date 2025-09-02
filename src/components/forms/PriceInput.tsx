@@ -53,7 +53,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   required = false,
   min = 0.01,
   max = 10000,
-  step = 0.01,
+  // step = 0.01,  // Unused parameter removed
   onBlur,
   onChange
 }) => {

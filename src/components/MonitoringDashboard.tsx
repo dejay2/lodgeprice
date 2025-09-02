@@ -51,6 +51,7 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
       const interval = setInterval(fetchMonitoringData, refreshInterval);
       return () => clearInterval(interval);
     }
+    return undefined;  // Add explicit return for all code paths
   }, [isOpen, autoRefresh, refreshInterval, fetchMonitoringData]);
 
   // Clear logs handler
@@ -255,7 +256,7 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                     [{log.level}]
                   </span>
                   <span className="text-gray-500 ml-2">{log.timestamp}</span>
-                  <span className="text-white ml-2">{log.message}</span>
+                  <span className="text-white ml-2">{String(log.message)}</span>
                   {log.data && (
                     <div className="text-gray-400 ml-8 mt-1">
                       {JSON.stringify(log.data, null, 2)}

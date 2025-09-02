@@ -10,14 +10,13 @@
  * - Visual error states and accessibility
  */
 
-import React, { useState, useCallback, useEffect } from 'react'
-import { Controller, Control, FieldError } from 'react-hook-form'
+import React, { useState, useCallback } from 'react'
+import { Controller, Control } from 'react-hook-form'
 import { dateRangeSchema, formatValidationError } from '../../lib/validation'
 import { DateInput } from './DateInput'
 import { 
   isValidDateRange, 
   daysBetweenDates, 
-  getTodayDateString,
   debounce 
 } from '../../utils/validationHelpers'
 
@@ -213,7 +212,7 @@ export const DateRangeInput: React.FC<DateRangeInputProps> = ({
             required: required ? 'Start date is required' : false,
             validate: validateDateRange
           }}
-          render={({ field: { onChange: fieldOnChange, value }, fieldState: { error } }) => (
+          render={({ field: { onChange: fieldOnChange, value } }) => (
             <DateInput
               name={startDateName}
               control={control}
@@ -239,7 +238,7 @@ export const DateRangeInput: React.FC<DateRangeInputProps> = ({
             required: required ? 'End date is required' : false,
             validate: validateDateRange
           }}
-          render={({ field: { onChange: fieldOnChange, value }, fieldState: { error } }) => (
+          render={({ field: { onChange: fieldOnChange, value } }) => (
             <DateInput
               name={endDateName}
               control={control}

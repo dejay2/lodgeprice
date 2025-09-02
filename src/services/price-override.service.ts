@@ -167,24 +167,24 @@ export class PriceOverrideService {
     await this.validateOverride(propertyId, overrideDate, overridePrice, reason)
     
     // Step 2: PROPERTY_RESOLUTION (FR-2)
-    // Convert to UUID if lodgify_property_id provided
-    const propertyUuid = await this.getPropertyUuid(propertyId)
+    // Use lodgify_property_id directly - price_overrides table stores lodgify format
+    const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
     
-    // Validate property exists
-    const property = await this.validatePropertyExists(propertyUuid)
+    // Validate property exists by lodgify_property_id
+    await this.validatePropertyByLodgifyId(lodgifyPropertyId)
     
     // Step 3: PREPARE_UPSERT_DATA
     // Round price to 2 decimal places for NUMERIC(10,2) constraint
     const roundedPrice = Math.round(overridePrice * 100) / 100
     
     // Check for existing override to track previous price
-    const existingOverride = await this.getExistingOverride(property.lodgify_property_id, overrideDate)
+    const existingOverride = await this.getExistingOverride(lodgifyPropertyId, overrideDate)
     const previousPrice = existingOverride?.override_price
     
     // Step 4: EXECUTE_UPSERT_WITH_RETRY (FR-5, FR-6)
     const result = await this.retryOperation(async () => {
       const upsertData: PriceOverrideInsert = {
-        property_id: property.lodgify_property_id,
+        property_id: lodgifyPropertyId,
         override_date: overrideDate,
         override_price: roundedPrice,
         reason: reason || null,
@@ -260,7 +260,7 @@ export class PriceOverrideService {
     }, retryConfig)
     
     // Invalidate relevant cache entries (FR-7)
-    this.invalidateOverrideCache(property.lodgify_property_id, overrideDate)
+    this.invalidateOverrideCache(lodgifyPropertyId, overrideDate)
     
     // Return result with operation metadata (FR-7)
     return {
@@ -809,35 +809,47 @@ export class PriceOverrideService {
   }
 
   /**
-   * Get lodgify_property_id from UUID or validate existing lodgify_property_id
-   * Follows pattern from base-price.service.ts
+   * Validate property exists by lodgify_property_id and get full property data
+   * Used by setOverride to avoid UUID conversion issues
+   */
+  private static async validatePropertyByLodgifyId(lodgifyPropertyId: string): Promise<Database['public']['Tables']['properties']['Row']> {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('lodgify_property_id', lodgifyPropertyId)
+      .single()
+
+    if (error || !data) {
+      throw new PriceOverrideError(
+        `Property not found: ${lodgifyPropertyId}`,
+        'PROPERTY_NOT_FOUND',
+        lodgifyPropertyId
+      )
+    }
+
+    return data
+  }
+
+  /**
+   * Validate lodgify_property_id format and existence
+   * No UUID conversion - price_overrides table uses lodgify_property_id directly
+   * Modified per PRP-021 to eliminate UUID conversion issues
    */
   private static async getLodgifyPropertyId(propertyId: string): Promise<string> {
-    // Check if it's already a lodgify_property_id (6-digit string like "327020")
-    if (propertyId.length === 6 && !propertyId.includes('-')) {
-      // Validate it exists
-      const { data, error } = await supabase
-        .from('properties')
-        .select('lodgify_property_id')
-        .eq('lodgify_property_id', propertyId)
-        .single()
-      
-      if (error || !data) {
-        throw new PriceOverrideError(
-          `Property not found: ${propertyId}`,
-          'PROPERTY_NOT_FOUND',
-          propertyId
-        )
-      }
-      
-      return propertyId
+    // Validate lodgify_property_id format (6-digit string like "327020")
+    if (!/^\d{6}$/.test(propertyId)) {
+      throw new PriceOverrideError(
+        `Invalid lodgify_property_id format: ${propertyId}. Expected 6-digit string.`,
+        'INVALID_PROPERTY_ID',
+        propertyId
+      )
     }
     
-    // It's likely a UUID, convert to lodgify_property_id
+    // Validate property exists by lodgify_property_id
     const { data, error } = await supabase
       .from('properties')
       .select('lodgify_property_id')
-      .eq('id', propertyId)
+      .eq('lodgify_property_id', propertyId)
       .single()
     
     if (error || !data) {
@@ -848,7 +860,7 @@ export class PriceOverrideService {
       )
     }
     
-    return data.lodgify_property_id
+    return propertyId
   }
   
   /**

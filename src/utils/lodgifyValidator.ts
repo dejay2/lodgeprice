@@ -1,6 +1,7 @@
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 import type { LodgifyPayload, PayloadValidationResult } from '@/types/lodgify'
+import type { PriceOverride } from '@/types/database'
 
 // Lodgify API JSON Schema
 const lodgifyPayloadSchema = {
@@ -258,5 +259,139 @@ export function validateCompletePayload(payloads: LodgifyPayload[]): {
     invalidPayloads: invalidCount,
     errors: allErrors,
     warnings: allWarnings
+  }
+}
+
+/**
+ * Validate that overrides are properly included in the payload
+ * @param payload - The generated Lodgify payload
+ * @param overrides - List of price overrides that should be included
+ * @returns Validation result with any missing overrides
+ */
+export function validateOverrideInclusion(
+  payload: LodgifyPayload, 
+  overrides: PriceOverride[]
+): {
+  valid: boolean
+  includedCount: number
+  missingCount: number
+  missingDates: string[]
+  warnings: string[]
+} {
+  const warnings: string[] = []
+  const missingDates: string[] = []
+  let includedCount = 0
+  let missingCount = 0
+  
+  if (!overrides || overrides.length === 0) {
+    return {
+      valid: true,
+      includedCount: 0,
+      missingCount: 0,
+      missingDates: [],
+      warnings: []
+    }
+  }
+  
+  // Build a map of dates covered by the payload rates
+  const coveredDates = new Set<string>()
+  
+  for (const rate of payload.rates) {
+    if (rate.is_default) {
+      // Default rate covers all dates not explicitly specified
+      continue
+    }
+    
+    if (rate.start_date && rate.end_date) {
+      // Add all dates in the range
+      const start = new Date(rate.start_date)
+      const end = new Date(rate.end_date)
+      const current = new Date(start)
+      
+      while (current <= end) {
+        coveredDates.add(current.toISOString().split('T')[0])
+        current.setDate(current.getDate() + 1)
+      }
+    }
+  }
+  
+  // Check each override
+  for (const override of overrides) {
+    if (!override.is_active) {
+      continue // Skip inactive overrides
+    }
+    
+    const overrideDate = override.override_date
+    
+    // Check if this date is covered by non-default rates
+    if (coveredDates.has(overrideDate)) {
+      // Need to verify the price matches
+      const ratesForDate = payload.rates.filter(rate => {
+        if (rate.is_default) return false
+        if (!rate.start_date || !rate.end_date) return false
+        
+        const start = new Date(rate.start_date)
+        const end = new Date(rate.end_date)
+        const check = new Date(overrideDate)
+        
+        return check >= start && check <= end
+      })
+      
+      if (ratesForDate.length > 0) {
+        // Check if any rate has the override price
+        const hasOverridePrice = ratesForDate.some(rate => 
+          Math.abs(rate.price_per_day - override.override_price) < 0.01
+        )
+        
+        if (hasOverridePrice) {
+          includedCount++
+        } else {
+          missingCount++
+          missingDates.push(overrideDate)
+          warnings.push(`Override for ${overrideDate} (€${override.override_price}) not reflected in payload`)
+        }
+      } else {
+        // Covered by default rate - override might not be applied
+        missingCount++
+        missingDates.push(overrideDate)
+        warnings.push(`Override for ${overrideDate} appears to use default rate instead`)
+      }
+    } else {
+      // Date not explicitly covered - will use default rate
+      // This might be intentional if the override price matches the default
+      const defaultRate = payload.rates.find(r => r.is_default)
+      if (defaultRate && Math.abs(defaultRate.price_per_day - override.override_price) < 0.01) {
+        includedCount++ // Override matches default, so it's effectively included
+      } else {
+        missingCount++
+        missingDates.push(overrideDate)
+        warnings.push(`Override for ${overrideDate} not found in payload (will use default rate)`)
+      }
+    }
+  }
+  
+  // Validate override price ranges
+  const overridePrices = overrides
+    .filter(o => o.is_active)
+    .map(o => o.override_price)
+  
+  if (overridePrices.length > 0) {
+    const maxOverride = Math.max(...overridePrices)
+    const minOverride = Math.min(...overridePrices)
+    
+    if (maxOverride > 10000) {
+      warnings.push(`Very high override price detected: €${maxOverride}`)
+    }
+    if (minOverride < 0) {
+      warnings.push(`Invalid negative override price detected: €${minOverride}`)
+    }
+  }
+  
+  return {
+    valid: missingCount === 0,
+    includedCount,
+    missingCount,
+    missingDates,
+    warnings
   }
 }

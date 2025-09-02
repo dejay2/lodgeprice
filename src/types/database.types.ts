@@ -526,9 +526,9 @@ export interface Database {
           savings_amount: number
           savings_percent: number
           min_price_enforced: boolean
-          is_overridden: boolean
-          override_price: number | null
-          reason: string | null
+          is_override: boolean           // NEW: renamed from is_overridden
+          override_price: number | null   // NEW: the override price when applicable
+          calculated_price: number | null // NEW: the calculated price before override
         }>
 
       }

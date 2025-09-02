@@ -18,6 +18,7 @@ import type {
   CacheOptions,
   BatchOperationResult,
 } from '@/types/helpers'
+import { PriceOverrideService } from './price-override.service'
 import {
   CacheKeys,
 } from '@/types/pricing'
@@ -26,6 +27,16 @@ import type {
   PricingCalendarData,
   BulkPriceUpdate,
 } from '@/types/pricing'
+
+/**
+ * Enhanced pricing data structure for override integration
+ */
+export interface OverrideAwarePricingData extends PreviewPricingCalendarReturn {
+  is_overridden: boolean
+  override_price?: number
+  override_reason?: string
+  original_calculated_price?: number // Preserved for debugging/analytics
+}
 
 /**
  * Simple in-memory cache for pricing data
@@ -73,6 +84,14 @@ const cache = new PricingCache()
 export interface ConditionalPricingOptions extends CacheOptions {
   includeSeasonalRates?: boolean
   includeDiscountStrategies?: boolean
+}
+
+/**
+ * Enhanced pricing options with override support
+ */
+export interface OverrideAwarePricingOptions extends ConditionalPricingOptions {
+  includeOverrides?: boolean // Default: true
+  fallbackOnOverrideError?: boolean // Default: true
 }
 
 /**
@@ -262,6 +281,205 @@ export class PricingService {
   }
   
   /**
+   * Load override data for a property within a date range
+   * Uses batch loading with composite index for optimal performance
+   * @private internal method for override integration
+   */
+  private async loadOverrideDataBatch(
+    propertyId: string,
+    dateRange: DateRange,
+    fallbackOnError = true
+  ): Promise<Map<string, { override_price: number; reason?: string }>> {
+    try {
+      const startDate = dateRange.start.toISOString().split('T')[0]
+      const endDate = dateRange.end.toISOString().split('T')[0]
+      
+      // Convert propertyId to lodgify_property_id format if needed
+      // The database stores overrides using lodgify_property_id (e.g., "327020")
+      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+      
+      // IMPORTANT: Don't use cached version from PriceOverrideService as it causes stale data
+      // when switching properties. Instead, fetch fresh data directly.
+      // The PriceOverrideService cache is not being invalidated properly on property switch.
+      const { data, error } = await supabase
+        .from('price_overrides')
+        .select('override_date, override_price, reason')
+        .eq('property_id', lodgifyPropertyId) // Use converted lodgify_property_id
+        .gte('override_date', startDate)
+        .lte('override_date', endDate)
+        .eq('is_active', true)
+        .order('override_date')
+      
+      if (error) {
+        throw new DatabaseError(`Failed to fetch overrides: ${error.message}`, 'FETCH_ERROR', error)
+      }
+      
+      // Build the enhanced override map directly with reason data
+      const enhancedOverrides = new Map<string, { override_price: number; reason?: string }>()
+      
+      data?.forEach(row => {
+        const price = typeof row.override_price === 'string' 
+          ? parseFloat(row.override_price) 
+          : row.override_price
+        
+        enhancedOverrides.set(row.override_date, {
+          override_price: price,
+          reason: row.reason || undefined
+        })
+      })
+      
+      return enhancedOverrides
+    } catch (error) {
+      if (fallbackOnError) {
+        console.warn('Override loading failed, using calculated prices:', error)
+        return new Map()
+      } else {
+        throw new DatabaseError(`Override loading failed: ${error instanceof Error ? error.message : String(error)}`, 'OVERRIDE_LOAD', error)
+      }
+    }
+  }
+  
+  /**
+   * Merge calendar data with override data, applying override priority logic
+   * @private internal method for data merging
+   */
+  private mergeCalendarDataWithOverrides(
+    basePricingData: PreviewPricingCalendarReturn[],
+    overrideMap: Map<string, { override_price: number; reason?: string }>,
+    nights: number
+  ): OverrideAwarePricingData[] {
+    return basePricingData.map(dayData => {
+      const dateKey = dayData.check_date
+      const override = overrideMap.get(dateKey)
+      
+      if (override) {
+        // Override completely replaces calculated price
+        return {
+          ...dayData,
+          is_overridden: true,
+          override_price: override.override_price,
+          override_reason: override.reason,
+          original_calculated_price: dayData.final_price_per_night,
+          final_price_per_night: override.override_price,
+          total_price: override.override_price * nights
+        }
+      }
+      
+      // No override, use calculated pricing with override metadata
+      return {
+        ...dayData,
+        is_overridden: false,
+        override_price: undefined,
+        override_reason: undefined,
+        original_calculated_price: undefined
+      }
+    })
+  }
+  
+  /**
+   * Load calendar data for a date range with override support
+   * Uses preview_pricing_calendar for bulk efficiency
+   * Extended to support conditional pricing based on toggles and overrides
+   */
+  async loadCalendarDataWithOverrides(
+    propertyId: string,
+    dateRange: DateRange,
+    nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH,
+    options: OverrideAwarePricingOptions = {}
+  ): Promise<OverrideAwarePricingData[]> {
+    // Validate inputs
+    this.validateDateRange(dateRange)
+    
+    try {
+      // Load base pricing data using existing logic
+      const basePricingData = await this.loadBasePricingData(propertyId, dateRange, nights, options)
+      
+      // Load override data in parallel for performance (if enabled)
+      let overrideData: Map<string, { override_price: number; reason?: string }>
+      if (options.includeOverrides !== false) {
+        overrideData = await this.loadOverrideDataBatch(
+          propertyId, 
+          dateRange, 
+          options.fallbackOnOverrideError !== false
+        )
+      } else {
+        overrideData = new Map()
+      }
+      
+      // Merge data with override priority logic
+      return this.mergeCalendarDataWithOverrides(basePricingData, overrideData, nights)
+    } catch (error) {
+      return this.handlePricingError(error, 'calendar-load-with-overrides')
+    }
+  }
+  
+  /**
+   * Load base pricing data (existing logic extracted for reuse)
+   * @private internal method for base pricing calculation
+   */
+  private async loadBasePricingData(
+    propertyId: string,
+    dateRange: DateRange,
+    nights: number,
+    options: ConditionalPricingOptions
+  ): Promise<PreviewPricingCalendarReturn[]> {
+    // Convert UUID to lodgify_property_id for database function
+    const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
+    
+    // Use bulk function for efficiency
+    const { data, error } = await supabase.rpc('preview_pricing_calendar', {
+      p_property_id: lodgifyPropertyId,
+      p_start_date: dateRange.start.toISOString().split('T')[0],
+      p_end_date: dateRange.end.toISOString().split('T')[0],
+      p_nights: nights,
+    })
+    
+    if (error) {
+      throw new DatabaseError(`Failed to load calendar data: ${error.message}`, 'CALENDAR_LOAD', error)
+    }
+    
+    let results = data || []
+    
+    // Apply toggle modifications if needed
+    const includeSeasonalRates = options.includeSeasonalRates ?? true
+    const includeDiscountStrategies = options.includeDiscountStrategies ?? true
+    
+    if (!includeSeasonalRates || !includeDiscountStrategies) {
+      results = results.map(day => {
+        let modifiedDay = { ...day }
+        
+        if (!includeSeasonalRates) {
+          // Remove seasonal adjustment
+          modifiedDay.seasonal_adjustment_percent = 0
+          modifiedDay.final_price_per_night = modifiedDay.base_price - 
+            (includeDiscountStrategies ? (modifiedDay.base_price * modifiedDay.last_minute_discount_percent / 100) : 0)
+        }
+        
+        if (!includeDiscountStrategies) {
+          // Remove discount
+          modifiedDay.last_minute_discount_percent = 0
+          modifiedDay.final_price_per_night = modifiedDay.base_price + 
+            (includeSeasonalRates ? (modifiedDay.base_price * modifiedDay.seasonal_adjustment_percent / 100) : 0)
+        }
+        
+        if (!includeSeasonalRates && !includeDiscountStrategies) {
+          // Base price only
+          modifiedDay.seasonal_adjustment_percent = 0
+          modifiedDay.last_minute_discount_percent = 0
+          modifiedDay.final_price_per_night = modifiedDay.base_price
+          modifiedDay.min_price_enforced = false
+        }
+        
+        modifiedDay.total_price = modifiedDay.final_price_per_night * nights
+        
+        return modifiedDay
+      })
+    }
+    
+    return results.map(result => this.transformPreviewResult(result))
+  }
+
+  /**
    * Load calendar data for a date range
    * Uses preview_pricing_calendar for bulk efficiency
    * Extended to support conditional pricing based on toggles
@@ -272,67 +490,8 @@ export class PricingService {
     nights = PRICING_CONSTANTS.DEFAULT_STAY_LENGTH,
     options: ConditionalPricingOptions = {}
   ): Promise<PreviewPricingCalendarReturn[]> {
-    // Validate inputs
-    this.validateDateRange(dateRange)
-    
-    try {
-      // Convert UUID to lodgify_property_id for database function
-      const lodgifyPropertyId = await this.getLodgifyPropertyId(propertyId)
-      
-      // Use bulk function for efficiency
-      const { data, error } = await supabase.rpc('preview_pricing_calendar', {
-        p_property_id: lodgifyPropertyId,
-        p_start_date: dateRange.start.toISOString().split('T')[0],
-        p_end_date: dateRange.end.toISOString().split('T')[0],
-        p_nights: nights,
-      })
-      
-      if (error) {
-        throw new DatabaseError(`Failed to load calendar data: ${error.message}`, 'CALENDAR_LOAD', error)
-      }
-      
-      let results = data || []
-      
-      // Apply toggle modifications if needed
-      const includeSeasonalRates = options.includeSeasonalRates ?? true
-      const includeDiscountStrategies = options.includeDiscountStrategies ?? true
-      
-      if (!includeSeasonalRates || !includeDiscountStrategies) {
-        results = results.map(day => {
-          let modifiedDay = { ...day }
-          
-          if (!includeSeasonalRates) {
-            // Remove seasonal adjustment
-            modifiedDay.seasonal_adjustment_percent = 0
-            modifiedDay.final_price_per_night = modifiedDay.base_price - 
-              (includeDiscountStrategies ? (modifiedDay.base_price * modifiedDay.last_minute_discount_percent / 100) : 0)
-          }
-          
-          if (!includeDiscountStrategies) {
-            // Remove discount
-            modifiedDay.last_minute_discount_percent = 0
-            modifiedDay.final_price_per_night = modifiedDay.base_price + 
-              (includeSeasonalRates ? (modifiedDay.base_price * modifiedDay.seasonal_adjustment_percent / 100) : 0)
-          }
-          
-          if (!includeSeasonalRates && !includeDiscountStrategies) {
-            // Base price only
-            modifiedDay.seasonal_adjustment_percent = 0
-            modifiedDay.last_minute_discount_percent = 0
-            modifiedDay.final_price_per_night = modifiedDay.base_price
-            modifiedDay.min_price_enforced = false
-          }
-          
-          modifiedDay.total_price = modifiedDay.final_price_per_night * nights
-          
-          return modifiedDay
-        })
-      }
-      
-      return results.map(result => this.transformPreviewResult(result))
-    } catch (error) {
-      return this.handlePricingError(error, 'calendar-load')
-    }
+    // Use the extracted base pricing data method
+    return this.loadBasePricingData(propertyId, dateRange, nights, options)
   }
   
   /**

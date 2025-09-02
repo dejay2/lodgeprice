@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Calendar from 'react-calendar'
 import { handleSupabaseError } from '@/lib/supabase'
-import { pricingService } from '@/services/pricing.service'
+import { pricingService, type OverrideAwarePricingOptions } from '@/services/pricing.service'
 import { usePricingContext } from '@/context/PricingContext'
 import { useDebounce } from '@/hooks/useDebounce'
 import PricingTile from './PricingTile'
@@ -18,7 +18,7 @@ import PricingLegend from './PricingLegend'
 // Removed useInlineEditing import - inline editing now handled through modal
 import type {
   PricingCalendarGridProps,
-  CalculateFinalPriceResult,
+  OverrideAwarePricingResult,
   CalendarLoadingState,
   CalendarValue
 } from '@/types/pricing-calendar.types'
@@ -37,13 +37,16 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   selectedStayLength: initialStayLength = 3,
   onStayLengthChange,
   onDateClick,
+  onOverrideModalOpen,
+  onShowPriceBreakdown,
   className = ''
 }) => {
   // Component state - property selection removed as it's handled by parent
-  const [propertyId] = useState(initialPropertyId)
+  // Use prop directly to ensure reactivity when prop changes
+  const propertyId = initialPropertyId // Using prop directly for reactivity
   const [selectedStayLength, setSelectedStayLength] = useState(initialStayLength)
   const [calendarValue, setCalendarValue] = useState<CalendarValue>(new Date())
-  const [pricingData, setPricingData] = useState<Map<string, CalculateFinalPriceResult>>(new Map())
+  const [pricingData, setPricingData] = useState<Map<string, OverrideAwarePricingResult>>(new Map())
   const [loadingState, setLoadingState] = useState<CalendarLoadingState>({
     isLoadingPrices: false,
     isLoadingProperty: false,
@@ -57,10 +60,19 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   // Debounce toggle changes to prevent excessive API calls (FR-6)
   const debouncedToggles = useDebounce(toggles, 300)
   
+  // Clear pricing data and trigger immediate reload when property changes
+  useEffect(() => {
+    console.log('Property changed, clearing pricing data and reloading for property:', propertyId)
+    // Clear existing data immediately to show loading state
+    setPricingData(new Map())
+    // Force a reload of calendar data for the new property
+    setLoadingState(prev => ({ ...prev, isLoadingPrices: true, error: null }))
+  }, [propertyId])
+  
   /**
-   * Load pricing data using pricing service for proper UUID conversion
+   * Load pricing data using pricing service with override support
    * Implements bulk loading as specified in PRP-10 with proper service layer
-   * Extended to support conditional pricing based on toggles (FR-3, FR-4, FR-5)
+   * Extended to support conditional pricing based on toggles and price overrides
    */
   const loadCalendarPricing = useCallback(async (
     propId: string,
@@ -71,23 +83,28 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   ) => {
     if (!propId) return
     
+    console.log('Refreshing calendar data for property:', propId)
     setLoadingState(prev => ({ ...prev, isLoadingPrices: true, error: null }))
     
     try {
-      // Use pricing service with toggle options for conditional pricing
+      // Use pricing service with toggle options and override support
       const dateRange = { start: startDate, end: endDate }
-      const result = await pricingService.loadCalendarData(
+      const options: OverrideAwarePricingOptions = {
+        includeSeasonalRates: toggleStates.seasonalRatesEnabled,
+        includeDiscountStrategies: toggleStates.discountStrategiesEnabled,
+        includeOverrides: true, // Always include overrides for calendar display
+        fallbackOnOverrideError: true // Gracefully degrade if override loading fails
+      }
+      
+      const result = await pricingService.loadCalendarDataWithOverrides(
         propId, 
         dateRange, 
         stayLength,
-        {
-          includeSeasonalRates: toggleStates.seasonalRatesEnabled,
-          includeDiscountStrategies: toggleStates.discountStrategiesEnabled
-        }
+        options
       )
       
-      // Convert to pricing data map
-      const newPricingData = new Map<string, CalculateFinalPriceResult>()
+      // Convert to pricing data map with override-aware structure
+      const newPricingData = new Map<string, OverrideAwarePricingResult>()
       
       result.forEach(dayData => {
         newPricingData.set(dayData.check_date, {
@@ -97,7 +114,11 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
           final_price_per_night: dayData.final_price_per_night,
           total_price: dayData.total_price,
           min_price_enforced: dayData.min_price_enforced,
-          is_override: (dayData as any).is_override || false
+          is_override: dayData.is_overridden, // Use correct field name
+          is_overridden: dayData.is_overridden,
+          override_price: dayData.override_price,
+          override_reason: dayData.override_reason,
+          original_calculated_price: dayData.original_calculated_price
         })
       })
       
@@ -192,12 +213,19 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
         hasSeasonalAdjustment={priceData ? Math.abs(priceData.seasonal_adjustment) > 0.01 : false}
         hasDiscount={priceData ? priceData.last_minute_discount > 0.01 : false}
         isMinPriceEnforced={priceData ? priceData.min_price_enforced : false}
-        isOverride={priceData ? priceData.is_override : false}
+        isOverride={priceData ? priceData.is_overridden : false}
+        propertyId={propertyId}
+        onOverrideModalOpen={onOverrideModalOpen}
+        onShowPriceBreakdown={onShowPriceBreakdown}
+        isOverrideModalAvailable={!!onOverrideModalOpen}
       />
     )
   }, [
     pricingData, 
-    selectedStayLength
+    selectedStayLength,
+    propertyId,
+    onOverrideModalOpen,
+    onShowPriceBreakdown
   ])
   
   /**
@@ -300,6 +328,13 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
             onChange={(value) => {
               if (value instanceof Date) {
                 setCalendarValue(value)
+              }
+            }}
+            onActiveStartDateChange={({ activeStartDate, view }) => {
+              // Update calendar value when navigating months to trigger data reload
+              if (view === 'month' && activeStartDate) {
+                console.log('Month navigation detected, updating to:', activeStartDate)
+                setCalendarValue(activeStartDate)
               }
             }}
             view="month"

@@ -35,6 +35,7 @@ interface UseOverridePricingParams {
 /**
  * Custom hook for price override operations
  * Encapsulates all business logic for the modal
+ * Updated per PRP-021 to validate lodgify_property_id format
  */
 export function useOverridePricing({
   propertyId,
@@ -48,6 +49,11 @@ export function useOverridePricing({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [_errorType, setErrorType] = useState<OverridePriceModalError | null>(null)
+  
+  // Validate property ID format on initialization
+  if (propertyId && !/^\d{6}$/.test(propertyId)) {
+    console.warn(`Invalid lodgify_property_id format received: ${propertyId}. Expected 6-digit string.`)
+  }
 
   /**
    * Clear error state
@@ -119,6 +125,11 @@ export function useOverridePricing({
         throw new Error('Missing required parameters')
       }
       
+      // Validate property ID format (must be 6-digit lodgify_property_id)
+      if (!/^\d{6}$/.test(propertyId)) {
+        throw new Error(`Invalid property ID format: ${propertyId}. Expected 6-digit lodgify_property_id.`)
+      }
+      
       if (data.overridePrice <= 0) {
         throw new Error('Override price must be greater than zero')
       }
@@ -176,6 +187,11 @@ export function useOverridePricing({
       // Validate inputs
       if (!propertyId || !date) {
         throw new Error('Missing required parameters')
+      }
+      
+      // Validate property ID format (must be 6-digit lodgify_property_id)
+      if (!/^\d{6}$/.test(propertyId)) {
+        throw new Error(`Invalid property ID format: ${propertyId}. Expected 6-digit lodgify_property_id.`)
       }
       
       if (!existingOverride) {

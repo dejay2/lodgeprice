@@ -9,8 +9,9 @@ import type {
   PayloadGenerationError,
   StayLengthCategory
 } from '@/types/lodgify'
-import type { Property } from '@/types/database'
+import type { Property, PriceOverride } from '@/types/database'
 import { pricingApi, propertyApi } from '@/services/api'
+import { PriceOverrideService } from './price-override.service'
 import { 
   generate24MonthRange, 
   generateCustomDateRange, 
@@ -70,6 +71,9 @@ export class LodgifyPayloadService {
       let totalRatesGenerated = 0
       let totalEntriesBeforeOptimization = 0
       let totalEntriesAfterOptimization = 0
+      let totalOverrideCount = 0
+      const propertiesWithOverrides = new Set<string>()
+      const dateRangesAffected: { start: string; end: string }[] = []
       
       // Process each property
       for (let propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
@@ -96,8 +100,16 @@ export class LodgifyPayloadService {
             options
           )
           
-          payloads.push(propertyPayload)
-          totalRatesGenerated += propertyPayload.rates.length
+          // Track override statistics
+          if (propertyPayload.overrideCount && propertyPayload.overrideCount > 0) {
+            totalOverrideCount += propertyPayload.overrideCount
+            propertiesWithOverrides.add(property.lodgify_property_id)
+          }
+          
+          // Remove the overrideCount from the final payload
+          const { overrideCount, ...cleanPayload } = propertyPayload
+          payloads.push(cleanPayload)
+          totalRatesGenerated += cleanPayload.rates.length
           
         } catch (error) {
           console.error(`Failed to generate payload for property ${property.lodgify_property_id}:`, error)
@@ -146,7 +158,11 @@ export class LodgifyPayloadService {
           ? ((totalEntriesBeforeOptimization - totalEntriesAfterOptimization) / totalEntriesBeforeOptimization) * 100
           : 0,
         generationTimeMs: endTime - startTime,
-        memoryUsedMB: endMemory && startMemory ? (endMemory - startMemory) / (1024 * 1024) : undefined
+        memoryUsedMB: endMemory && startMemory ? (endMemory - startMemory) / (1024 * 1024) : undefined,
+        // Override statistics
+        overrideCount: totalOverrideCount,
+        propertiesWithOverrides: Array.from(propertiesWithOverrides),
+        dateRangesAffected: dateRangesAffected
       }
       
       this.reportProgress({
@@ -183,7 +199,7 @@ export class LodgifyPayloadService {
     dates: Date[],
     stayCategories: StayLengthCategory[],
     options: PayloadGenerationOptions
-  ): Promise<LodgifyPayload> {
+  ): Promise<LodgifyPayload & { overrideCount?: number }> {
     const rates: LodgifyRate[] = []
     
     // Add mandatory default rate
@@ -196,6 +212,23 @@ export class LodgifyPayloadService {
         price_per_additional_guest: 5,
         additional_guests_starts_from: 2
       })
+    }
+    
+    // Load price overrides if enabled
+    let propertyOverrides: Map<string, PriceOverride> = new Map()
+    let overrideCount = 0
+    if (options.includeOverrides !== false) {
+      try {
+        const overrides = await this.loadPropertyOverrides(
+          property.lodgify_property_id,
+          dates[0],
+          dates[dates.length - 1]
+        )
+        propertyOverrides = new Map(overrides.map(o => [o.override_date, o]))
+      } catch (error) {
+        console.warn(`Failed to load overrides for property ${property.lodgify_property_id}:`, error)
+        // Continue without overrides if loading fails
+      }
     }
     
     // Generate rates for each stay length category
@@ -223,17 +256,41 @@ export class LodgifyPayloadService {
           
           if (bulkPricing && Array.isArray(bulkPricing)) {
             for (const dayPrice of bulkPricing) {
-              pricingData.push({
-                date: dayPrice.check_date,
-                price: parseFloat((dayPrice.final_price_per_night).toFixed(2)), // Ensure clean 2 decimal places
-                minStay: stayCategory.minStay,
-                maxStay: stayCategory.maxStay,
-                stayLength: stayCategory.stayLength,
-                basePrice: parseFloat((dayPrice.base_price).toFixed(2)), // Ensure clean 2 decimal places
-                seasonalAdjustment: dayPrice.seasonal_adjustment_percent || 0,
-                lastMinuteDiscount: dayPrice.last_minute_discount_percent || 0,
-                minPriceEnforced: dayPrice.min_price_enforced || false
-              })
+              // Check for override for this date
+              const override = propertyOverrides.get(dayPrice.check_date)
+              
+              if (override && override.is_active) {
+                // Use override price
+                overrideCount++
+                pricingData.push({
+                  date: dayPrice.check_date,
+                  price: parseFloat((override.override_price).toFixed(2)),
+                  minStay: stayCategory.minStay,
+                  maxStay: stayCategory.maxStay,
+                  stayLength: stayCategory.stayLength,
+                  basePrice: parseFloat((dayPrice.base_price).toFixed(2)),
+                  seasonalAdjustment: dayPrice.seasonal_adjustment_percent || 0,
+                  lastMinuteDiscount: dayPrice.last_minute_discount_percent || 0,
+                  minPriceEnforced: false, // Override bypasses min price enforcement
+                  priceSource: 'override',
+                  overrideReason: override.reason || undefined,
+                  originalCalculatedPrice: dayPrice.final_price_per_night
+                })
+              } else {
+                // Use calculated price
+                pricingData.push({
+                  date: dayPrice.check_date,
+                  price: parseFloat((dayPrice.final_price_per_night).toFixed(2)),
+                  minStay: stayCategory.minStay,
+                  maxStay: stayCategory.maxStay,
+                  stayLength: stayCategory.stayLength,
+                  basePrice: parseFloat((dayPrice.base_price).toFixed(2)),
+                  seasonalAdjustment: dayPrice.seasonal_adjustment_percent || 0,
+                  lastMinuteDiscount: dayPrice.last_minute_discount_percent || 0,
+                  minPriceEnforced: dayPrice.min_price_enforced || false,
+                  priceSource: 'calculated'
+                })
+              }
             }
           }
         } catch (error) {
@@ -284,7 +341,8 @@ export class LodgifyPayloadService {
     return {
       property_id: parseInt(property.lodgify_property_id),
       room_type_id: property.lodgify_room_type_id || 0,
-      rates
+      rates,
+      overrideCount
     }
   }
   
@@ -413,6 +471,28 @@ export class LodgifyPayloadService {
       currentDate.setDate(currentDate.getDate() + 1)
     }
   }
+  
+  /**
+   * Load price overrides for a property within a date range
+   */
+  private async loadPropertyOverrides(
+    propertyId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<PriceOverride[]> {
+    try {
+      const overrides = await PriceOverrideService.getOverrides(
+        propertyId,
+        formatDateForAPI(startDate),
+        formatDateForAPI(endDate)
+      )
+      return overrides
+    } catch (error) {
+      console.error(`Failed to load overrides for property ${propertyId}:`, error)
+      return []
+    }
+  }
+  
 }
 
 // Export singleton instance

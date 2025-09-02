@@ -18,6 +18,7 @@ import OverridePriceModal from './OverridePriceModal'
 import PreviewControls from './PreviewControls'
 import PreviewSummary from './PreviewSummary'
 import PricingConfirmationModal from './PricingConfirmationModal'
+import { pricingService } from '@/services/pricing.service'
 import type { CalculateFinalPriceReturn } from '@/types/helpers'
 import type { CalculateFinalPriceResult } from '@/types/pricing-calendar.types'
 import type { Property } from '@/types/database'
@@ -145,7 +146,7 @@ const PricingDashboardInner: React.FC = () => {
   }, [selectedProperty, refreshCalendarData])
   
   /**
-   * Handle date click from calendar
+   * Handle date click from calendar (for backward compatibility)
    */
   const handleDateClick = (date: Date, priceData: CalculateFinalPriceResult | null) => {
     if (priceData && selectedProperty) {
@@ -178,6 +179,95 @@ const PricingDashboardInner: React.FC = () => {
       setPriceDetailData(convertedData)
       setShowPriceDetail(true)
     }
+  }
+  
+  /**
+   * Handle override modal open directly from calendar double-click
+   */
+  const handleOverrideModalOpenDirect = async (date: Date, propertyId: string) => {
+    if (selectedProperty && propertyId === selectedProperty.lodgify_property_id) {
+      setSelectedDate(date)
+      
+      try {
+        // Calculate actual price data using pricing service
+        const actualPriceData = await pricingService.calculateDetailedPrice(
+          propertyId,
+          date,
+          defaultNights
+        )
+        
+        // Convert to the format expected by the modal
+        const convertedData: CalculateFinalPriceReturn = {
+          property_id: propertyId,
+          property_name: selectedProperty.property_name,
+          check_date: date.toISOString().split('T')[0],
+          nights: defaultNights,
+          base_price_per_night: actualPriceData.base_price,
+          seasonal_adjustment: actualPriceData.seasonal_adjustment,
+          seasonal_rate: 0, // Not available in database function
+          adjusted_price_per_night: actualPriceData.base_price + actualPriceData.seasonal_adjustment,
+          last_minute_discount: actualPriceData.last_minute_discount,
+          discounted_price_per_night: actualPriceData.base_price + actualPriceData.seasonal_adjustment - actualPriceData.last_minute_discount,
+          final_price_per_night: actualPriceData.final_price_per_night,
+          total_price: actualPriceData.total_price,
+          min_price_per_night: actualPriceData.base_price, // Assuming base price is minimum
+          savings_amount: actualPriceData.last_minute_discount,
+          savings_percentage: actualPriceData.base_price > 0 ? (actualPriceData.last_minute_discount / actualPriceData.base_price) * 100 : 0,
+          has_seasonal_rate: Math.abs(actualPriceData.seasonal_adjustment) > 0.01,
+          has_last_minute_discount: actualPriceData.last_minute_discount > 0.01,
+          at_minimum_price: actualPriceData.min_price_enforced,
+          is_overridden: actualPriceData.is_overridden,
+          // Add required compatibility fields
+          base_price: actualPriceData.base_price,
+          min_price_enforced: actualPriceData.min_price_enforced
+        }
+        
+        setPriceDetailData(convertedData)
+      } catch (error) {
+        console.error('Failed to calculate price for modal:', error)
+        // Fall back to minimal data if calculation fails
+        const minimalPriceData: CalculateFinalPriceReturn = {
+          property_id: propertyId,
+          property_name: selectedProperty.property_name,
+          check_date: date.toISOString().split('T')[0],
+          nights: defaultNights,
+          base_price_per_night: 0,
+          seasonal_adjustment: 0,
+          seasonal_rate: 0,
+          adjusted_price_per_night: 0,
+          last_minute_discount: 0,
+          discounted_price_per_night: 0,
+          final_price_per_night: 0,
+          total_price: 0,
+          min_price_per_night: 0,
+          savings_amount: 0,
+          savings_percentage: 0,
+          has_seasonal_rate: false,
+          has_last_minute_discount: false,
+          at_minimum_price: false,
+          is_overridden: false,
+          base_price: 0,
+          min_price_enforced: false
+        }
+        
+        setPriceDetailData(minimalPriceData)
+      }
+      
+      setExistingOverride(null)
+      setShowOverrideModal(true)
+    }
+  }
+  
+  /**
+   * Handle price breakdown display from calendar single-click
+   */
+  const handleShowPriceBreakdown = (date: Date) => {
+    // For now, just trigger the date click handler
+    // In the future, this could show an inline breakdown
+    const dateKey = date.toISOString().split('T')[0]
+    // We would need to get the price data from context or state
+    // For now, this is handled by the tooltip in PricingTile
+    console.log(`Show price breakdown for ${dateKey}`)
   }
 
   /**
@@ -299,6 +389,8 @@ const PricingDashboardInner: React.FC = () => {
                   propertyId={selectedProperty.lodgify_property_id}
                   selectedStayLength={defaultNights}
                   onDateClick={handleDateClick}
+                  onOverrideModalOpen={handleOverrideModalOpenDirect}
+                  onShowPriceBreakdown={handleShowPriceBreakdown}
                 />
               </div>
             )}

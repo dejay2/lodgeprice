@@ -26,7 +26,7 @@ export class PricingCalendarPage {
 
   @step
   async waitForCalendarToLoad() {
-    await expect(this.page.getByTestId('pricing-calendar')).toBeVisible();
+    await expect(this.page.getByTestId('calendar-grid')).toBeVisible();
     // Wait for react-calendar tiles to load with pricing data
     await expect(this.page.locator('.react-calendar__tile .pricing-tile').first()).toBeVisible({ timeout: 10000 });
   }

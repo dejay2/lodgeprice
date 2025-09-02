@@ -27,6 +27,10 @@ export interface DatePriceData {
   seasonalAdjustment: number
   lastMinuteDiscount: number
   minPriceEnforced: boolean
+  // Override tracking
+  priceSource?: 'calculated' | 'override'
+  overrideReason?: string
+  originalCalculatedPrice?: number
 }
 
 export interface OptimizedRange {
@@ -45,6 +49,7 @@ export interface PayloadGenerationOptions {
   stayLengthCategories: StayLengthCategory[]
   includeDefaultRate: boolean
   optimizeRanges: boolean
+  includeOverrides?: boolean  // Default: true - include price overrides in export
 }
 
 export interface StayLengthCategory {
@@ -70,6 +75,10 @@ export interface GenerationStatistics {
   optimizationReduction: number  // Percentage
   generationTimeMs: number
   memoryUsedMB?: number
+  // Override-specific statistics
+  overrideCount?: number
+  propertiesWithOverrides?: string[]
+  dateRangesAffected?: { start: string; end: string }[]
 }
 
 export interface PayloadExportOptions {

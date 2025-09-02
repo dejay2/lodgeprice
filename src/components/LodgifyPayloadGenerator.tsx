@@ -40,6 +40,7 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
   const [stayLengthCategories] = useState<StayLengthCategory[]>(getDefaultStayLengthCategories())
   const [includeDefaultRate, setIncludeDefaultRate] = useState(true)
   const [optimizeRanges, setOptimizeRanges] = useState(true)
+  const [includeOverrides, setIncludeOverrides] = useState(true)
   
   // Results state
   const [payloads, setPayloads] = useState<LodgifyPayload[]>([])
@@ -119,7 +120,8 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
         endDate,
         stayLengthCategories,
         includeDefaultRate,
-        optimizeRanges
+        optimizeRanges,
+        includeOverrides
       }
       
       const result = await lodgifyPayloadService.generatePayload(
@@ -141,7 +143,7 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
       setError(message)
       setState('error')
     }
-  }, [selectedProperties, getDateRange, stayLengthCategories, includeDefaultRate, optimizeRanges])
+  }, [selectedProperties, getDateRange, stayLengthCategories, includeDefaultRate, optimizeRanges, includeOverrides])
 
   // Cancel generation
   const handleCancel = useCallback(() => {
@@ -430,6 +432,15 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
                 />
                 <span className="text-sm">Optimize consecutive days into ranges (reduces payload size)</span>
               </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={includeOverrides}
+                  onChange={(e) => setIncludeOverrides(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Include price overrides (use manually set prices where available)</span>
+              </label>
             </div>
           </div>
 
@@ -568,6 +579,18 @@ const LodgifyPayloadGenerator: React.FC<LodgifyPayloadGeneratorProps> = ({
                   <p className="text-sm text-blue-800">
                     {statistics.optimizationReduction.toFixed(1)}% reduction 
                     ({statistics.entriesBeforeOptimization} → {statistics.entriesAfterOptimization} entries)
+                  </p>
+                </div>
+              )}
+              
+              {statistics.overrideCount !== undefined && statistics.overrideCount > 0 && (
+                <div className="mt-4 p-3 bg-purple-50 rounded">
+                  <p className="text-sm font-medium text-purple-900">Price Overrides Applied:</p>
+                  <p className="text-sm text-purple-800">
+                    {statistics.overrideCount} override{statistics.overrideCount !== 1 ? 's' : ''} included
+                    {statistics.propertiesWithOverrides && statistics.propertiesWithOverrides.length > 0 && (
+                      <span> across {statistics.propertiesWithOverrides.length} propert{statistics.propertiesWithOverrides.length !== 1 ? 'ies' : 'y'}</span>
+                    )}
                   </p>
                 </div>
               )}

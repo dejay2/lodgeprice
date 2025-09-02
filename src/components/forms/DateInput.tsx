@@ -70,16 +70,9 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   // Initialize display value from field value when component mounts
   useEffect(() => {
-    if (typeof control.getValues === 'function') {
-      const fieldValue = control.getValues(name)
-      if (fieldValue && fieldValue !== inputState.displayValue) {
-        setInputState(prev => ({
-          ...prev,
-          displayValue: fieldValue
-        }))
-      }
-    }
-  }, [control, name, inputState.displayValue])
+    // Skip initialization as Control doesn't have getValues
+    // Field value will be provided through Controller's render prop
+  }, [])
 
   // Debounced validation function
   const debouncedValidate = useCallback(
@@ -200,24 +193,25 @@ export const DateInput: React.FC<DateInputProps> = ({
       control={control}
       rules={{
         required: required ? 'Date is required' : false,
-        validate: (value: string) => {
-          if (!value && !required) return true
+        validate: (value: unknown) => {
+          const strValue = String(value || '');
+          if (!strValue && !required) return true
           
-          const result = dateSchema.safeParse(value)
+          const result = dateSchema.safeParse(strValue)
           if (!result.success) {
             const errors = formatValidationError(result.error)
             return Object.values(errors)[0] || 'Invalid date'
           }
           
-          if (!isValidCalendarDate(value)) {
+          if (!isValidCalendarDate(strValue)) {
             return 'Please enter a valid calendar date'
           }
           
-          if (minDate && value < minDate) {
+          if (minDate && strValue < minDate) {
             return `Date cannot be earlier than ${minDate}`
           }
           
-          if (maxDate && value > maxDate) {
+          if (maxDate && strValue > maxDate) {
             return `Date cannot be later than ${maxDate}`
           }
           

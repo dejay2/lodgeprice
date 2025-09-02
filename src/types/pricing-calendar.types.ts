@@ -19,6 +19,13 @@ export interface CalculateFinalPriceResult {
   calculated_price?: number  // The calculated price before override
 }
 
+// Enhanced pricing result with override metadata (extends base structure)
+export interface OverrideAwarePricingResult extends CalculateFinalPriceResult {
+  is_overridden: boolean
+  override_reason?: string
+  original_calculated_price?: number  // Preserved for debugging/analytics
+}
+
 export interface PreviewPricingCalendarResult {
   check_date: string
   days_from_today: number
@@ -33,13 +40,23 @@ export interface PreviewPricingCalendarResult {
   is_override?: boolean  // Added for override price support
 }
 
+// Enhanced preview calendar result with override metadata  
+export interface OverrideAwarePreviewResult extends PreviewPricingCalendarResult {
+  is_overridden: boolean
+  override_price?: number
+  override_reason?: string
+  original_calculated_price?: number  // Preserved for debugging/analytics
+}
+
 // Props for the main PricingCalendarGrid component
 export interface PricingCalendarGridProps {
   propertyId: string
   selectedStayLength: number
   // Property selection removed - now handled by parent component
   onStayLengthChange?: (nights: number) => void
-  onDateClick?: (date: Date, priceData: CalculateFinalPriceResult | null) => void
+  onDateClick?: (date: Date, priceData: OverrideAwarePricingResult | null) => void
+  onOverrideModalOpen?: (date: Date, propertyId: string) => void  // Handler for opening override modal
+  onShowPriceBreakdown?: (date: Date) => void  // Handler for showing price breakdown
   className?: string
   // Inline editing removed (PRP-11) - handled through modal in task 12
 }
@@ -48,12 +65,16 @@ export interface PricingCalendarGridProps {
 export interface PricingTileProps {
   date: Date
   view: string
-  priceData?: CalculateFinalPriceResult | null
+  priceData?: OverrideAwarePricingResult | null
   stayLength: number
   hasSeasonalAdjustment?: boolean
   hasDiscount?: boolean
   isMinPriceEnforced?: boolean
   isOverride?: boolean  // Added for override price visual distinction
+  propertyId?: string  // Required for override modal context
+  onOverrideModalOpen?: (date: Date, propertyId: string) => void  // Handler for opening override modal
+  onShowPriceBreakdown?: (date: Date) => void  // Handler for showing price breakdown
+  isOverrideModalAvailable?: boolean  // Whether override modal is available
   // Inline editing removed in PRP-11 - calendar tiles display only
 }
 

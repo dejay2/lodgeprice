@@ -158,18 +158,39 @@
   background-color: #e3f2fd; /* Light blue, 4.5:1 contrast with dark text */
   border-left: 3px solid #1976d2; /* Visual accent */
   position: relative;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
-/* Override badge styling */
+.pricing-tile.override-tile:hover {
+  background-color: #bbdefb; /* Slightly darker on hover */
+  border-left-color: #1565c0;
+}
+
+/* Override tile in calendar tile context */
+.react-calendar__tile:has(.pricing-tile.override-tile) {
+  background-color: transparent; /* Let the inner tile control background */
+}
+
+/* Override badge styling - positioned absolutely */
+.override-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 10;
+}
+
 .indicator-badge.override {
-  background-color: #1565c0;
-  color: white;
-  font-size: 0.5rem;
-  font-weight: bold;
+  background-color: #1976d2;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
   padding: 1px 4px;
   border-radius: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  line-height: 1.2;
 }
 
 .indicator-dot.seasonal {
@@ -279,13 +300,26 @@
   }
   
   /* Override indicator responsive scaling */
+  .override-indicator {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+  }
+  
   .indicator-badge.override {
-    font-size: 0.4rem;
-    padding: 1px 2px;
+    font-size: 7px;
+    padding: 0px 2px;
+    letter-spacing: 0.3px;
   }
   
   .pricing-tile.override-tile {
     border-left-width: 2px; /* Thinner border on mobile */
+    background-color: #e3f2fd; /* Maintain background color */
+  }
+  
+  /* Ensure badge doesn't overlap with price on small screens */
+  .pricing-tile.override-tile .price-display {
+    padding-right: 30px; /* Make room for badge */
   }
 }
 
@@ -357,17 +391,31 @@
   
   .indicator-dot.seasonal,
   .indicator-symbol.discount,
-  .indicator-text.min-price,
-  .indicator-badge.override {
+  .indicator-text.min-price {
     color: #000;
     background-color: #fff;
     border: 1px solid #000;
+  }
+  
+  /* Enhanced override styling for high contrast */
+  .indicator-badge.override {
+    background-color: #000;
+    color: #fff;
+    border: 2px solid #fff;
+    font-weight: bold;
+    padding: 2px 5px;
   }
   
   .pricing-tile.override-tile {
     background-color: #fff;
     border: 2px solid #000;
     border-left-width: 4px;
+    outline: 2px solid #000;
+    outline-offset: -4px;
+  }
+  
+  .pricing-tile.override-tile:hover {
+    background-color: #f0f0f0;
   }
 }
 
@@ -537,4 +585,30 @@
 
 .react-calendar__tile.has-editing-tile .pricing-tile.editing {
   pointer-events: all;
+}
+
+/* Dark mode support for override elements */
+@media (prefers-color-scheme: dark) {
+  .pricing-tile.override-tile {
+    background-color: #1a2332; /* Dark blue background */
+    border-left-color: #42a5f5; /* Lighter blue accent */
+  }
+  
+  .pricing-tile.override-tile:hover {
+    background-color: #263238;
+    border-left-color: #64b5f6;
+  }
+  
+  .indicator-badge.override {
+    background-color: #42a5f5;
+    color: #000000;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Ensure good contrast in dark mode */
+  .pricing-tile.override-tile .price-amount {
+    color: #ffffff;
+    font-weight: 600;
+  }
 }
