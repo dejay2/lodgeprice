@@ -46,6 +46,10 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   const propertyId = initialPropertyId // Using prop directly for reactivity
   const [selectedStayLength, setSelectedStayLength] = useState(initialStayLength)
   const [calendarValue, setCalendarValue] = useState<CalendarValue>(new Date())
+  const [currentMonthYear, setCurrentMonthYear] = useState<string>(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  })
   const [pricingData, setPricingData] = useState<Map<string, OverrideAwarePricingResult>>(new Map())
   const [loadingState, setLoadingState] = useState<CalendarLoadingState>({
     isLoadingPrices: false,
@@ -54,8 +58,8 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     error: null
   })
   
-  // Get toggle state from context (FR-3, FR-4)
-  const { toggles } = usePricingContext()
+  // Get toggle state and refresh trigger from context (FR-3, FR-4)
+  const { toggles, lastRefresh } = usePricingContext()
   
   // Debounce toggle changes to prevent excessive API calls (FR-6)
   const debouncedToggles = useDebounce(toggles, 300)
@@ -142,6 +146,11 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
   useEffect(() => {
     if (!propertyId) return
     
+    // Log refresh trigger for debugging
+    if (lastRefresh) {
+      console.log('PricingCalendarGrid: Refresh triggered by context at:', lastRefresh.toISOString())
+    }
+    
     // Calculate date range for current view (current month + neighboring days)
     const currentDate = calendarValue instanceof Date ? calendarValue : new Date()
     const year = currentDate.getFullYear()
@@ -163,7 +172,7 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
     
     // Load with current toggle states (uses debounced values to prevent excessive calls)
     loadCalendarPricing(propertyId, startDate, endDate, selectedStayLength, debouncedToggles)
-  }, [propertyId, selectedStayLength, calendarValue, debouncedToggles, loadCalendarPricing])
+  }, [propertyId, selectedStayLength, calendarValue, currentMonthYear, debouncedToggles, lastRefresh, loadCalendarPricing])
   
   // Property selection now handled by parent component
   
@@ -334,7 +343,19 @@ const PricingCalendarGrid: React.FC<PricingCalendarGridProps> = ({
               // Update calendar value when navigating months to trigger data reload
               if (view === 'month' && activeStartDate) {
                 console.log('Month navigation detected, updating to:', activeStartDate)
-                setCalendarValue(activeStartDate)
+                
+                // Force new Date object to trigger useEffect dependency
+                const newCalendarValue = new Date(activeStartDate.getTime())
+                
+                // Add month/year string for reliable tracking
+                const monthYear = `${newCalendarValue.getFullYear()}-${String(newCalendarValue.getMonth() + 1).padStart(2, '0')}`
+                
+                // Update state to trigger useEffect
+                setCalendarValue(newCalendarValue)
+                setCurrentMonthYear(monthYear)
+                
+                // Clear previous month's cached data to ensure fresh load
+                setPricingData(new Map())
               }
             }}
             view="month"

@@ -137,21 +137,20 @@ export function PricingProvider({ children }: PricingProviderProps) {
     setError(null)
     
     try {
-      // This will be implemented with actual Supabase call in database hooks
-      // For now, we're setting up the structure
       console.log('Refreshing calendar data for property:', selectedProperty.lodgify_property_id)
       
-      // Placeholder for actual implementation
-      // const { data, error: dbError } = await supabase.rpc('preview_pricing_calendar', {
-      //   property_id: selectedProperty.lodgify_property_id,
-      //   start_date: selectedDateRange.start.toISOString().split('T')[0],
-      //   end_date: selectedDateRange.end.toISOString().split('T')[0],
-      //   nights: defaultNights
-      // })
+      // Clear existing cache to force fresh data load
+      setCalendarData(new Map())
+      setLastRefresh(null)
       
+      // Set refresh timestamp to trigger dependent components
+      // PricingCalendarGrid will detect this change and reload its data
       setLastRefresh(new Date())
+      
+      console.log('Calendar refresh triggered at:', new Date().toISOString())
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load calendar data')
+      setError(err instanceof Error ? err.message : 'Failed to refresh calendar data')
+      throw err // Re-throw for caller error handling
     } finally {
       setLoading(false)
     }
